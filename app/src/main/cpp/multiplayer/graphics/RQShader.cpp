@@ -39,7 +39,6 @@ void BuildPixelSource(uint32 flags) {
     int ped_spec = 0;
     std::ostringstream buff;
 
-   // auto v2 = OS_SystemChip();
     buff << "precision mediump float;";
 
     if ((flags & FLAG_TEX0))
@@ -94,7 +93,7 @@ void BuildPixelSource(uint32 flags) {
         if ( (flags & 0x12) != 0 )
             buff << "fcolor = Out_Color;";
         else
-            buff << "fcolor = 0.0;";
+            buff << "fcolor = vec4(0.0);";
 
         goto LABEL_40;
     }
@@ -199,15 +198,16 @@ void BuildPixelSource(uint32 flags) {
         buff << "gl_FragColor.a *= AlphaModulate;";
 
     buff << "}";
-    strcpy(pixelSrc.shaderSrc, buff.str().c_str());
+
+    strncpy(pixelSrc.shaderSrc, buff.str().c_str(), sizeof(pixelSrc.shaderSrc) - 1);
+    pixelSrc.shaderSrc[sizeof(pixelSrc.shaderSrc) - 1] = '\0';
 }
 
 int GetMobileEffectSetting() {
     return CHook::CallFunction<int>("_Z22GetMobileEffectSettingv");
 }
 
-void BuildVertexSource(uint32 flags)
-{
+void BuildVertexSource(uint32 flags) {
     int& RQMaxBones = *(int(*))(g_libGTASA + (VER_x32 ? 0x6B8BAC : 0x896140));
     RQCapabilities* RQCaps = (RQCapabilities*)(g_libGTASA + (VER_x32 ? 0x6B8B9C : 0x896130));
 
@@ -377,13 +377,13 @@ void BuildVertexSource(uint32 flags)
     }
     if (flags & FLAG_FOG)
         buff << "Out_FogAmt = clamp((length(WorldPos.xyz - CameraPosition.xyz) - FogDistances.x) * FogDistances.z, 0.0, 1.0);";
-     //   buff << "Out_FogAmt = clamp((length(WorldPos.xyz - CameraPosition.xyz) - FogDistances.x) * FogDistances.z, 0.0, 0.90);";
+    //   buff << "Out_FogAmt = clamp((length(WorldPos.xyz - CameraPosition.xyz) - FogDistances.x) * FogDistances.z, 0.0, 0.90);";
 
     if (flags & FLAG_TEX0) {
         char* tex;
 
         if (flags & FLAG_PROJECT_TEXCOORD)
-            tex = "TexCoord0.xy / TexCoord0.w";
+            tex = "TexCoord0.w == 0.0 ? TexCoord0.xy : TexCoord0.xy / TexCoord0.w";
 
         else if (flags & FLAG_COMPRESSED_TEXCOORD)
             tex = "TexCoord0 / 512.0";
@@ -438,8 +438,8 @@ void BuildVertexSource(uint32 flags)
                 buff    << "vec3 vertClamped = clamp(" << vertexColor <<".xyz, 0.0, 0.5);"
                         // NB: AmbientLightColor is DirectionalLightColourFromDay here
                         << "ambEmissLight = AmbientLightColor * MaterialAmbient.xyz + vertClamped;";
-                        // dunno what they were going for with this. flat shading because they messed up the prelight?
-                        //	VTX_EMIT("ambEmissLight = AmbientLightColor * MaterialAmbient.xyz * 1.5;");
+                // dunno what they were going for with this. flat shading because they messed up the prelight?
+                //	VTX_EMIT("ambEmissLight = AmbientLightColor * MaterialAmbient.xyz * 1.5;");
             }else
                 buff << "ambEmissLight = AmbientLightColor * MaterialAmbient.xyz + " << vertexColor <<".xyz;";
         } else {
@@ -500,5 +500,6 @@ void BuildVertexSource(uint32 flags)
 
     buff << "}";
 
-    strcpy(vertexSrc.shaderSrc, buff.str().c_str());
+    strncpy(vertexSrc.shaderSrc, buff.str().c_str(), sizeof(vertexSrc.shaderSrc) - 1);
+    vertexSrc.shaderSrc[sizeof(vertexSrc.shaderSrc) - 1] = '\0';
 }
