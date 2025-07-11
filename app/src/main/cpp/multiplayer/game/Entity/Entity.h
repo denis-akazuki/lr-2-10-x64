@@ -135,7 +135,6 @@ public:
     [[nodiscard]] auto GetStatus() const noexcept { return m_nStatus; }
     void SetStatus(eEntityStatus status) { m_nStatus = status; }
 
-
     void UpdateRwFrame();
     void UpdateRpHAnim();
     bool HasPreRenderEffects();
@@ -158,6 +157,7 @@ public:
     void UpdateRW();
 
     void SetCollisionChecking(bool bCheck);
+    void ProcessLightsForEntity();
 
     // NOTSA
     auto GetModelId() const { return (eModelID)m_nModelIndex; }

@@ -24,6 +24,9 @@ public:
     // Coronas array. count: MAX_NUM_CORONAS (default: 64)
     static constexpr int32 MAX_NUM_CORONAS = 64;
     static inline CRegisteredCorona aCoronas[MAX_NUM_CORONAS];
+
+    static constexpr int32 CORONA_TEXTURES_COUNT = 10;
+    static inline RwTexture* gpCoronaTexture[CORONA_TEXTURES_COUNT];
 //
 //    static uint16 (&ms_aEntityLightsOffsets)[8];
 //
@@ -41,20 +44,16 @@ public:
     static void Render();
     static void RenderReflections();
     static void RenderSunReflection();
-    static void RegisterCorona(uint32 id, CEntity* attachTo, uint8 red, uint8 green, uint8 blue, uint8 alpha, const CVector& posn,
+    static void RegisterCorona(uint32 id, CEntity* attachTo, uint8 red, uint8 green, uint8 blue, uint8 alpha, const CVector* posn,
                                float radius, float farClip, RwTexture* texture, eCoronaFlareType flareType, bool enableReflection, bool checkObstacles, int32 _param_not_used,
                                float angle, bool longDistance, float nearClip, uint8 fadeState, float fadeSpeed, bool onlyFromBelow, bool reflectionDelay);
     static void RegisterCorona(uint32 id, CEntity* attachTo, uint8 red, uint8 green, uint8 blue, uint8 alpha, const CVector* posn,
                                float radius, float farClip, eCoronaType coronaType, eCoronaFlareType flareType, bool enableReflection, bool checkObstacles, int32 _param_not_used,
                                float angle, bool longDistance, float nearClip, uint8 fadeState, float fadeSpeed, bool onlyFromBelow, bool reflectionDelay);
 
-    static void UpdateCoronaCoors(uint32 id, const CVector& posn, float farClip, float angle);
+    static void UpdateCoronaCoors(uint32 id, const CVector* posn, float farClip, float angle);
     static void DoSunAndMoon();
 };
-
-extern uint32 MAX_CORONAS;
-constexpr int32 CORONA_TEXTURES_COUNT = 10;
-//static inline RwTexture* gpCoronaTexture[CORONA_TEXTURES_COUNT];
 
 static inline const char* aCoronaSpriteNames[] = {
         "coronastar",

@@ -18,6 +18,8 @@ enum eWeatherRegion : int16 {
 
 class CWeather {
 public:
+    static inline bool      bScriptsForceRain;
+
     static inline float     Wind;
     static inline CVector   WindDir;
     static inline float     Foggyness_SF;
@@ -25,6 +27,16 @@ public:
     static inline float     CloudCoverage;
     static inline float     Rainbow;
     static inline float     ExtraSunnyness;
+    static inline float     SunGlare;
+    static inline float     WetRoads;
+    static inline float     Rain;
+    static inline float     InTunnelness;
+    static inline float     UnderWaterness;
+    static inline float     InterpolationValue;
+
+    static inline int16     OldWeatherType;
+    static inline int16     NewWeatherType;
+    static inline int16     ForcedWeatherType;
 
 public:
     static void InjectHooks();

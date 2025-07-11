@@ -172,8 +172,7 @@ void CClouds::Render_MaybeRenderRockstarLogo(float colorBalance) {
     const auto colorB  = 255u * time / 60u;
     const auto colorRG = CalculateColorWithBalance(colorB, colorBalance);
 
-    RwTexture* (&gpCoronaTexture)[CORONA_TEXTURES_COUNT] = *(RwTexture*(*)[CORONA_TEXTURES_COUNT])(g_libGTASA + (VER_x32 ? 0x00A25B08 : 0xCC6A18));
-    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, RWRSTATE(RwTextureGetRaster(gpCoronaTexture[0])));
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, RWRSTATE(RwTextureGetRaster(CCoronas::gpCoronaTexture[0])));
 
     const auto camPos = TheCamera.GetPosition();
     //
@@ -366,8 +365,7 @@ void CClouds::Render_MaybeRenderRainbows() {
 //        }
 //    }
 
-    RwTexture* (&gpCoronaTexture)[CORONA_TEXTURES_COUNT] = *(RwTexture*(*)[CORONA_TEXTURES_COUNT])(g_libGTASA + (VER_x32 ? 0x00A25B08 : 0xCC6A18));
-    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, RWRSTATE(RwTextureGetRaster(gpCoronaTexture[0])));
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, RWRSTATE(RwTextureGetRaster(CCoronas::gpCoronaTexture[0])));
 
     const auto camPos = TheCamera.GetPosition();
 
@@ -472,8 +470,7 @@ void CClouds::Render_MaybeRenderMoon(float colorBalance) {
     //
     // Draw the actual moon texture
     //
-    RwTexture* (&gpCoronaTexture)[CORONA_TEXTURES_COUNT] = *(RwTexture*(*)[CORONA_TEXTURES_COUNT])(g_libGTASA + (VER_x32 ? 0x00A25B08 : 0xCC6A18));
-    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, RWRSTATE(RwTextureGetRaster(gpCoronaTexture[2])));
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, RWRSTATE(RwTextureGetRaster(CCoronas::gpCoronaTexture[2])));
     RwRenderStateSet(rwRENDERSTATESRCBLEND,      RWRSTATE(rwBLENDDESTALPHA));
     RwRenderStateSet(rwRENDERSTATEDESTBLEND,     RWRSTATE(rwBLENDONE));
     RwRenderStateSet(rwRENDERSTATEZWRITEENABLE,  RWRSTATE(FALSE));

@@ -8,7 +8,7 @@
 
 
 // Creates corona by texture
-void CCoronas::RegisterCorona(uint32 id, CEntity* attachTo, uint8 red, uint8 green, uint8 blue, uint8 alpha, const CVector& posn, float radius, float farClip, RwTexture* texture, eCoronaFlareType flareType, bool enableReflection, bool checkObstacles, int32 _param_not_used, float angle, bool longDistance, float nearClip, uint8 fadeState, float fadeSpeed, bool onlyFromBelow, bool reflectionDelay) {
+void CCoronas::RegisterCorona(uint32 id, CEntity* attachTo, uint8 red, uint8 green, uint8 blue, uint8 alpha, const CVector* posn, float radius, float farClip, RwTexture* texture, eCoronaFlareType flareType, bool enableReflection, bool checkObstacles, int32 _param_not_used, float angle, bool longDistance, float nearClip, uint8 fadeState, float fadeSpeed, bool onlyFromBelow, bool reflectionDelay) {
     CHook::CallFunction<void>(g_libGTASA + (VER_x32 ? 0x005A3AAC + 1 : 0x6C71D0), id, attachTo, red, green, blue, alpha, posn, radius, farClip, texture, flareType, enableReflection, checkObstacles, _param_not_used, angle, longDistance, nearClip, fadeState, fadeSpeed, onlyFromBelow, reflectionDelay);
 }
 
@@ -16,14 +16,20 @@ void CCoronas::RegisterCorona(uint32 id, CEntity* attachTo, uint8 red, uint8 gre
 void CCoronas::RegisterCorona(uint32 id, CEntity* attachTo, uint8 red, uint8 green, uint8 blue, uint8 alpha, const CVector* posn, float radius, float farClip, eCoronaType coronaType, eCoronaFlareType flareType, bool enableReflection, bool checkObstacles, int32 _param_not_used, float angle, bool longDistance, float nearClip, uint8 fadeState, float fadeSpeed, bool onlyFromBelow, bool reflectionDelay) {
     CHook::CallFunction<void>(g_libGTASA + (VER_x32 ? 0x005A3A20 + 1 : 0x6C7174), id, attachTo, red, green, blue, alpha, posn, radius, farClip, coronaType, flareType, enableReflection, checkObstacles, _param_not_used, angle, longDistance, nearClip, fadeState, fadeSpeed, onlyFromBelow, reflectionDelay);
 }
+
+void CCoronas::UpdateCoronaCoors(uint32 id, const CVector* posn, float farClip, float angle) {
+    CHook::CallFunction<void>("_ZN8CCoronas17UpdateCoronaCoorsEjRK7CVectorff", id, posn, farClip, angle);
+}
+
 void (*CCoronas__Init)();
 void CCoronas::InjectHooks() {
-    CHook::Write(g_libGTASA + (VER_x32 ? 0x00679A84 : 0x851528), &CCoronas::SunScreenX);
-    CHook::Write(g_libGTASA + (VER_x32 ? 0x00679784 : 0x850F20), &CCoronas::SunScreenY);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x00679A84 : 0x851528), &SunScreenX);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x00679784 : 0x850F20), &SunScreenY);
 
-    CHook::Write(g_libGTASA + (VER_x32 ? 0x00679F40 : 0x851E90), &CCoronas::SunBlockedByClouds);
-    CHook::Write(g_libGTASA + (VER_x32 ? 0x00675F6C : 0x849F60), &CCoronas::MoonSize);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x00679F40 : 0x851E90), &SunBlockedByClouds);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x00675F6C : 0x849F60), &MoonSize);
 
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x00679F78 : 0x851F08), &gpCoronaTexture);
    // CHook::InlineHook("_ZN8CCoronas4InitEv", &CCoronas::Init, &CCoronas__Init);
 }
 

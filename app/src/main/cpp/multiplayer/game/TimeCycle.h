@@ -11,6 +11,9 @@
 class CTimeCycle {
 
 public:
+    static inline CVector m_VectorToSun[16];
+    static inline uint32 m_CurrentStoredValue;
+
     static inline CColourSet m_CurrentColours;
     static inline RwRGBA m_BelowHorizonGrey;
 
