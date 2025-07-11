@@ -1,0 +1,113 @@
+#include "../main.h"
+#include "game.h"
+#include "CFirstPersonCamera.h"
+#include "..//chatwindow.h"
+#include "game/Entity/Ped/Ped.h"
+#include "..//net/netgame.h"
+#include "Scene.h"
+
+extern CNetGame* pNetGame;
+
+bool CFirstPersonCamera::m_bEnabled = false;
+
+void CFirstPersonCamera::ProcessCameraOnFoot(CCam* pCam, CPedSamp* pPed)
+{
+    if (!m_bEnabled)
+    {
+        return;
+    }
+
+    CVector* pVec = &pCam->Source;
+
+    CVector vecOffset;
+    vecOffset.x = 0.35f;
+    vecOffset.y = 0.1f;
+    vecOffset.z = 0.1f;
+
+
+    CVector vecOut;
+    ProjectMatrix(&vecOut, (CMatrix*)&pPed->m_HeadBoneMatrix, &vecOffset);
+
+    if (vecOut.x != vecOut.x || vecOut.y != vecOut.y || vecOut.z != vecOut.z)
+    {
+        pPed->m_pPed->GetBonePosition(&vecOut, 4, false);
+    }
+    if (vecOut.x != vecOut.x || vecOut.y != vecOut.y || vecOut.z != vecOut.z)
+    {
+        return;
+    }
+
+    *pVec = vecOut;
+
+    RwCameraSetNearClipPlane(Scene.m_pRwCamera, 0.2f);
+}
+
+void CFirstPersonCamera::ProcessCameraInVeh(CCam* pCam, CPedSamp* pPed, CVehicle* pVeh)
+{
+    if (!m_bEnabled || !pPed->GetGtaVehicle())
+    {
+        return;
+    }
+
+    CVector* pVec = &pCam->Source;
+
+    CVector vecOffset;
+    vecOffset.x = 0.0f;
+    vecOffset.y = 0.0f;
+    vecOffset.z = 0.6f;
+
+    uint16_t modelIndex = pPed->GetGtaVehicle()->m_nModelIndex;
+
+    if (modelIndex == 581 || modelIndex == 509 || modelIndex == 481 || modelIndex == 462 || modelIndex == 521 || modelIndex == 463 || modelIndex == 510 ||
+        modelIndex == 522 || modelIndex == 461 || modelIndex == 468 || modelIndex == 448 || modelIndex == 586)
+    {
+        vecOffset.x = 0.05f;
+        vecOffset.y = 0.3f;
+        vecOffset.z = 0.45f;
+        RwCameraSetNearClipPlane(Scene.m_pRwCamera, 0.3f);
+    }
+    else
+    {
+        RwCameraSetNearClipPlane(Scene.m_pRwCamera, 0.01f);
+    }
+
+    CVector vecOut;
+    RwMatrix mat;
+
+    memcpy(&mat, pPed->m_pPed->m_matrix, sizeof(RwMatrix));
+
+    ProjectMatrix(&vecOut, (CMatrix*)&mat, &vecOffset);
+
+    if (vecOut.x != vecOut.x || vecOut.y != vecOut.y || vecOut.z != vecOut.z)
+    {
+        pPed->m_pPed->GetBonePosition(&vecOut, 4, false);
+    }
+    if (vecOut.x != vecOut.x || vecOut.y != vecOut.y || vecOut.z != vecOut.z)
+    {
+        return;
+    }
+
+    *pVec = vecOut;
+
+    if (!pVeh) {
+        if (!pPed->m_pPed->IsAPassenger()) {
+            pCam->m_nMode = MODE_1STPERSON;
+        }
+        return;
+    }
+}
+
+void CFirstPersonCamera::SetEnabled(bool bEnabled)
+{
+    m_bEnabled = bEnabled;
+}
+
+void CFirstPersonCamera::Toggle()
+{
+    m_bEnabled ^= 1;
+}
+
+bool CFirstPersonCamera::IsEnabled()
+{
+    return m_bEnabled;
+}
