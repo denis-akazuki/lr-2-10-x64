@@ -3,8 +3,6 @@
 #include "netgame.h"
 #include "game/Coronas.h"
 
-extern CNetGame *pNetGame;
-
 void CVehiclePool::Init()
 {
 //	for(VEHICLEID VehicleID = 0; VehicleID < MAX_VEHICLES; VehicleID++)
@@ -24,11 +22,11 @@ void CVehiclePool::Free()
 
 CVehicle* CVehiclePool::GetVehicleFromTrailer(CVehicle *pTrailer) {
 
-    for(auto &pair : CVehiclePool::list)
-    {
+    if (!pTrailer) return nullptr;
+
+    for(auto &pair : CVehiclePool::list) {
         auto pVehicle = pair.second;
-        if(reinterpret_cast<CVehicleGta *>(pVehicle->m_pVehicle->m_pTrailer) == pTrailer->m_pVehicle)
-        {
+        if(reinterpret_cast<CVehicleGta *>(pVehicle->m_pVehicle->m_pTrailer) == pTrailer->m_pVehicle) {
             return pVehicle;
         }
     }
@@ -117,6 +115,9 @@ bool CVehiclePool::New(NewVehiclePacket *pNewVehicle) {
 							pNewVehicle->byteAddSiren);
 
 		list[vehicleId] = pVeh;
+
+        entityToIdMap[pVeh->m_pVehicle] = vehicleId;
+        rwObjectToIdMap[pVeh->m_pVehicle->m_pRwObject] = vehicleId;
     } catch (const std::exception &e) {
         CChatWindow::DebugMessage("Warning: vehicle %u not created", vehicleId);
         return false;
@@ -159,16 +160,8 @@ bool CVehiclePool::Delete(VEHICLEID VehicleID)
 
 VEHICLEID CVehiclePool::FindIDFromGtaPtr(CEntity *pGtaVehicle)
 {
-	for(auto &pair : list) {
-		auto pVehicle = pair.second;
-
-		if(pVehicle->m_pVehicle == pGtaVehicle)
-		{
-			return pair.first;
-		}
-	}
-
-	return INVALID_VEHICLE_ID;
+    if (!pGtaVehicle) return INVALID_VEHICLE_ID;
+    return GetEntity(pGtaVehicle);
 }
 
 //CVehicle* CVehiclePool::FindVehicle(CVehicleGta *pGtaVehicle)
@@ -188,15 +181,9 @@ VEHICLEID CVehiclePool::FindIDFromGtaPtr(CEntity *pGtaVehicle)
 
 VEHICLEID CVehiclePool::FindIDFromRwObject(RwObject* pRWObject)
 {
-    for(auto &pair : list) {
-        auto pVehicle = pair.second;
-        if(pVehicle->m_pVehicle->m_pRwObject == pRWObject)
-            return pair.first;
-    }
-
-	return INVALID_VEHICLE_ID;
+    if (!pRWObject) return INVALID_VEHICLE_ID;
+    return GetRwObject(pRWObject);
 }
-
 
 int CVehiclePool::FindGtaIDFromID(VEHICLEID id)
 {

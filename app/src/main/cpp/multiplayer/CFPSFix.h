@@ -8,10 +8,9 @@
 class CFPSFix
 {
 private:
-	[[noreturn]] void Routine();
+    void Routine();
 
 public:
-	CFPSFix();
-	~CFPSFix()= default;
+    CFPSFix();
 };
 

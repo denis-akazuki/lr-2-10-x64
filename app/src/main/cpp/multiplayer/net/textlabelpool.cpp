@@ -5,8 +5,8 @@
 #include "CSettings.h"
 #include "game/Render/Sprite.h"
 #include "../game/Entity/Ped/Ped.h"
+#include "World.h"
 
-extern CNetGame *pNetGame;
 extern CGUI *pGUI;
 
 void TextWithColors(ImVec2 pos, ImColor col, const char* szStr, const char* szStrWithoutColors);
@@ -98,66 +98,48 @@ void CText3DLabelsPool::DrawTextLabel(CText3DLabel* pLabel, const CVector* pos)
 		return;
 	}
 
-	if (pLabel->useLineOfSight)
-	{
-		CAMERA_AIM* pCam = GameGetInternalAim();
-		if (!pCam)
-		{
-			return;
-		}
+    if (pPed->m_pPed->GetDistanceFromPoint(pos->x, pos->y, pos->z) <= pLabel->drawDistance) {
+        if (pLabel->useLineOfSight) {
+            CAMERA_AIM *pCam = GameGetInternalAim();
+            if (!pCam) return;
 
-		hitEntity = ScriptCommand(&get_line_of_sight,
-								  pos->x, pos->y, pos->z,
-			pCam->vecSource.x, pCam->vecSource.y, pCam->vecSource.z,
-			1, 0, 0, 0, 0);
-	}
+            hitEntity = CWorld::GetIsLineOfSightClear(pos, pCam->vecSource, true, false, false, false, false, false, false);
+        }
+        if (!pLabel->useLineOfSight || hitEntity) {
+            CVector Out;
 
-	if (!pLabel->useLineOfSight || hitEntity)
-	{
-		if (pPed->m_pPed->GetDistanceFromPoint(pos->x, pos->y, pos->z) <= pLabel->drawDistance)
-		{
-			CVector Out;
+            CSprite::CalcScreenCoors(*pos, &Out, nullptr, nullptr, false, false);
+            if (Out.z < 1.0f) return;
 
-			CSprite::CalcScreenCoors(*pos, &Out, nullptr, nullptr, false, false);
-			if (Out.z < 1.0f)
-			{
-				return;
-			}
+            ImVec2 pos = ImVec2(Out.x, Out.y);
 
-			ImVec2 pos = ImVec2(Out.x, Out.y);
+            if (pLabel->m_fTrueX < 0.0f) {
+                char *curBegin = pLabel->textWithoutColors;
+                char *curPos = pLabel->textWithoutColors;
+                while (*curPos != '\0') {
+                    if (*curPos == '\n') {
+                        float width = ImGui::CalcTextSize(curBegin, (char *) (curPos - 1)).x;
+                        if (width > pLabel->m_fTrueX) {
+                            pLabel->m_fTrueX = width;
+                        }
 
-			if (pLabel->m_fTrueX < 0.0f)
-			{
-				char* curBegin = pLabel->textWithoutColors;
-				char* curPos = pLabel->textWithoutColors;
-				while (*curPos != '\0')
-				{
-					if (*curPos == '\n')
-					{
-						float width = ImGui::CalcTextSize(curBegin, (char*)(curPos - 1)).x;
-						if (width > pLabel->m_fTrueX)
-						{
-							pLabel->m_fTrueX = width;
-						}
+                        curBegin = curPos + 1;
+                    }
 
-						curBegin = curPos + 1;
-					}
+                    curPos++;
+                }
 
-					curPos++;
-				}
+                if (pLabel->m_fTrueX < 0.0f) {
+                    pLabel->m_fTrueX = ImGui::CalcTextSize(pLabel->textWithoutColors).x;
+                }
+            }
 
-				if (pLabel->m_fTrueX < 0.0f)
-				{
-					pLabel->m_fTrueX = ImGui::CalcTextSize(pLabel->textWithoutColors).x;
-				}
+            //pos.x -= (pLabel->m_fTrueX / 2.0f);
 
-			}
-
-			//pos.x -= (pLabel->m_fTrueX / 2.0f);
-
-			TextWithColors(pos, __builtin_bswap32(pLabel->color), pLabel->text, pLabel->textWithoutColors);
-		}
-	}
+            TextWithColors(pos, __builtin_bswap32(pLabel->color), pLabel->text,
+                           pLabel->textWithoutColors);
+        }
+    }
 }
 
 void CText3DLabelsPool::Free()

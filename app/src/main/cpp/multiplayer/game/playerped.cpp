@@ -273,7 +273,7 @@ BYTE CPedSamp::GetCurrentWeapon()
 // 0.3.7
 CVehicleGta* CPedSamp::GetGtaVehicle()
 {
-	return (CVehicleGta*)m_pPed->pVehicle;
+	return m_pPed->pVehicle;
 }
 
 // 0.3.7
@@ -394,18 +394,16 @@ VEHICLEID CPedSamp::GetCurrentSampVehicleID()
 
 	return CVehiclePool::FindIDFromGtaPtr((CVehicleGta *)m_pPed->pVehicle);
 }
+
 CVehicle* CPedSamp::GetCurrentVehicle()
 {
 	if(!m_pPed || !m_pPed->IsInVehicle())
         return nullptr;
 
-	for(auto &pair : CVehiclePool::list) {
-		auto pVehicle = pair.second;
-		if(pVehicle->m_pVehicle == (CVehicleGta *) m_pPed->pVehicle) {
-			return pVehicle;
-		}
-	}
-
+    uint32_t vehicleId = CVehiclePool::GetEntity(m_pPed->pVehicle);
+    if (vehicleId != INVALID_VEHICLE_ID) {
+        return CVehiclePool::GetAt(vehicleId);
+    }
 	return nullptr;
 }
 
@@ -416,7 +414,7 @@ CVehicleGta* CPedSamp::GetCurrentGtaVehicle()
 	return (CVehicleGta *)m_pPed->pVehicle;
 }
 
-uint32_t CPedSamp::GetCurrentGTAVehicleID(){
+uint32_t CPedSamp::GetCurrentGTAVehicleID() {
 	if(!m_pPed) return 0;
 	return GamePool_Vehicle_GetIndex(reinterpret_cast<CVehicleGta *>(m_pPed->pVehicle));
 }
