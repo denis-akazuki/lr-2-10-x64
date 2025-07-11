@@ -7,18 +7,9 @@
 #include "../gui/gui.h"
 #include "../util/CJavaWrapper.h"
 #include "../java_systems/HUD.h"
-#include "..///..//santrope-tea-gtasa/encryption/CTinyEncrypt.h"
-#include "..///..//santrope-tea-gtasa/encryption/encrypt.h"
 #include "game/Widgets/WidgetGta.h"
 #include "game/WaterCannons.h"
 #include "game/Pickups.h"
-extern "C"
-{
-#include "..//santrope-tea-gtasa/encryption/aes.h"
-}
-#include "RW/rpworld.h"
-#include "..///..//santrope-tea-gtasa/CGameResourcesDecryptor.cpp"
-#include "..///..//santrope-tea-gtasa/CGameResourcesDecryptor.h"
 #include "chatwindow.h"
 #include "../util/patch.h"
 #include "java_systems/Speedometr.h"
@@ -36,50 +27,8 @@ extern CPedSamp *g_pCurrentFiredPed;
 
 static uint32_t dwRLEDecompressSourceSize = 0;
 
-#define MAX_ENCRYPTED_TXD 5
-const std::string cryptTexturesBd[MAX_ENCRYPTED_TXD] = {
-		"texdb/txd/txd.txt",
-        "texdb/gta3/gta3.txt",
-        "texdb/gta_int/gta_int.txt",
-		"texdb/cars/cars.txt",
-		"texdb/skins/skins.txt"
-};
-
 extern bool g_bIsTestMode;
 
-bool isEncrypted(const char *szArch)
-{
-    if(g_bIsTestMode || VER_SAMP)
-		return false;
-
-	//return false;
-    for (const auto & i : cryptTexturesBd)
-    {
-        if (!strcmp(i.c_str(), szArch))
-            return true;
-    }
-    return false;
-}
-void InitCTX(AES_ctx& ctx, const uint8_t* pKey)
-{
-    uint8_t key[16];
-    memcpy(&key[0], &pKey[0], 16);
-    for (int i = 0; i < 16; i++)
-    {
-        key[i] = XOR_UNOBFUSCATE(key[i]);
-    }
-    uint8_t iv[16];
-    memcpy(&iv[0], &g_iIV, 16);
-    for (int i = 0; i < 16; i++)
-    {
-        iv[i] = XOR_UNOBFUSCATE(iv[i]);
-    }
-    AES_init_ctx_iv(&ctx, &key[0], &iv[0]);
-}
-
-OSFile lastOpenedFile = 0;
-
-extern CNetGame *pNetGame;
 extern CGUI *pGUI;
 // Neiae/SAMP
 bool g_bPlaySAMP = false;
@@ -317,6 +266,8 @@ void cHandlingDataMgr__ConvertDataToGameUnits(uintptr_t *thiz, tHandlingData* ha
 
 int lastNvEvent;
 #include "..//nv_event.h"
+#include "ResourceCrypt/ResourceCrypt.h"
+
 int32_t(*NVEventGetNextEvent_hooked)(NVEvent* ev, int waitMSecs);
 int32_t NVEventGetNextEvent_hook(NVEvent* ev, int waitMSecs)
 {
@@ -389,13 +340,7 @@ int32_t NVEventGetNextEvent_hook(NVEvent* ev, int waitMSecs)
 signed int (*OS_FileOpen)(unsigned int a1, OSFile *intoFile, const char *filename, int a4);
 signed int OS_FileOpen_hook(unsigned int a1, OSFile *intoFile, const char *filename, int a4)
 {
-    signed int retn = OS_FileOpen(a1, intoFile, filename, a4);
-
-    if (isEncrypted(filename))
-    {
-        lastOpenedFile = *intoFile;
-    }
-    return retn;
+    return OS_FileOpen(a1, intoFile, filename, a4);
 }
 
 size_t (*OS_FileRead)(OSFile a1, void *buffer, size_t numBytes);
@@ -403,33 +348,15 @@ size_t OS_FileRead_hook(OSFile a1, void *buffer, size_t numBytes)
 {
     dwRLEDecompressSourceSize = numBytes;
 
-    uintptr_t calledFrom = 0;
-    GET_LR(calledFrom);
-
-    if (!numBytes)
-    {
+    if (!numBytes) {
         return 0;
     }
 
-    if (calledFrom == (VER_x32 ? 0x1E8142 + 1 : 0x2842b0) && a1 == lastOpenedFile)
-    {
-        lastOpenedFile = 0;
-
-        AES_ctx ctx;
-		InitCTX(ctx, &g_iEncryptionKeyTXD[0]);
-
-        size_t retv = OS_FileRead(a1, buffer, numBytes);
-        int fileSize = numBytes;
-        int iters = fileSize / PART_SIZE_TXD;
-        uintptr_t pointer = (uintptr_t)buffer;
-        for (int i = 0; i < iters; i++)
-        {
-            AES_CBC_decrypt_buffer(&ctx, (uint8_t *)pointer, PART_SIZE_TXD);
-            pointer += PART_SIZE_TXD;
-        }
-        return retv;
+    size_t result = OS_FileRead(a1, buffer, numBytes);
+    if (CResourceCrypt::IsEncryptedFile((uint8 *) buffer)) {
+        CResourceCrypt::DecryptStream(static_cast<char *>(buffer));
     }
-    return OS_FileRead(a1, buffer, numBytes);
+    return result;
 }
 
 extern char g_iLastBlock[123];

@@ -23,8 +23,6 @@ file(GLOB_RECURSE SOURCES
         ${CMAKE_CURRENT_LIST_DIR}/java_systems/casino/*.cpp
         ${CMAKE_CURRENT_LIST_DIR}/util/*.cpp
         ${CMAKE_CURRENT_LIST_DIR}/gui/*.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/../santrope-tea-gtasa/encryption/*.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/../santrope-tea-gtasa/encryption/*.c
         ${CMAKE_CURRENT_LIST_DIR}/vendor/ini/*.cpp
         ${CMAKE_CURRENT_LIST_DIR}/vendor/RakNet/*.cpp
         ${CMAKE_CURRENT_LIST_DIR}/vendor/RakNet/SAMP/*.cpp

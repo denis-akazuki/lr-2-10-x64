@@ -87,13 +87,10 @@ public:
 extern void BuildVertexSource(uint32 flags);
 extern void BuildPixelSource(uint32 flags);
 
-
 struct ES2Shader : RQShader
 {
-    //ES2VectorBinding vBindings[24];
     uint8 vBindings[0x2A0];
     uint8 mBindings[0x130];
-   // ES2MatrixBinding mBindings[4];
     GLint bonesLocation;
     GLuint pixelShader;
     bool ownsPixelShader;
@@ -102,3 +99,4 @@ struct ES2Shader : RQShader
     GLuint fullProgram;
     GLuint flags;
 };
+VALIDATE_SIZE(ES2Shader, (VER_x32 ? 0x3F0 : 0x3F8));

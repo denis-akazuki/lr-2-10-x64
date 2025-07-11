@@ -23,6 +23,8 @@
 #include "game/Fx/CarFXRenderer.h"
 #include "game/Widgets/TouchInterface.h"
 #include "GrassRenderer.h"
+#include "Weather.h"
+#include "Clock.h"
 
 void ApplyPatches();
 void ApplyInGamePatches();
@@ -293,24 +295,15 @@ uintptr CGame::CreateRadarMarkerIcon(int iMarkerType, float fX, float fY, float 
 	return dwMarkerID;
 }
 
-// 0.3.7
-void CGame::SetWorldTime(int iHour, int iMinute)
-{
-	*(uint8_t*)(g_libGTASA + (VER_x32 ? 0x00953143 : 0xBBBC1B)) = (uint8_t)iMinute;
-	*(uint8_t*)(g_libGTASA + (VER_x32 ? 0x00953142 : 0xBBBC1A)) = (uint8_t)iHour;
-	ScriptCommand(&set_current_time, iHour, iMinute);
+void CGame::SetWorldTime(int iHour, int iMinute) {
+    CClock::ms_nGameClockHours = iHour;
+    CClock::ms_nGameClockMinutes = iMinute;
 }
 
-// 0.3.7
-void CGame::SetWorldWeather(unsigned char byteWeatherID)
-{
-	CHook::CallFunction<void>(g_libGTASA + (VER_x32 ? 0x005CDF88 + 1 : 0x6F24E8), byteWeatherID);
-
-	if(!m_bClockEnabled)
-	{
-		*(uint16_t*)(g_libGTASA + (VER_x32 ? 0x00A7D136 : 0xD216F2)) = byteWeatherID;
-		*(uint16_t*)(g_libGTASA + (VER_x32 ? 0x00A7D134 : 0xD216F0)) = byteWeatherID;
-	}
+void CGame::SetWorldWeather(unsigned char byteWeatherID) {
+    CWeather::ForcedWeatherType = byteWeatherID;
+    CWeather::OldWeatherType = byteWeatherID;
+    CWeather::NewWeatherType = byteWeatherID;
 }
 
 void CGame::ToggleThePassingOfTime(bool bOnOff)
