@@ -6,9 +6,28 @@
 #include "..//net/netgame.h"
 #include "Scene.h"
 
-extern CNetGame* pNetGame;
-
 bool CFirstPersonCamera::m_bEnabled = false;
+
+void CFirstPersonCamera::MakePlayerFaceCameraDirection(CCam* pCam, CPedSamp* player) {
+    CVector playerPos = player->m_pPed->GetPosition();
+
+    CVector LookAt = {
+            pCam->Source.x + (pCam->Front.x * 20.0f),
+            pCam->Source.y + (pCam->Front.y * 20.0f),
+            pCam->Source.z + (pCam->Front.z * 20.0f)
+    };
+
+    CVector direction = {
+            LookAt.x - playerPos.x,
+            LookAt.y - playerPos.y,
+            0.0f
+    };
+
+    double fZ = atan2(-direction.x, direction.y) * 57.295776;
+    if (fZ > 360.0f) fZ -= 360.0f;
+    if (fZ < 0.0f) fZ += 360.0f;
+    player->SetRotation((float)fZ);
+}
 
 void CFirstPersonCamera::ProcessCameraOnFoot(CCam* pCam, CPedSamp* pPed)
 {
@@ -38,8 +57,8 @@ void CFirstPersonCamera::ProcessCameraOnFoot(CCam* pCam, CPedSamp* pPed)
     }
 
     *pVec = vecOut;
-
     RwCameraSetNearClipPlane(Scene.m_pRwCamera, 0.2f);
+    MakePlayerFaceCameraDirection(pCam, pPed);
 }
 
 void CFirstPersonCamera::ProcessCameraInVeh(CCam* pCam, CPedSamp* pPed, CVehicle* pVeh)
