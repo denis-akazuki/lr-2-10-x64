@@ -26,6 +26,7 @@ class CJavaWrapper
 public:
 	static JNIEnv* GetEnv();
 
+    static void* NVThreadSpawnProc(void* arg);
 	void ShowClientSettings();
 
 	void SetPauseState(bool a1);

@@ -655,6 +655,158 @@ void NvUtilInit_hook()
     CWeaponsOutFit::ParseDatFile();
 }
 
+#include <pthread.h>
+#include <unistd.h>
+#include <cstring>
+#include <sys/resource.h>
+#include <cstdlib>
+
+typedef pthread_t OSThreadHandle;
+typedef void* (*OSThreadFunction)(void*);
+
+typedef enum {
+    THREAD_RENDER_QUEUE,
+    THREAD_CD_STREAM,
+    THREAD_MAIN,
+    THREAD_BANK_LOADER,
+    THREAD_STREAM_RADIO,
+    THREAD_DEFAULT
+} CustomThreadType;
+
+typedef struct {
+    const char* threadNamePattern;
+    int priority;
+    size_t stackSizeKB;
+} ThreadConfig;
+
+static const ThreadConfig threadConfigs[] = {
+        [THREAD_RENDER_QUEUE]  = { "RenderQueue", -20, 512 },
+        [THREAD_CD_STREAM]     = { "CdStream",    -20, 512 },
+        [THREAD_MAIN]          = { "MainThread",  -15, 256 },
+        [THREAD_BANK_LOADER]   = { "BankLoader",   -5, 128 },
+        [THREAD_STREAM_RADIO]  = { "StreamThread",  0, 128 },
+        [THREAD_DEFAULT]       = { NULL,            0, 256 }
+};
+
+static CustomThreadType getThreadType(const char* threadName) {
+    if (!threadName) return THREAD_DEFAULT;
+
+    for (int i = 0; i < sizeof(threadConfigs)/sizeof(ThreadConfig); i++) {
+        if (threadConfigs[i].threadNamePattern &&
+            strstr(threadName, threadConfigs[i].threadNamePattern)) {
+            return (CustomThreadType)i;
+        }
+    }
+    return THREAD_DEFAULT;
+}
+
+struct ThreadLaunchData {
+    void* thread_struct;
+    OSThreadFunction func;
+    char thread_name[32];
+};
+
+OSThreadHandle (*orig_OS_ThreadLaunch)(
+        OSThreadFunction function,
+        void* functionData,
+        unsigned int processorAffinity,
+        const char* threadName,
+        int joinable,
+        uintptr_t priority);
+OSThreadHandle custom_OS_ThreadLaunch(
+        OSThreadFunction function,
+        void* functionData,
+        unsigned int processorAffinity,
+        const char* threadName,
+        int joinable,
+        uintptr_t priority) {
+
+    CustomThreadType threadType = getThreadType(threadName);
+    const ThreadConfig* config = &threadConfigs[threadType];
+
+#if VER_x32
+    if (threadType == THREAD_MAIN) {
+        Log("ThreadMain return to original");
+        return orig_OS_ThreadLaunch(function, functionData, processorAffinity, threadName, joinable, priority);
+    }
+#endif
+
+    auto* threadData = (ThreadLaunchData*)malloc(sizeof(ThreadLaunchData));
+    if (!threadData) return static_cast<OSThreadHandle>(NULL);
+
+    threadData->func = function;
+    threadData->thread_struct = functionData;
+
+    if (threadName) {
+        strncpy(threadData->thread_name, threadName, sizeof(threadData->thread_name)-1);
+        threadData->thread_name[sizeof(threadData->thread_name)-1] = '\0';
+    } else {
+        strcpy(threadData->thread_name, "AppThread");
+    }
+
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+
+    struct rlimit rlim{};
+    getrlimit(RLIMIT_STACK, &rlim);
+
+    size_t safe_stack = (rlim.rlim_cur == RLIM_INFINITY)
+                        ? config->stackSizeKB * 1024
+                        : std::min(config->stackSizeKB * 1024, (size_t)rlim.rlim_cur);
+
+    if (pthread_attr_setstacksize(&attr, safe_stack) != 0) {
+        Log("Stack size set failed, using default");
+    }
+
+    struct sched_param param = {0};
+    pthread_attr_getschedparam(&attr, &param);
+
+    int priority_min = sched_get_priority_min(SCHED_OTHER);
+    int priority_max = sched_get_priority_max(SCHED_OTHER);
+    int range = priority_max - priority_min;
+
+    switch (priority) {
+        case 0:
+            param.sched_priority = priority_min;
+            break;
+        case 1:
+            param.sched_priority = priority_min + (2 * range) / 3;
+            break;
+        case 2:
+            param.sched_priority = priority_min + (4 * range) / 5;
+            break;
+        case 3:
+            param.sched_priority = priority_max;
+            break;
+        default:
+            param.sched_priority = 0;
+            break;
+    }
+
+    if (pthread_attr_setschedparam(&attr, &param) != 0) {
+        Log("Failed to set priority %d (range %d-%d)",
+            param.sched_priority, priority_min, priority_max);
+    }
+
+    pthread_t thread;
+    if (pthread_create(&thread, &attr, CJavaWrapper::NVThreadSpawnProc, threadData) != 0) {
+        free(threadData);
+        pthread_attr_destroy(&attr);
+        return static_cast<OSThreadHandle>(NULL);
+    }
+
+    if (threadName) {
+        pthread_setname_np(thread, threadName);
+    }
+
+    if (!joinable) {
+        pthread_detach(thread);
+    }
+
+    pthread_attr_destroy(&attr);
+    return thread;
+}
+
 void InstallSpecialHooks()
 {
 	InjectHooks();
@@ -696,6 +848,8 @@ void InstallSpecialHooks()
 	CHook::InstallPLT(g_libGTASA + (VER_x32 ? 0x0067125C : 0x842150), &cHandlingDataMgr__ConvertDataToGameUnits);
 
 	CHook::InlineHook("_Z19NVEventGetNextEventP7NVEventi", NVEventGetNextEvent_hook, &NVEventGetNextEvent_hooked);
+
+    CHook::InlineHook("_Z15OS_ThreadLaunchPFjPvES_jPKci16OSThreadPriority", &custom_OS_ThreadLaunch, &orig_OS_ThreadLaunch);
 }
 
 // thanks Codeesar

@@ -210,16 +210,16 @@ void CStreaming::InjectHooks() {
     CHook::Write(g_libGTASA + (VER_x32 ? 0x676214 : 0x84A4A8), &ms_pStreamingBuffer);
     CHook::Write(g_libGTASA + (VER_x32 ? 0x67962C : 0x850C78), &ms_streamingBufferSize);
 
-    CHook::Write(g_libGTASA + (VER_x32 ? 0x00679EB4 : 0x851D80), &CStreaming::ms_memoryUsed);
-    CHook::Write(g_libGTASA + (VER_x32 ? 0x006791EC : 0x850408), &CStreaming::ms_memoryAvailable);
-    CHook::Write(g_libGTASA + (VER_x32 ? 0x006795A4 : 0x850B68), &CStreaming::desiredNumVehiclesLoaded);
-    CHook::Write(g_libGTASA + (VER_x32 ? 0x00676AB8 : 0x84B5D0), &CStreaming::ms_files);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x00679EB4 : 0x851D80), &ms_memoryUsed);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x006791EC : 0x850408), &ms_memoryAvailable);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x006795A4 : 0x850B68), &desiredNumVehiclesLoaded);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x00676AB8 : 0x84B5D0), &ms_files);
 
-    CHook::Write(g_libGTASA + (VER_x32 ? 0x00677564 : 0x84CB10), &CStreaming::ms_rwObjectInstances);
-    CHook::Write(g_libGTASA + (VER_x32 ? 0x00677DD0 : 0x84DBD0), &CStreaming::ms_aInfoForModel);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x00677564 : 0x84CB10), &ms_rwObjectInstances);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x00677DD0 : 0x84DBD0), &ms_aInfoForModel);
 
-    CHook::Redirect("_ZN10CStreaming13InitImageListEv", &CStreaming::InitImageList);
-    CHook::Redirect("_ZN10CStreaming12MakeSpaceForEi", &CStreaming::MakeSpaceFor);
+    CHook::Redirect("_ZN10CStreaming13InitImageListEv", &InitImageList);
+    CHook::Redirect("_ZN10CStreaming12MakeSpaceForEi", &MakeSpaceFor);
 }
 
 int CStreaming::AddImageToList(char const* pFileName, bool bNotPlayerImg) {

@@ -39,6 +39,51 @@ JNIEnv *CJavaWrapper::GetEnv() {
 
     return env;
 }
+typedef void* (*OSThreadFunction)(void*);
+struct ThreadLaunchData {
+    void* thread_struct;
+    OSThreadFunction func;
+    char thread_name[32];
+};
+
+void* CJavaWrapper::NVThreadSpawnProc(void* arg) {
+    std::unique_ptr<ThreadLaunchData> data(static_cast<ThreadLaunchData*>(arg));
+
+    bool attached = false;
+    JNIEnv* env = nullptr;
+    jint status = javaVM->GetEnv((void**)&env, JNI_VERSION_1_6);
+
+    if (status == JNI_EDETACHED) {
+        if (javaVM->AttachCurrentThread(&env, nullptr) == 0) {
+            attached = true;
+        }
+    }
+
+    if (env && data->thread_name[0] != '\0') {
+        jclass threadClass = env->FindClass("java/lang/Thread");
+        if (threadClass) {
+            jmethodID currentThread = env->GetStaticMethodID(threadClass, "currentThread", "()Ljava/lang/Thread;");
+            jmethodID setName = env->GetMethodID(threadClass, "setName", "(Ljava/lang/String;)V");
+
+            if (currentThread && setName) {
+                jobject threadObj = env->CallStaticObjectMethod(threadClass, currentThread);
+                jstring nameStr = env->NewStringUTF(data->thread_name);
+                env->CallVoidMethod(threadObj, setName, nameStr);
+
+                env->DeleteLocalRef(nameStr);
+                env->DeleteLocalRef(threadObj);
+            }
+            env->DeleteLocalRef(threadClass);
+        }
+    }
+
+    void* result = data->func(data->thread_struct);
+
+    if (attached) {
+        javaVM->DetachCurrentThread();
+    }
+    return result;
+}
 
 void CJavaWrapper::ShowClientSettings() {
     JNIEnv *env = GetEnv();

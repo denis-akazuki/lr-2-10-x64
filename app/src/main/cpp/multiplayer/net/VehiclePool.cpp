@@ -148,14 +148,16 @@ bool CVehiclePool::New(NewVehiclePacket *pNewVehicle) {
 
 bool CVehiclePool::Delete(VEHICLEID VehicleID)
 {
-	if(!GetAt(VehicleID))
-		return false;
+    if (auto pVehicle = GetAt(VehicleID)) {
+        const auto vehicle = pVehicle->m_pVehicle;
+        entityToIdMap.erase(vehicle);
+        rwObjectToIdMap.erase(vehicle->m_pRwObject);
 
-
-	delete list[VehicleID];
-
-	list.erase(VehicleID);
-	return true;
+        delete list[VehicleID];
+        list.erase(VehicleID);
+        return true;
+    }
+    return false;
 }
 
 VEHICLEID CVehiclePool::FindIDFromGtaPtr(CEntity *pGtaVehicle)
