@@ -69,21 +69,107 @@ CClumpModelInfo* CModelInfo::AddClumpModel(int32 index)
     return &pInfo;
 }
 
+CBaseModelInfo* CModelInfo::GetModelInfo(const char* name, int32* index)
+{
+    auto iKey = CKeyGen::GetUppercaseKey(name);
+    auto iCurInd = ms_lastPositionSearched;
+
+    while (iCurInd < NUM_MODEL_INFOS) {
+        auto mi = GetModelInfo(iCurInd);
+        if (mi && mi->m_nKey == iKey) {
+            ms_lastPositionSearched = iCurInd;
+            if (index) {
+                *index = iCurInd;
+            }
+            return mi;
+        }
+
+        ++iCurInd;
+    }
+
+    iCurInd = ms_lastPositionSearched;
+    if (iCurInd < 0)
+        return nullptr;
+
+    while (iCurInd >= 0) {
+        auto mi = GetModelInfo(iCurInd);
+        if (mi && mi->m_nKey == iKey) {
+            ms_lastPositionSearched = iCurInd;
+            if (index) {
+                *index = iCurInd;
+            }
+            return mi;
+        }
+
+        --iCurInd;
+    }
+
+    return nullptr;
+}
+
+CBaseModelInfo* CModelInfo::GetModelInfo(const char* name, int32 minIndex, int32 maxIndex)
+{
+    auto iKey = CKeyGen::GetUppercaseKey(name);
+    if (minIndex > maxIndex)
+        return nullptr;
+
+    for (int32 i = minIndex; i <= maxIndex; ++i) {
+        auto mi = GetModelInfo(i);
+        if (mi && mi->m_nKey == iKey)
+            return mi;
+    }
+
+    return nullptr;
+}
+
+int32 CModelInfo::GetModelInfoIndex(const char* name)
+{
+    auto iKey = CKeyGen::GetUppercaseKey(name);
+    auto iCurInd = ms_lastPositionSearched;
+
+    while (iCurInd < NUM_MODEL_INFOS) {
+        auto mi = GetModelInfo(iCurInd);
+        if (mi && mi->m_nKey == iKey) {
+            ms_lastPositionSearched = iCurInd;
+            return iCurInd;
+        }
+
+        ++iCurInd;
+    }
+
+    iCurInd = ms_lastPositionSearched;
+    if (iCurInd < 0)
+        return 0;
+
+    while (iCurInd >= 0) {
+        auto mi = GetModelInfo(iCurInd);
+        if (mi && mi->m_nKey == iKey) {
+            ms_lastPositionSearched = iCurInd;
+            return iCurInd;
+        }
+
+        --iCurInd;
+    }
+
+    return 0;
+}
+
 void CModelInfo::Initialise() {
     memset(ms_modelInfoPtrs, 0, sizeof(ms_modelInfoPtrs));
-
 }
 
 void CModelInfo::injectHooks()
 {
-    CHook::Write(g_libGTASA + (VER_x32 ? 0x676A34 : 0x84B4C8), &CModelInfo::ms_atomicModelInfoStore);
-    CHook::Write(g_libGTASA + (VER_x32 ? 0x6773CC : 0x84C7E0), &CModelInfo::ms_pedModelInfoStore);
-    CHook::Write(g_libGTASA + (VER_x32 ? 0x678C8C : 0x84F948), &CModelInfo::ms_vehicleModelInfoStore);
-    CHook::Write(g_libGTASA + (VER_x32 ? 0x6796CC : 0x850DB8), &CModelInfo::ms_modelInfoPtrs);
-    CHook::Write(g_libGTASA + (VER_x32 ? 0x678538 : 0x84EA98), &CModelInfo::ms_clumpModelInfoStore);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x676B58 : 0x84B710), &ms_lastPositionSearched);
 
-    CHook::Redirect("_ZN10CModelInfo13AddClumpModelEi", &CModelInfo::AddClumpModel);
-    CHook::Redirect("_ZN10CModelInfo11AddPedModelEi", &CModelInfo::AddPedModel);
-    CHook::Redirect("_ZN10CModelInfo15AddVehicleModelEi", &CModelInfo::AddVehicleModel);
-    CHook::Redirect("_ZN10CModelInfo14AddAtomicModelEi", &CModelInfo::AddAtomicModel);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x676A34 : 0x84B4C8), &ms_atomicModelInfoStore);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x6773CC : 0x84C7E0), &ms_pedModelInfoStore);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x678C8C : 0x84F948), &ms_vehicleModelInfoStore);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x6796CC : 0x850DB8), &ms_modelInfoPtrs);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x678538 : 0x84EA98), &ms_clumpModelInfoStore);
+
+    CHook::Redirect("_ZN10CModelInfo13AddClumpModelEi", &AddClumpModel);
+    CHook::Redirect("_ZN10CModelInfo11AddPedModelEi", &AddPedModel);
+    CHook::Redirect("_ZN10CModelInfo15AddVehicleModelEi", &AddVehicleModel);
+    CHook::Redirect("_ZN10CModelInfo14AddAtomicModelEi", &AddAtomicModel);
 }

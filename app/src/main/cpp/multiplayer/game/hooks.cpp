@@ -563,6 +563,9 @@ int CTextureDatabaseRuntime__GetEntry_hook(TextureDatabaseRuntime *a1, const cha
 #include "Core/QuadTreeNode.h"
 #include "IplStore.h"
 #include "game/Tasks/TaskTypes/TaskSimpleUseGun.h"
+#include "Audio/entities/AEVehicleAudioEntity.h"
+#include "Audio/managers/AESoundManager.h"
+#include "Audio/hardware/AEAudioHardware.h"
 
 void InjectHooks()
 {
@@ -573,6 +576,8 @@ void InjectHooks()
     CColStore::InjectHooks();
     CCustomCarEnvMapPipeline::InjectHooks();
     RQShader::InjectHooks();
+    CAEAudioEntity::InjectHooks();
+    CAEVehicleAudioEntity::InjectHooks();
 
 	CHook::Write(g_libGTASA + (VER_x32 ? 0x678954 : 0x84F2D0), &Scene);
 
@@ -950,44 +955,34 @@ int CUpsideDownCarCheck__IsCarUpsideDown_hook(uintptr* thiz, const CVehicle* pVe
 #include "..//keyboard.h"
 
 #include "util.h"
-
 #include <list>
 
+RwFrame* CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, RpClump* clump, int32 modelId) {
+    if (pFrameResult)
+        return pFrameResult;
 
-RwFrame* CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, RpClump* pClump, int id)
-{
-	if (pFrameResult)
-		return pFrameResult;
+    uintptr_t calledFrom = 0;
+    GET_LR(calledFrom);
 
-	uintptr_t calledFrom = 0;
-	__asm__ volatile ("mov %0, lr" : "=r" (calledFrom));
-	calledFrom -= g_libGTASA;
+    if (calledFrom == (VER_x32 ? 0x0058C61C : 0x6AFEE4)                // CVehicle::SetWindowOpenFlag
+        || calledFrom == (VER_x32 ? 0x0058C644 : 0x6AFF18)             // CVehicle::ClearWindowOpenFlag
+        || calledFrom == (VER_x32 ? 0x003885EC : 0x45FC40)             // CVehicleModelInfo::GetOriginalCompPosition
+        || calledFrom == (VER_x32 ? 0x00387A28 : 0x45ECD0))            // CVehicleModelInfo::CreateInstance
+        return nullptr;
 
-	if (calledFrom == 0x00515708                // CVehicle::SetWindowOpenFlag
-		|| calledFrom == 0x00515730             // CVehicle::ClearWindowOpenFlag
-		|| calledFrom == 0x00338698             // CVehicleModelInfo::GetOriginalCompPosition
-		|| calledFrom == 0x00338B2C)            // CVehicleModelInfo::CreateInstance
-		return nullptr;
-
-	for (uint i = 2; i < 40; i++)
-	{
-		RwFrame* pNewFrameResult = nullptr;
-		uint     uiNewId = id + (i / 2) * ((i & 1) ? -1 : 1);
-
-		pNewFrameResult = ((RwFrame * (*)(RpClump * pClump, int id))(g_libGTASA + (VER_2_1 ? 0x003856D0 : 0x00335CC0) + 1))(pClump, i);
-
-		if (pNewFrameResult)
-		{
-			return pNewFrameResult;
-		}
-	}
-
-	return nullptr;
+    for (uint i = 2; i < 40; i++) {
+        RwFrame* pNewFrameResult;
+        pNewFrameResult = CHook::CallFunction<RwFrame*>("_ZN15CClumpModelInfo14GetFrameFromIdEP7RpClumpi", clump, i);
+        if (pNewFrameResult) {
+            return pNewFrameResult;
+        }
+    }
+    return nullptr;
 }
-RwFrame* (*CClumpModelInfo_GetFrameFromId)(RpClump*, int);
-RwFrame* CClumpModelInfo_GetFrameFromId_hook(RpClump* a1, int a2)
-{
-	return CClumpModelInfo_GetFrameFromId_Post(CClumpModelInfo_GetFrameFromId(a1, a2), a1, a2);
+
+RwFrame* (*CClumpModelInfo_GetFrameFromId)(RpClump*, int32);
+RwFrame* CClumpModelInfo_GetFrameFromId_hook(RpClump* clump, int32 modelId) {
+    return CClumpModelInfo_GetFrameFromId_Post(CClumpModelInfo_GetFrameFromId(clump, modelId), clump, modelId);
 }
 
 #include "crashlytics.h"
@@ -1691,10 +1686,8 @@ void InstallHooks()
 	// gettexture fix crash
 	CHook::Redirect("_Z10GetTexturePKc", &CUtil::GetTexture);
 
-#if VER_x32
-	// GetFrameFromID fix
-	CHook::InlineHook("_ZN15CClumpModelInfo14GetFrameFromIdEP7RpClumpi", &CClumpModelInfo_GetFrameFromId_hook, &CClumpModelInfo_GetFrameFromId);
-#endif
+    // GetFrameFromID fix
+    CHook::InlineHook("_ZN15CClumpModelInfo14GetFrameFromIdEP7RpClumpi", &CClumpModelInfo_GetFrameFromId_hook, &CClumpModelInfo_GetFrameFromId);
 	// fix
 	//CHook::InlineHook("_Z19_rwFreeListFreeRealP10RwFreeListPv", &_rwFreeListFreeReal_hook, &_rwFreeListFreeReal);
 

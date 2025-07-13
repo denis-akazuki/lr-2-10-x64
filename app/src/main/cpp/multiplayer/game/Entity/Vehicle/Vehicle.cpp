@@ -242,3 +242,36 @@ bool CVehicleGta::IsRCVehicleModelID() {
     }
     return false;
 }
+
+bool CVehicleGta::UsesSiren() {
+    switch (m_nModelIndex) {
+        case MODEL_FIRETRUK:
+        case MODEL_AMBULAN:
+        case MODEL_MRWHOOP:
+            return true;
+        case MODEL_RHINO:
+            return false;
+        default:
+            return IsLawEnforcementVehicle() != false;
+    }
+}
+
+bool CVehicleGta::IsLawEnforcementVehicle() const {
+    switch (m_nModelIndex) {
+        case MODEL_ENFORCER:
+        case MODEL_PREDATOR:
+        case MODEL_RHINO:
+        case MODEL_BARRACKS:
+        case MODEL_FBIRANCH:
+        case MODEL_COPBIKE:
+        case MODEL_FBITRUCK:
+        case MODEL_COPCARLA:
+        case MODEL_COPCARSF:
+        case MODEL_COPCARVG:
+        case MODEL_COPCARRU:
+        case MODEL_SWATVAN:
+            return true;
+        default:
+            return false;
+    }
+}

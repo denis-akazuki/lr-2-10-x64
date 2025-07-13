@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Vibrator
 import android.util.Base64
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewParent
@@ -23,6 +24,8 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.russia.game.R
 import com.russia.game.gui.hud.HudManager
 import com.russia.launcher.async.task.CacheChecker.isGameCacheValid
+import java.io.File
+import java.io.IOException
 import java.security.MessageDigest
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
@@ -33,7 +36,7 @@ import java.util.TimerTask
 class Samp : GTASA() {
     private var mDialogClientSettings: DialogClientSettings? = null
 
-    private external fun initSAMP(maxFps: Float)
+    private external fun initSAMP(maxFps: Float, directory: String)
 
     override fun onCreate(bundle: Bundle?) {
 
@@ -42,9 +45,45 @@ class Samp : GTASA() {
         val display = Companion.windowManager.defaultDisplay
         maxFps = display.refreshRate
 
-        initSAMP(maxFps)
+        val internalDir = File(filesDir, "AudioConfig")
+        clearDir(internalDir)
+        copyFromAssets(internalDir)
+
+        initSAMP(maxFps, filesDir.toString())
         super.onCreate(bundle)
         init()
+    }
+    private fun clearDir(dir: File) {
+        try {
+            if (dir.exists()) {
+                dir.deleteRecursively()
+                Log.d("AudioConfig", "Audio directory cleared: ${dir.absolutePath}")
+            }
+        } catch (e: IOException) {
+            Log.e("AudioConfig", "Failed to clear audio dir: ${e.message}")
+        }
+    }
+
+    private fun copyFromAssets(dir: File) {
+        try {
+            if (!dir.exists()) {
+                dir.mkdirs()
+            }
+
+            val assetFiles = assets.list("AudioConfig") ?: return
+
+            assetFiles.forEach { filename ->
+                assets.open("AudioConfig/$filename").use { inputStream ->
+                    File(dir, filename).outputStream().use { outputStream ->
+                        inputStream.copyTo(outputStream)
+                        Log.d("AudioConfig", "Copied audio: $filename → ${dir.absolutePath}")
+                    }
+                }
+            }
+
+        } catch (e: IOException) {
+            Log.e("ShaderManager", "Failed to copy shaders: ${e.message}")
+        }
     }
 
     fun init() {

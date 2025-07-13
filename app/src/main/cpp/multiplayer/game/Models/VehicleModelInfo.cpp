@@ -227,6 +227,14 @@ void CVehicleModelInfo__DeleteRwObject_hook(CVehicleModelInfo* thiz) {
     thiz->CVehicleModelInfo__DeleteRwObject();
 }
 
+extern void readVehiclesAudioSettings();
+void (*CVehicleModelInfo_SetupCommonData)();
+void CVehicleModelInfo_SetupCommonData_hook()
+{
+    CVehicleModelInfo_SetupCommonData();
+    readVehiclesAudioSettings();
+}
+
 void CVehicleModelInfo::InjectHooks() {
     CHook::Write(g_libGTASA + (VER_x32 ? 0x679D00 : 0x851A18), &ms_pLightsTexture);
     CHook::Write(g_libGTASA + (VER_x32 ? 0x67820C : 0x84E440), &ms_pLightsOnTexture);
@@ -234,6 +242,8 @@ void CVehicleModelInfo::InjectHooks() {
 
     CHook::InstallPLT(g_libGTASA + (VER_x32 ? 0x66E910 : 0x83DEE0), &SetEditableMaterials);
     CHook::InstallPLT(g_libGTASA + (VER_x32 ? 0x675E30 : 0x849D10), &ResetEditableMaterials);
+
+    CHook::InlineHook("_ZN17CVehicleModelInfo15SetupCommonDataEv", &CVehicleModelInfo_SetupCommonData_hook, &CVehicleModelInfo_SetupCommonData);
 
 //    CVehicleStructure::m_pInfoPool = new CPool<CVehicleStructure>(CModelInfo::NUM_VEHICLE_MODEL_INFOS, "VehicleStruct");
 //

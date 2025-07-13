@@ -15,6 +15,7 @@ class CModelInfo {
 public:
     static constexpr int32 NUM_MODEL_INFOS = TOTAL_DFF_MODEL_IDS;
     static inline CBaseModelInfo* ms_modelInfoPtrs[NUM_MODEL_INFOS];
+    static inline int32 ms_lastPositionSearched;
 
     static void injectHooks();
 
@@ -35,6 +36,10 @@ public:
     static CDamageAtomicModelInfo* AddDamageAtomicModel(int32 index);
     static CVehicleModelInfo *AddVehicleModel(int index);
     static CClumpModelInfo* AddClumpModel(int32 index);
+
+    static CBaseModelInfo* GetModelInfo(const char* name, int32 minIndex, int32 maxIndex);
+    static CBaseModelInfo* GetModelInfo(const char* name, int32* index = nullptr);
+    static int32 GetModelInfoIndex(const char* name);
 
     static CBaseModelInfo* GetModelInfo(int index) { return ms_modelInfoPtrs[index]; }
     static auto GetPedModelInfo(int32_t index) { return GetModelInfo(index)->AsPedModelInfoPtr(); }

@@ -9,6 +9,7 @@
 #include "game/tHandlingData.h"
 #include "game/Enums/eModelID.h"
 #include "game/RideAnimData.h"
+#include "Audio/entities/AEVehicleAudioEntity.h"
 
 enum eVehicleCreatedBy : uint8 {
     RANDOM_VEHICLE = 1,
@@ -39,11 +40,7 @@ struct CPedGta;
 //#pragma pack(push, 1)
 struct CVehicleGta : CPhysical
 {
-#if VER_x32
-    uint8_t m_VehicleAudioEntity[588];
-#else
-    uint8_t m_VehicleAudioEntity[0x310];
-#endif
+    CAEVehicleAudioEntity m_VehicleAudioEntity;
     tHandlingData* m_pHandlingData;
     uintptr_t* pFlyingHandling;
     union{
@@ -351,6 +348,9 @@ public:
 
     void AddVehicleUpgrade(int32 modelId);
     void RemoveVehicleUpgrade(int32 upgradeModelIndex);
+
+    bool UsesSiren();
+    bool IsLawEnforcementVehicle() const;
 };
 //#pragma pack(pop)
 

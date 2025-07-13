@@ -21,6 +21,7 @@
 
 extern uintptr_t g_libGTASA;
 extern char* g_pszStorage;
+extern char* g_pszRootStorage;
 
 void LogLong(const char* message);
 void Log(const char *fmt, ...);

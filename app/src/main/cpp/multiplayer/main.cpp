@@ -24,6 +24,7 @@
 uintptr_t g_libGTASA = 0;
 uintptr_t g_libSAMP = 0;
 char* g_pszStorage = nullptr;
+char* g_pszRootStorage = nullptr;
 
 #include "CLocalisation.h"
 #include "java_systems/HUD.h"
@@ -321,25 +322,25 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved)
 
 	CLoader::loadBassLib();
 
-	struct sigaction act;
+	struct sigaction act{};
 	act.sa_sigaction = handler;
 	sigemptyset(&act.sa_mask);
 	act.sa_flags = SA_SIGINFO;
 	sigaction(SIGSEGV, &act, &act_old);
 
-	struct sigaction act1;
+	struct sigaction act1{};
 	act1.sa_sigaction = handler1;
 	sigemptyset(&act1.sa_mask);
 	act1.sa_flags = SA_SIGINFO;
 	sigaction(SIGABRT, &act1, &act1_old);
 
-	struct sigaction act2;
+	struct sigaction act2{};
 	act2.sa_sigaction = handler2;
 	sigemptyset(&act2.sa_mask);
 	act2.sa_flags = SA_SIGINFO;
 	sigaction(SIGFPE, &act2, &act2_old);
 
-	struct sigaction act3;
+	struct sigaction act3{};
 	act3.sa_sigaction = handler3;
 	sigemptyset(&act3.sa_mask);
 	act3.sa_flags = SA_SIGINFO;
@@ -433,8 +434,17 @@ uint32_t GetTickCount()
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_russia_game_core_Samp_initSAMP(JNIEnv *env, jobject thiz, jfloat maxFps) {
+Java_com_russia_game_core_Samp_initSAMP(JNIEnv *env, jobject thiz, jfloat maxFps, jstring directory) {
     Log("Initializing SAMP..");
+
+    const char *dirChars = env->GetStringUTFChars(directory, nullptr);
+    if (g_pszRootStorage != nullptr) {
+        delete[] g_pszRootStorage;
+    }
+    g_pszRootStorage = new char[strlen(dirChars) + 1];
+    strcpy(g_pszRootStorage, dirChars);
+
+    env->ReleaseStringUTFChars(directory, dirChars);
 
 	CSettings::maxFps = (int)maxFps;
     g_pJavaWrapper = new CJavaWrapper(env, thiz);
