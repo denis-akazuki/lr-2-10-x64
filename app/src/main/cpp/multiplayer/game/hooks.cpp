@@ -566,6 +566,8 @@ int CTextureDatabaseRuntime__GetEntry_hook(TextureDatabaseRuntime *a1, const cha
 #include "Audio/entities/AEVehicleAudioEntity.h"
 #include "Audio/managers/AESoundManager.h"
 #include "Audio/hardware/AEAudioHardware.h"
+#include "Mirrors.h"
+#include "Mobile/MobileSettings/MobileSettings.h"
 
 void InjectHooks()
 {
@@ -578,6 +580,8 @@ void InjectHooks()
     RQShader::InjectHooks();
     CAEAudioEntity::InjectHooks();
     CAEVehicleAudioEntity::InjectHooks();
+    CMirrors::InjectHooks();
+    CMobileSettings::InjectHooks();
 
 	CHook::Write(g_libGTASA + (VER_x32 ? 0x678954 : 0x84F2D0), &Scene);
 

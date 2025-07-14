@@ -17,6 +17,7 @@
 #include "game/Animation/AnimBlendFrameData.h"
 #include "game/PedIK.h"
 #include "game/PlayerPedData.h"
+#include "Enums/ePedBones.h"
 
 struct CVehicleGta;
 struct CPlayerPedGta;
@@ -339,7 +340,10 @@ public:
     CPedGta(ePedType pedType);
     ~CPedGta() override;
 
-    void GetBonePosition(RwV3d *posn, uint32 boneTag, bool bCalledFromCamera);
+    CVector GetBonePosition(ePedBones boneId, bool updateSkinBones = false);
+    void GetBonePosition(CVector* outVec, ePedBones bone, bool updateSkinBones);
+    RwMatrix* GetBoneMatrix(ePedBones bone) const;
+
     void StopNonPartialAnims();
 
     CPedIntelligence* GetIntelligence() { return m_pIntelligence; }

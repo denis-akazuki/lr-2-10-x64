@@ -6,8 +6,6 @@
 #include "game/Models/ModelInfo.h"
 #include <cmath>
 
-extern CNetGame *pNetGame;
-
 float fixAngle(float angle)
 {
 	if (angle > 180.0f) angle -= 360.0f;
@@ -39,6 +37,12 @@ CObject::CObject(int iModel, float fPosX, float fPosY, float fPosZ, CVector vecR
 	m_bAttachedType = eObjectAttachType::NONE;
 	m_usAttachedVehicle = 0xFFFF;
 
+    if (m_pEntity) {
+        auto it = std::find(objectToIdMap.begin(), objectToIdMap.end(), m_pEntity);
+        if (it == objectToIdMap.end()) {
+            objectToIdMap.push_back(m_pEntity);
+        }
+    }
 	InstantRotate(vecRot.x, vecRot.y, vecRot.z);
 }
 
@@ -49,6 +53,13 @@ CObject::~CObject()
 	if(m_pEntity)
 		ScriptCommand(&destroy_object, m_dwGTAId);
 
+    if (m_pEntity) {
+        auto it = std::find(objectToIdMap.begin(), objectToIdMap.end(), m_pEntity);
+        if (it != objectToIdMap.end()) {
+            objectToIdMap.erase(it);
+        }
+        ScriptCommand(&destroy_object, m_dwGTAId);
+    }
 	CStreaming::RemoveModelIfNoRefs(modelId);
 }
 

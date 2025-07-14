@@ -102,3 +102,9 @@ RwBool RpHAnimFrameSetID(RwFrame* frame, RwInt32 id) {
 RwInt32 RpHAnimFrameGetID(RwFrame* frame) {
     return CHook::CallFunction<RwInt32>(g_libGTASA + (VER_x32 ? 0x1C2C00 + 1 : 0x255BD4), frame);
 }
+
+RwMatrix* RpHAnimHierarchyGetNodeMatrix(RpHAnimHierarchy* hierarchy, RwInt32 nodeID) {
+    const auto i = RpHAnimIDGetIndex(hierarchy, nodeID);
+    assert(i >= 0 && i < hierarchy->numNodes);
+    return &RpHAnimHierarchyGetMatrixArray(hierarchy)[i];
+}

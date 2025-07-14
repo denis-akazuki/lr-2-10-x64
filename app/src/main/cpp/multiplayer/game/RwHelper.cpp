@@ -55,3 +55,11 @@ RpAtomic* AtomicRemoveAnimFromSkinCB(RpAtomic* atomic, void* data) {
 RpClump* RpClumpGetBoundingSphere(RpClump* clump, RwSphere* sphere, bool bUseLTM) {
     return CHook::CallFunction<RpClump*>(g_libGTASA + (VER_x32 ? 0x5D0E3C + 1 : 0x6F51F8), clump, sphere, bUseLTM);
 }
+
+RpHAnimHierarchy* GetAnimHierarchyFromFrame(RwFrame* frame) {
+    return CHook::CallFunction<RpHAnimHierarchy*>("_Z25GetAnimHierarchyFromFrameP7RwFrame", frame);
+}
+
+RpHAnimHierarchy* GetAnimHierarchyFromClump(RpClump* clump) {
+    return GetAnimHierarchyFromFrame(RpClumpGetFrame(clump));
+}

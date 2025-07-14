@@ -18,7 +18,6 @@
 #include "Timer.h"
 #include "WeaponInfo.h"
 
-extern CNetGame *pNetGame;
 CPedSamp* g_pCurrentFiredPed;
 
 CPedSamp::CPedSamp()
@@ -542,17 +541,17 @@ void CPedSamp::GetWeaponInfoForFire(int bLeft, CVector* vecBone, CVector* vecOut
 		vecOut->y = pFireOffset->y;
 		vecOut->z = pFireOffset->z;
 
-		int bone_id = 24;
-		if (bLeft) {
-			bone_id = 34;
-		}
+        ePedBones boneId = ePedBones::BONE_R_HAND;
+        if (bLeft) {
+            boneId = ePedBones::BONE_L_HAND;
+        }
 
-		m_pPed->GetBonePosition(vecBone, bone_id, false);
+		m_pPed->GetBonePosition(vecBone, boneId, false);
 
 		vecBone->z += pFireOffset->z + 0.15f;
 
 		// CPed::GetTransformedBonePosition
-		((void (*)(CPedGta*, CVector*, int, bool))(g_libGTASA + (VER_x32 ? 0x004A24A8 + 1 : 0x598670)))(m_pPed, vecOut, bone_id, false);
+		((void (*)(CPedGta*, CVector*, int, bool))(g_libGTASA + (VER_x32 ? 0x004A24A8 + 1 : 0x598670)))(m_pPed, vecOut, boneId, false);
 	}
 }
 

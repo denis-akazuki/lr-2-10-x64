@@ -49,7 +49,7 @@ void CFirstPersonCamera::ProcessCameraOnFoot(CCam* pCam, CPedSamp* pPed)
 
     if (vecOut.x != vecOut.x || vecOut.y != vecOut.y || vecOut.z != vecOut.z)
     {
-        pPed->m_pPed->GetBonePosition(&vecOut, 4, false);
+        pPed->m_pPed->GetBonePosition(&vecOut, BONE_NECK, false);
     }
     if (vecOut.x != vecOut.x || vecOut.y != vecOut.y || vecOut.z != vecOut.z)
     {
@@ -99,7 +99,7 @@ void CFirstPersonCamera::ProcessCameraInVeh(CCam* pCam, CPedSamp* pPed, CVehicle
 
     if (vecOut.x != vecOut.x || vecOut.y != vecOut.y || vecOut.z != vecOut.z)
     {
-        pPed->m_pPed->GetBonePosition(&vecOut, 4, false);
+        pPed->m_pPed->GetBonePosition(&vecOut, BONE_NECK, false);
     }
     if (vecOut.x != vecOut.x || vecOut.y != vecOut.y || vecOut.z != vecOut.z)
     {

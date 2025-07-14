@@ -36,6 +36,8 @@ public:
 	CPhysical		    *m_pEntity;
 	uint32_t		    m_dwGTAId;
 
+    static inline       std::vector<CEntity*> objectToIdMap {};
+
 	CObject(int iModel, float fPosX, float fPosY, float fPosZ, CVector vecRot, float fDrawDistance);
 	~CObject();
 

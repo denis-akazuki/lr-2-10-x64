@@ -59,7 +59,7 @@ void CPlayerTags::Render() {
 			if (distFromCam > m_fDistance[playerId]) {
 				ResetChatBubble(playerId);
 			} else {
-				pPlayerPed->m_pPed->GetBonePosition(&vecPos, 8, false);
+				pPlayerPed->m_pPed->GetBonePosition(&vecPos, BONE_JAW, false);
 				DrawChatBubble(playerId, &vecPos, distFromCam);
 			}
 
@@ -69,7 +69,7 @@ void CPlayerTags::Render() {
 		}
 
 		if (distFromCam <= pNetGame->m_fNameTagDrawDistance) {
-			pPlayerPed->m_pPed->GetBonePosition(&vecPos, 8, false);
+			pPlayerPed->m_pPed->GetBonePosition(&vecPos, BONE_JAW, false);
 
 			if (!pNetGame->m_bNameTagLOS || CWorld::GetIsLineOfSightClear(vecPos, TheCamera.GetPosition(), true, false, false, true, false, false, false)) {
 				static char szNickBuf[50]{};
@@ -98,7 +98,7 @@ void CPlayerTags::RenderActors() {
             continue;
 
 		if (distFromCam <= pNetGame->m_fNameTagDrawDistance) {
-			pPed->GetBonePosition(&vecPos, 8, false);
+			pPed->GetBonePosition(&vecPos, BONE_JAW, false);
 
 			if (!pNetGame->m_bNameTagLOS || CWorld::GetIsLineOfSightClear(vecPos, TheCamera.GetPosition(), false, false, false, false, false, false, false)) {
 				vecPos.z += 0.25f + (distFromCam * 0.0475f);

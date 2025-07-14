@@ -29,7 +29,7 @@ void CText3DLabelsPool::DrawAttachedToPlayer(CText3DLabel* pLabel)
 	CPedSamp* pPlayerPed = pPlayer->GetPlayerPed();
 
 	CVector pos;
-	pPlayerPed->m_pPed->GetBonePosition(&pos, 5, false);
+	pPlayerPed->m_pPed->GetBonePosition(&pos, BONE_HEAD, false);
 
 	pos += pLabel->offsetCoords;
 
