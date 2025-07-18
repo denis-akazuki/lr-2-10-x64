@@ -6,6 +6,7 @@
 #include "../util/patch.h"
 #include "Entity/Ped/Ped.h"
 #include "game/Entity/Object/Object.h"
+#include "Tasks/TaskTypes/TaskSimpleUseGun.h"
 
 void CPedIntelligence::Process() {
 
@@ -216,4 +217,8 @@ void CPedIntelligence::ProcessAfterPreRender() {
 
 CTaskSimpleDuck *CPedIntelligence::GetTaskDuck(bool bIgnoreCheckingForSimplestActiveTask) {
     return CHook::CallFunction<CTaskSimpleDuck*>(g_libGTASA + (VER_x32 ? 0x4C06AE + 1 : 0x5BCCF4), this, bIgnoreCheckingForSimplestActiveTask);
+}
+
+CTaskSimpleUseGun* CPedIntelligence::GetTaskUseGun() {
+    return CTask::DynCast<CTaskSimpleUseGun>(m_TaskMgr.GetTaskSecondary(TASK_SECONDARY_ATTACK));
 }

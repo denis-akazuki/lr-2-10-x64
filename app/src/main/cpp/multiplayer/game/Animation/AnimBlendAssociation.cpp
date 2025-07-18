@@ -283,6 +283,10 @@ void CAnimBlendAssociation::UpdateTimeStep(float speedMult, float timeMult) {
     }
 }
 
+float CAnimBlendAssociation::GetTimeProgress() const {
+    return m_fCurrentTime / m_pHierarchy->m_fTotalTime;
+}
+
 // 0x4CEA50
 void CAnimBlendAssociation::ReferenceAnimBlock() {
     if (m_nFlags & ANIMATION_BLOCK_REFERENCED) {

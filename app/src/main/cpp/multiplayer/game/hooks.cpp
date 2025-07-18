@@ -583,6 +583,9 @@ void InjectHooks()
     CMirrors::InjectHooks();
     CMobileSettings::InjectHooks();
 
+    CWeapon::InjectHooks();
+    CWeaponInfo::InjectHooks();
+
 	CHook::Write(g_libGTASA + (VER_x32 ? 0x678954 : 0x84F2D0), &Scene);
 
 #if !VER_x32 // mb all.. wtf crash x64?

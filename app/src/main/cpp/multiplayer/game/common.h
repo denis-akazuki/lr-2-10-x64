@@ -1,9 +1,9 @@
 #pragma once
 
-#include <inttypes.h>
+#include <cinttypes>
 
 #define VER_2_1 	    true
-#define VER_SAMP 	    false
+#define VER_SAMP 	    true
 #define VER_LR		    true
 #define USE_FILE_LOG    false
 
@@ -93,6 +93,26 @@ namespace notsa {
 			assert(result); // In release mode this won't do anything
 		}
 	};
+
+    /*!
+    * @arg value The value to search for in the range
+    *
+    * @brief Check if a range contains a value, uses `rng::find`. NOTE: If you plan on using the iterator, just use `rng::find` instead..
+    */
+    template<std::ranges::input_range R, class T = std::ranges::range_value_t<R>, class Proj = std::identity>
+    requires std::indirect_binary_predicate<std::ranges::equal_to, std::projected<std::ranges::iterator_t<R>, Proj>, const T*>
+    bool contains(R&& r, const T& value, Proj proj = {}) {
+        return std::ranges::find(r, value, proj) != std::ranges::end(r);
+    }
+
+
+    /*!
+    * Helper (Of your fingers) - Reduces typing needed for Python style `value in {}`
+    */
+    template<typename Y>
+    bool contains(std::initializer_list<Y> r, const Y& value) {
+        return contains(r, value, {});
+    }
 };
 //! Macro for passing a string var to *scanf_s function.
 #define VERIFY notsa::detail::VerifyMacroImpl

@@ -119,6 +119,64 @@ void CPedGta::GiveWeapon(int iWeaponID, int iAmmo)
     CHook::CallFunction<void>(g_libGTASA + (VER_x32 ? 0x004A521C + 1 : 0x59B86C), this, iWeaponID);	// CPed::SetCurrentWeapon(thisptr, weapid)
 }
 
+eWeaponSlot CPedGta::GiveWeapon(eWeaponType weaponType, uint32 ammo, bool likeUnused) {
+    return CHook::CallFunction<eWeaponSlot>("_ZN4CPed10GiveWeaponE11eWeaponTypejb", weaponType, ammo, likeUnused);
+    /*const auto givenWepInfo = CWeaponInfo::GetWeaponInfo(weaponType);
+    auto& wepInSlot = GetWeaponInSlot(givenWepInfo->m_nSlot);
+    const auto wepSlot = (eWeaponSlot)givenWepInfo->m_nSlot;
+
+    if (wepInSlot.m_nType != weaponType) { // Another weapon in the slot, remove it, and set this weapon
+
+        // Remove previous weapon (and possibly add any ammo it had to `ammo`)
+        if (wepInSlot.m_nType != WEAPON_UNARMED) {
+            switch (wepSlot) {
+                case eWeaponSlot::SHOTGUN:
+                case eWeaponSlot::SMG:
+                case eWeaponSlot::RIFLE: {
+                    ammo += wepInSlot.m_nTotalAmmo;
+                    break;
+                }
+            }
+
+            RemoveWeaponModel(wepInSlot.GetWeaponInfo().m_nModelId1);
+
+            if (givenWepInfo->m_nSlot == CWeaponInfo::GetWeaponInfo(WEAPON_INFRARED)->m_nSlot) {
+                RemoveGogglesModel();
+            }
+
+            wepInSlot.Shutdown();
+        }
+
+        wepInSlot.Initialise(weaponType, ammo, this);
+
+        // Now `wepInSlot` is the weapon we've given to the player
+
+        if (givenWepInfo->m_nSlot == m_nActiveWeaponSlot && !bInVehicle) {
+            AddWeaponModel(givenWepInfo->m_nModelId1);
+        }
+    } else { // Same weapon already in the slot, update its ammo count and `Reload()` it
+        if (wepSlot == eWeaponSlot::GIFT) { // Gifts have no ammo :D
+            return eWeaponSlot::GIFT;
+        }
+
+        wepInSlot.m_nTotalAmmo = std::min(99'999u, wepInSlot.m_nTotalAmmo + ammo);
+        wepInSlot.Reload(this);
+
+        // TODO: Inlined
+        if (wepInSlot.m_nState == WEAPONSTATE_OUT_OF_AMMO) {
+            if (wepInSlot.m_nTotalAmmo > 0) {
+                wepInSlot.m_nState = WEAPONSTATE_READY;
+            }
+        }
+    }
+
+    if (wepInSlot.m_nState != WEAPONSTATE_OUT_OF_AMMO) {
+        wepInSlot.m_nState = WEAPONSTATE_READY;
+    }
+
+    return wepSlot;*/
+}
+
 /*!
 * @addr 0x5DEC00
 */
@@ -336,4 +394,105 @@ bool CPedGta::IsExitingVehicle() {
 
 CPedGta::~CPedGta() {
     CHook::CallFunction<void>(g_libGTASA + (VER_x32 ? 0x49F6A4 + 1 : 0x59541C), this);
+}
+
+eWeaponSkill CPedGta::GetWeaponSkill() {
+    return GetWeaponSkill(GetActiveWeapon().m_nType);
+}
+
+eWeaponSkill CPedGta::GetWeaponSkill(eWeaponType weaponType)
+{
+    if (!CWeaponInfo::TypeHasSkillStats(weaponType)) {
+        return eWeaponSkill::STD;
+    }
+
+    if (IsPlayer())
+    {
+        const auto GetReqStatLevelWith = [this, weaponType](eWeaponSkill skill) {
+            return (float)CWeaponInfo::GetWeaponInfo(weaponType, skill)->m_nReqStatLevel;
+        };
+
+        const auto statValue = CHook::CallFunction<float>("_ZN6CStats12GetStatValueEt", (eStats)CWeaponInfo::GetSkillStatIndex(weaponType));
+        if (statValue >= GetReqStatLevelWith(eWeaponSkill::PRO)) {
+            return eWeaponSkill::PRO;
+        } else if (statValue <= GetReqStatLevelWith(eWeaponSkill::POOR)) {
+            return eWeaponSkill::POOR;
+        } else {
+            return eWeaponSkill::STD; // Somewhere in-between poor and pro stat levels
+        }
+    } else {
+        if (weaponType == WEAPON_PISTOL && m_nPedType == PEDTYPE_COP)
+            return eWeaponSkill::COP;
+        return m_nWeaponSkill;
+    }
+}
+
+void CPedGta::GetTransformedBonePosition(RwV3d& inOutPos, ePedBones bone, bool updateSkinBones) { // todo: fix this too!!!
+    // Pretty much the same as GetBonePosition..
+    if (updateSkinBones) {
+        if (!bCalledPreRender) {
+            UpdateRpHAnim();
+            bCalledPreRender = true;
+        }
+    } else if (!bCalledPreRender) { // Return static local bone position instead
+        inOutPos = m_matrix->TransformPoint(GetPedBoneStdPosition(bone));
+        return;
+    }
+
+    // Return actual position
+    RwV3dTransformPoints(&inOutPos, &inOutPos, 1, GetBoneMatrix(bone));
+}
+
+bool CPedGta::DoGunFlash(int32 duration, bool isLeftHand) {
+    if (!m_pGunflashObject || !m_pWeaponObject) {
+        return false;
+    }
+
+    // Really elegant.. ;D
+    if (isLeftHand) {
+        m_nWeaponGunflashAlphaMP2     = m_sGunFlashBlendStart;
+        m_nWeaponGunFlashAlphaProgMP2 = (uint16)m_sGunFlashBlendStart / duration;
+    } else {
+        m_nWeaponGunflashAlphaMP1     = m_sGunFlashBlendStart;
+        m_nWeaponGunFlashAlphaProgMP1 = (uint16)m_sGunFlashBlendStart / duration;
+    }
+
+    const auto angle = CGeneral::GetRandomNumberInRange(-360.0f, 360.0f);
+
+    CVector vec = CPedIK::XaxisIK;
+    RwMatrixRotate(RwFrameGetMatrix(RwFrameGetParent(m_pGunflashObject)), &vec, angle);
+    return true;
+}
+
+void CPedGta::SetCurrentWeapon(int32 slot) {
+    CHook::CallFunction<void>("_ZN4CPed16SetCurrentWeaponEi", this, slot);
+}
+
+void CPedGta::SetCurrentWeapon(eWeaponType weaponType) {
+    SetCurrentWeapon(GetWeaponSlot(weaponType));
+}
+
+int32 CPedGta::GetWeaponSlot(eWeaponType weaponType) {
+    return CWeaponInfo::GetWeaponInfo(weaponType)->m_nSlot;
+}
+
+void CPedGta::SetAmmo(eWeaponType weaponType, uint32 ammo) {
+    const auto wepSlot = GetWeaponSlot(weaponType);
+    if (wepSlot != -1) {
+        auto& wepInSlot = GetWeaponInSlot(wepSlot);
+
+        if (ammo < 0) {
+            wepInSlot.m_nTotalAmmo = 0;
+            wepInSlot.m_nAmmoInClip = 0;
+        } else {
+            wepInSlot.m_nTotalAmmo = std::min(ammo, 99'999u);
+            wepInSlot.m_nAmmoInClip = std::max(wepInSlot.m_nTotalAmmo, wepInSlot.m_nAmmoInClip);
+        }
+
+        if (wepInSlot.m_nState == WEAPONSTATE_OUT_OF_AMMO) {
+            if (wepInSlot.m_nTotalAmmo > 0) {
+                wepInSlot.m_nState = WEAPONSTATE_READY;
+            }
+        }
+    }
 }

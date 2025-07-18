@@ -86,6 +86,8 @@ enum ePedCreatedBy : uint8 {
     PED_GAME_MISSION = 3, // used for the playbacked peds on replay
 };
 
+static inline int16 m_sGunFlashBlendStart = 10'000; // 0x8D1370
+
 struct CPedGta : CPhysical {
 #if VER_x32
     uint8_t             m_PedAudioEntity[0x15C];
@@ -363,6 +365,7 @@ public:
     CWeapon& GetWeaponInSlot(size_t slot) noexcept { return m_aWeapons[slot]; }
     CWeapon& GetWeaponInSlot(eWeaponSlot slot) noexcept { return m_aWeapons[(size_t)slot]; }
     CWeapon& GetActiveWeapon() noexcept { return GetWeaponInSlot(m_nActiveWeaponSlot); }
+    CWeapon& GetWeapon(eWeaponType wt) noexcept { return GetWeaponInSlot(GetWeaponSlot(wt)); }
 
     void RemoveFromVehicleAndPutAt(const CVector &pos);
     int GetSampSeatId();
@@ -376,8 +379,21 @@ public:
 
     void SetMoveState(eMoveState moveState);
 
-    // NOTSA
+    eWeaponSkill GetWeaponSkill(eWeaponType weaponType);
+    eWeaponSkill GetWeaponSkill();
+
+    void GetTransformedBonePosition(RwV3d& inOutPos, ePedBones boneId, bool updateSkinBones = false);
+
+    int32 GetWeaponSlot(eWeaponType weaponType);
+    void SetAmmo(eWeaponType weaponType, uint32 ammo);
+
     void GiveWeapon(int iWeaponID, int iAmmo);
+    eWeaponSlot GiveWeapon(eWeaponType weaponType, uint32 ammo, bool likeUnused);
+
+    void SetCurrentWeapon(int32 slot);
+    void SetCurrentWeapon(eWeaponType weaponType);
+
+    bool DoGunFlash(int32 duration, bool isLeftHand);
 };
 
 VALIDATE_SIZE(CPedGta, (VER_x32 ? 0x7A4 : 0x988));

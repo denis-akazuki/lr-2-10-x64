@@ -65,6 +65,9 @@ public:
     static uint32_t GetTimeInMS() { return m_snTimeInMilliseconds; }
     static void   SetTimeInMS(uint32_t t) { m_snTimeInMilliseconds = t; }
 
+    static uint32_t GetPreviousTimeInMS() { return m_snPreviousTimeInMilliseconds; }
+    static void   SetPreviousTimeInMS(uint32_t t) { m_snPreviousTimeInMilliseconds = t; }
+
     static uint32_t GetCurrentUnixTimeMoscow();
     static float  GetTimeStep() { return ms_fTimeStep; }
     static void   SetTimeStep(float ts) { ms_fTimeStep = ts; }

@@ -525,7 +525,7 @@ CVector* CPedSamp::GetCurrentWeaponFireOffset() {
 
 	CWeapon* pSlot = GetCurrentWeaponSlot();
 	if (pSlot) {
-		return &CWeaponInfo::GetWeaponInfo(pSlot->m_nType, 1)->m_vecFireOffset;
+        return &CWeaponInfo::GetWeaponInfo(pSlot->m_nType, eWeaponSkill::STD)->m_vecFireOffset;
 	}
 	return nullptr;
 }

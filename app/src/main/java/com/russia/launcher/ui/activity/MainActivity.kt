@@ -120,7 +120,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onClickPlay() {
-        if (isCheckSkipping) {
+        startGame()
+        /*if (isCheckSkipping) {
             startGame()
         } else {
             val progressDialog = findViewById<ConstraintLayout>(R.id.progressDialog)
@@ -134,7 +135,7 @@ class MainActivity : AppCompatActivity() {
                     progressDialog.visibility = View.GONE
                 }
             }
-        }
+        }*/
     }
 
     private val isCheckSkipping: Boolean

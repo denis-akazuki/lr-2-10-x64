@@ -5,23 +5,35 @@
 #pragma once
 
 #include "common.h"
-#include "game/Enums/eWeaponType.h"
-#include "game/Enums/eWeaponFire.h"
-#include "game/Enums/AnimationEnums.h"
+#include "Enums/eWeaponType.h"
+#include "Enums/eWeaponFire.h"
+#include "Enums/AnimationEnums.h"
+#include "Enums/eWeaponSkill.h"
+#include "Enums/eStats.h"
+
+struct CPedGta;
+
+constexpr static auto FIRST_WEAPON_WITH_SKILLS = WEAPON_PISTOL;
+constexpr static auto LAST_WEAPON_WITH_SKILLS  = WEAPON_TEC9;
+
+constexpr static auto NUM_WEAPONS_WITH_SKILL = (LAST_WEAPON_WITH_SKILLS - FIRST_WEAPON_WITH_SKILLS) + 1;
+constexpr static auto NUM_WEAPON_INFOS = NUM_WEAPONS + NUM_WEAPONS_WITH_SKILL * (NUM_WEAPON_SKILLS - 1);
+
+#define SCANF_S_STR(s) s, std::size(s)
+
+struct CGunAimingOffset {
+    float AimX;
+    float AimZ;
+    float DuckX;
+    float DuckZ;
+    int16 RLoadA;
+    int16 RLoadB;
+    int16 CrouchRLoadA;
+    int16 CrouchRLoadB;
+};
+static inline CGunAimingOffset g_GunAimingOffsets[20];
 
 class CWeaponInfo {
-    constexpr static auto FIRST_WEAPON_WITH_SKILLS = WEAPON_PISTOL;
-    constexpr static auto LAST_WEAPON_WITH_SKILLS  = WEAPON_TEC9;
-
-    constexpr static auto NUM_WEAPONS_WITH_SKILL = (LAST_WEAPON_WITH_SKILLS - FIRST_WEAPON_WITH_SKILLS) + 1; //< Weapons with multiple skills levels (other than `eWeaponSkill::STD`)
-    static_assert(NUM_WEAPONS_WITH_SKILL == 11);
-
-    //constexpr static auto NUM_WEAPON_INFOS = NUM_WEAPONS + NUM_WEAPONS_WITH_SKILL * (NUM_WEAPON_SKILLS - 1); // `-1` to account for `std` that all weapons have
-    //static_assert(NUM_WEAPON_INFOS == 80);
-
-//    //! Memory Layout(Assuming vanilla settings): [STD 0 - 47][POOR 47 - 57][PRO 58 - 68][COP 69 - 79]
-//    static inline CWeaponInfo(&aWeaponInfo)[NUM_WEAPON_INFOS] = *(CWeaponInfo(*)[NUM_WEAPON_INFOS])0xC8AAB8;
-
 public:
     eWeaponFire m_nWeaponFire;
     float       m_fTargetRange; // max targeting range
@@ -85,5 +97,25 @@ public:
 public:
     static void InjectHooks();
 
-    static CWeaponInfo* GetWeaponInfo(int iWeapon, int iSkill);
+    static void LoadWeaponData();
+    static eWeaponType FindWeaponType(const char* type);
+    static eWeaponFire FindWeaponFireType(const char* name);
+
+    static CWeaponInfo *GetWeaponInfo(eWeaponType weaponType, eWeaponSkill skill = eWeaponSkill::STD);
+    static uint32 GetWeaponInfoIndex(eWeaponType weaponType, eWeaponSkill skill);
+
+    static bool TypeHasSkillStats(eWeaponType type);
+    static bool TypeIsWeapon(eWeaponType type);
+    static eStats GetSkillStatIndex(eWeaponType weaponType);
+
+    auto GetCrouchReloadAnimationID() const -> AnimationId;
+    auto GetWeaponReloadTime() const -> uint32;
+
+    static auto GetWeaponInfo(CPedGta* ped);
+    auto GetAnimLoopStart(bool isSet2 = false) const { return isSet2 ? m_fAnimLoop2Start : m_fAnimLoopStart; }
+    auto GetAnimLoopEnd(bool isSet2 = false) const { return isSet2 ? m_fAnimLoop2End : m_fAnimLoopEnd; }
+    const auto& GetAimingOffset() const { return g_GunAimingOffsets[m_nAimOffsetIndex]; }
 };
+VALIDATE_SIZE(CWeaponInfo, 0x70);
+
+static inline CWeaponInfo aWeaponInfo[NUM_WEAPON_INFOS];

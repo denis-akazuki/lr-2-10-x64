@@ -152,6 +152,9 @@ public:
         m_fSpeed = speed;
     }
 
+    float GetCurrentTime() const { return m_fCurrentTime; }
+    float GetTimeProgress() const;
+
     auto GetNodes() { return std::span{ &m_pNodeArray, m_nNumBlendNodes }; }
     void SetDefaultFinishCallback() { SetFinishCallback(CDefaultAnimCallback::DefaultAnimCB, nullptr); }
 

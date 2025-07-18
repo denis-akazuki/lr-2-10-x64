@@ -26,6 +26,10 @@ CRepeatSector* GetRepeatSector(int32 x, int32 y) {
 
 void CWorld::InjectHooks() {
 
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x006761FC : 0x84A478), &bIncludeBikers);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x006765D4 : 0x84AC18), &bIncludeCarTyres);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x00675F9C : 0x849FC0), &bIncludeDeadPeds);
+
     CHook::InstallPLT(g_libGTASA + (VER_x32 ? 0x675C58 : 0x849A20), &ProcessPedsAfterPreRender);
 }
 

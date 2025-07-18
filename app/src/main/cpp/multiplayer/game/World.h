@@ -33,6 +33,10 @@ public:
     static inline CPlayerInfoGta Players[MAX_PLAYERS];
     static inline int PlayerInFocus;
 
+    static inline bool bIncludeBikers;
+    static inline bool bIncludeCarTyres;
+    static inline bool bIncludeDeadPeds;
+
     // Use GetRepeatSector() to access this array
     // static inline CRepeatSector ms_aRepeatSectors[MAX_REPEAT_SECTORS_Y][MAX_REPEAT_SECTORS_X];
 
@@ -105,6 +109,13 @@ public:
                && pos.y > -3000.0f && pos.y < 3000.0f;
     }
 
+    static void SetToIgnoreEntity(CEntity* entity) {
+        *(CEntity**)(g_libGTASA + (VER_x32 ? 0x0096B9D0 : 0xBDCAF8)) = entity;
+    }
+
+    static CEntity* GetToIgnoreEntity() {
+        return (CEntity*)(g_libGTASA + (VER_x32 ? 0x0096B9D0 : 0xBDCAF8));
+    }
 };
 
 CSector* GetSector(int32 x, int32 y);

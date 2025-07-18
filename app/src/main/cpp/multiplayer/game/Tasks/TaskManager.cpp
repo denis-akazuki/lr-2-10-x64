@@ -300,3 +300,12 @@ void CTaskManager::InjectHooks() {
 CTask *CTaskManager::FindActiveTaskByType(eTaskType taskType) {
     return CHook::CallFunction<CTask*>(g_libGTASA + (VER_x32 ? 0x00533B20 + 1 : 0x64E348), this, taskType);
 }
+
+CTask* CTaskManager::GetActiveTask() {
+    for (const auto task : m_aPrimaryTasks) {
+        if (task) {
+            return task;
+        }
+    }
+    return nullptr;
+}

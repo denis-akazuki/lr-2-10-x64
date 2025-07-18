@@ -8,6 +8,7 @@
 #include "game/Tasks/TaskManager.h"
 #include "game/Events/EventHandler.h"
 #include "game/Events/EventGroup.h"
+#include "Tasks/TaskTypes/TaskSimpleUseGun.h"
 
 class CTaskSimpleJetPack;
 class CTaskSimpleDuck;
@@ -54,6 +55,7 @@ public:
     void ProcessAfterPreRender();
 
     CTaskSimpleJetPack* GetTaskJetPack();
+    CTaskSimpleUseGun* GetTaskUseGun();
     CTaskSimpleDuck* GetTaskDuck(bool bIgnoreCheckingForSimplestActiveTask = true);
 };
 VALIDATE_SIZE(CPedIntelligence, (VER_x32 ? 0x298 : 0x440));
