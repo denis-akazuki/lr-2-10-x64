@@ -82,6 +82,8 @@ public:
 
     /// NOTSA. Get random gangtalk anim
     static AnimationId GetRandomGangTalkAnim();
+
+    static auto GetAssocGroupDefs() { return std::span<AnimAssocDefinition>(ms_aAnimAssocDefinitions.data(), ms_numAnimAssocDefinitions); }
 private:
     static inline void LoadAnimFile_ANPK(RwStream* stream, bool compress, const char (*uncompressedAnims)[32]);
     static inline void LoadAnimFile_ANP23(RwStream* stream, bool compress, bool isANP3);

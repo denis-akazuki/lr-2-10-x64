@@ -17,27 +17,40 @@ void CMirrors::RenderReflections()
     if (carReflections < 2)
         return;
 
+    std::vector<CEntity*> hiddenEntities;
     if (pNetGame) {
         auto pPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
         if (pPed && pPed->m_pPed) {
             pPed->m_pPed->m_bIsVisible = false;
+            hiddenEntities.push_back(pPed->m_pPed);
         }
+
         for (const auto& pair : CPlayerPool::spawnedPlayers) {
-            const auto pPed = pair.second->GetPlayerPed();
-            if (pPed && pPed->m_pPed && !pPed->m_pPed->m_bRemoveFromWorld) {
-                pPed->m_pPed->m_bIsVisible = false;
+            const auto pPed = pair.second->GetPlayerPed()->m_pPed;
+            if (pPed && !pPed->m_bRemoveFromWorld) {
+                pPed->m_bIsVisible = false;
+                hiddenEntities.push_back(pPed);
             }
         }
+
         for (auto* pEntity : CObject::objectToIdMap) {
             if (pEntity && !pEntity->m_bRemoveFromWorld) {
                 pEntity->m_bIsVisible = false;
+                hiddenEntities.push_back(pEntity);
             }
         }
     }
 
     CHook::CallFunction<void>("_ZN8CMirrors12CreateBufferEv");
-    if (!FindPlayerPed(-1) || !reflBuffer[0])
+    if (!FindPlayerPed(-1) || !reflBuffer[0]) {
+        for (auto* pEntity : hiddenEntities) {
+            if (pEntity) {
+                pEntity->m_bIsVisible = true;
+            }
+        }
+        hiddenEntities.clear();
         return;
+    }
 
     static float reflectionRadius = 0.0f;
     static bool radiusInitialized = false;
@@ -58,9 +71,7 @@ void CMirrors::RenderReflections()
     const float originalFarPlane = Scene.m_pRwCamera->farPlane;
     const float originalFogPlane = Scene.m_pRwCamera->fogPlane;
 
-    Scene.m_pRwCamera->frameBuffer = reflBuffer[0];
-    Scene.m_pRwCamera->zBuffer = reflBuffer[1];
-
+    memcpy(&Scene.m_pRwCamera->frameBuffer, reflBuffer, sizeof(RwRaster*)*2);
     CHook::CallFunction<void>("_Z22emu_SetRenderingSpherePfh", nullptr, 1);
 
     RwRGBA skyColor(
@@ -105,23 +116,12 @@ void CMirrors::RenderReflections()
     Scene.m_pRwCamera->farPlane = originalFarPlane;
     Scene.m_pRwCamera->fogPlane = originalFogPlane;
 
-    if (pNetGame) {
-        auto pPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
-        if (pPed && pPed->m_pPed) {
-            pPed->m_pPed->m_bIsVisible = true;
-        }
-        for (const auto& pair : CPlayerPool::spawnedPlayers) {
-            const auto pPed = pair.second->GetPlayerPed();
-            if (pPed && pPed->m_pPed && !pPed->m_pPed->m_bRemoveFromWorld) {
-                pPed->m_pPed->m_bIsVisible = true;
-            }
-        }
-        for (auto* pEntity : CObject::objectToIdMap) {
-            if (pEntity && !pEntity->m_bRemoveFromWorld) {
-                pEntity->m_bIsVisible = true;
-            }
+    for (auto* pEntity : hiddenEntities) {
+        if (pEntity) {
+            pEntity->m_bIsVisible = true;
         }
     }
+    hiddenEntities.clear();
 }
 
 void CMirrors::InjectHooks() {
