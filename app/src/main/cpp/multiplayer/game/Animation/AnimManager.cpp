@@ -166,9 +166,19 @@ const char* CAnimManager::GetAnimBlockName(AssocGroupId groupId) {
 // NOTSA
 AssocGroupId CAnimManager::GetAnimationGroupId(const char* name) {
     for (auto i = 0; i < ms_numAnimAssocDefinitions; i++) {
-        if (std::string_view{ name } == GetAnimGroupName((AssocGroupId)i)) {
+        if (name == GetAnimGroupName((AssocGroupId)i)) {
             return (AssocGroupId)i;
         }
+    }
+    return AssocGroupId::ANIM_GROUP_DEFAULT;
+}
+
+AssocGroupId CAnimManager::GetAnimationGroupIdByName(std::string_view name) {
+    for (size_t i = 0; const auto& gd : GetAssocGroupDefs()) {
+        if (gd.groupName == name) {
+            return (AssocGroupId)i;
+        }
+        i++;
     }
     return AssocGroupId::ANIM_GROUP_DEFAULT;
 }

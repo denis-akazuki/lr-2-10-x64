@@ -7,9 +7,9 @@
 #include "PedModelInfo.h"
 #include "AtomicModelInfo.h"
 #include "VehicleModelInfo.h"
+#include "WeaponModelInfo.h"
 #include "game/Core/Store.h"
 #include "game/constants.h"
-
 
 class CModelInfo {
 public:
@@ -30,12 +30,16 @@ public:
     static constexpr int32 NUM_CLUMP_MODEL_INFOS = 92;
     static inline CStore<CClumpModelInfo, NUM_CLUMP_MODEL_INFOS> ms_clumpModelInfoStore;
 
+    static constexpr int32 NUM_WEAPON_MODEL_INFOS = 51;
+    static inline CStore<CWeaponModelInfo, NUM_WEAPON_MODEL_INFOS> ms_weaponModelInfoStore;
+
     static CPedModelInfo *AddPedModel(int index);
 
     static CAtomicModelInfo *AddAtomicModel(int index);
     static CDamageAtomicModelInfo* AddDamageAtomicModel(int32 index);
     static CVehicleModelInfo *AddVehicleModel(int index);
     static CClumpModelInfo* AddClumpModel(int32 index);
+    static CWeaponModelInfo* AddWeaponModel(int32 index);
 
     static CBaseModelInfo* GetModelInfo(const char* name, int32 minIndex, int32 maxIndex);
     static CBaseModelInfo* GetModelInfo(const char* name, int32* index = nullptr);

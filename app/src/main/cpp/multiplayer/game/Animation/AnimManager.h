@@ -55,6 +55,7 @@ public:
     static const char* GetAnimGroupName(AssocGroupId groupId);
     static const char* GetAnimBlockName(AssocGroupId groupId);
     static AssocGroupId GetAnimationGroupId(const char* name);
+    static AssocGroupId GetAnimationGroupIdByName(std::string_view name);
     static CAnimBlendStaticAssociation* GetAnimAssociation(AssocGroupId groupId, AnimationId animId);
     static CAnimBlendStaticAssociation* GetAnimAssociation(AssocGroupId groupId, const char* animName);
     static int32 GetNumRefsToAnimBlock(int32 index);

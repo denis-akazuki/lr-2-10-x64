@@ -45,7 +45,6 @@ class CVehicleModelInfo;
 class CWeaponModelInfo;
 struct RwObject;
 
-
 struct CBaseModelInfo {
    // uintptr_t 	vtable;
     uint32_t    m_nKey;

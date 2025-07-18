@@ -69,6 +69,19 @@ CClumpModelInfo* CModelInfo::AddClumpModel(int32 index)
     return &pInfo;
 }
 
+CWeaponModelInfo* CModelInfo::AddWeaponModel(int32 index)
+{
+    auto& pInfo = ms_weaponModelInfoStore.AddItem();
+
+    ((void(*)(CWeaponModelInfo*))(g_libGTASA + (VER_x32 ? 0x00384FD8 + 1 : 0x45B3BC)))(&pInfo);
+
+    CHook::SetVTable(&pInfo, g_libGTASA + (VER_x32 ? 0x6676F8 : 0x82F450));
+    CHook::CallVTableFunctionByNum<void>(&pInfo, 7);
+
+    CModelInfo::SetModelInfo(index, &pInfo);
+    return &pInfo;
+}
+
 CBaseModelInfo* CModelInfo::GetModelInfo(const char* name, int32* index)
 {
     auto iKey = CKeyGen::GetUppercaseKey(name);
@@ -167,9 +180,11 @@ void CModelInfo::injectHooks()
     CHook::Write(g_libGTASA + (VER_x32 ? 0x678C8C : 0x84F948), &ms_vehicleModelInfoStore);
     CHook::Write(g_libGTASA + (VER_x32 ? 0x6796CC : 0x850DB8), &ms_modelInfoPtrs);
     CHook::Write(g_libGTASA + (VER_x32 ? 0x678538 : 0x84EA98), &ms_clumpModelInfoStore);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x676F64 : 0x84BF20), &ms_weaponModelInfoStore);
 
     CHook::Redirect("_ZN10CModelInfo13AddClumpModelEi", &AddClumpModel);
     CHook::Redirect("_ZN10CModelInfo11AddPedModelEi", &AddPedModel);
     CHook::Redirect("_ZN10CModelInfo15AddVehicleModelEi", &AddVehicleModel);
     CHook::Redirect("_ZN10CModelInfo14AddAtomicModelEi", &AddAtomicModel);
+    CHook::Redirect("_ZN10CModelInfo14AddWeaponModelEi", &AddWeaponModel);
 }
