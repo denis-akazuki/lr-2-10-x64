@@ -1616,15 +1616,19 @@ long long CAnimBlendNode__FindKeyFrame_hook(CAnimBlendNode *thiz, float fCurrent
 int g_iLastRenderedObject;
 
 void(*CEntity__Render)(CEntity*);
-void CEntity__Render_hook(CEntity* thiz) {
+void CEntity__Render_hook(CEntity* entity) {
 	if (CSkyBox::GetSkyObject()) {
 		//Log("thiz = %x, ent = %x", thiz, CSkyBox::GetSkyObject()->m_pEntity);
-		if (CSkyBox::GetSkyObject()->m_pEntity == thiz && !CSkyBox::IsNeedRender()) {
+		if (CSkyBox::GetSkyObject()->m_pEntity == entity && !CSkyBox::IsNeedRender()) {
             return;
         }
 	}
-    g_iLastRenderedObject = thiz->m_nModelIndex;
-    CEntity__Render(thiz);
+
+    if ((entity->IsPed() || entity->IsObject()) && CMirrors::bRenderingReflection)
+        return;
+
+    g_iLastRenderedObject = entity->m_nModelIndex;
+    CEntity__Render(entity);
 }
 
 void(*CFireManager__ExtinguishPointWithWater)(uintptr* thiz, CVector point, float fRadius, float fWaterStrength);

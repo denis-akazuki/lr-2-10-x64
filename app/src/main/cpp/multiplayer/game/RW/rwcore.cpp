@@ -117,3 +117,7 @@ RwBool RwTextureSetFindCallBack(RwTextureCallBackFind callBack) {
 RwBool RwTextureSetReadCallBack(RwTextureCallBackRead callBack) {
     return CHook::CallFunction<RwBool>(g_libGTASA + (VER_x32 ? 0x1DB3E0 + 1 : 0x273AFC), callBack);
 }
+
+RwBool RsCameraBeginUpdate(RwCamera* camera) {
+    return CHook::CallFunction<RwBool>("_Z19RsCameraBeginUpdateP8RwCamera", camera);
+}

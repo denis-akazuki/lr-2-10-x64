@@ -17,10 +17,15 @@ enum eMirrorType : uint8 {
 class CMirrors {
 public:
     static inline RwRaster*     reflBuffer[2];
+    static inline RwRaster*     pBuffer;
+    static inline RwRaster*     pZBuffer;
     static inline eMirrorType   TypeOfMirror;
     static inline bool          bRenderingReflection;
 
 public:
     static void InjectHooks();
+
+    static void CreateBuffer();
     static void RenderReflections();
+    static void BeforeMainRender();
 };

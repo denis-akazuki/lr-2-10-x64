@@ -7,7 +7,7 @@
 #include "scripting.h"
 
 void CCamera::InjectHooks() {
-
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x678DD8 : 0x84FBE0), &preMirrorMat);
 }
 
 CCam& CCamera::GetActiveCamera() {
@@ -78,5 +78,18 @@ void CCamera::InterpolateCameraLookAt(CVector *posFrom, CVector *posTo, int time
 
 bool CCamera::IsSphereVisible(const CVector* origin, float radius) {
     return CHook::CallFunction<bool>("_ZN7CCamera15IsSphereVisibleERK7CVectorf", origin, radius);
+}
+
+void CCamera::SetCameraUpForMirror() {
+    preMirrorMat = m_mCameraMatrix;
+    m_mCameraMatrix = m_matMirror;
+    CHook::CallFunction<void>("_ZN7CCamera23CopyCameraMatrixToRWCamEb", this, true);
+    CHook::CallFunction<void>("_ZN7CCamera22CalculateDerivedValuesEbb", this, true, false);
+}
+
+void CCamera::RestoreCameraAfterMirror() {
+    SetMatrix(preMirrorMat);
+    CHook::CallFunction<void>("_ZN7CCamera23CopyCameraMatrixToRWCamEb", this, true);
+    CHook::CallFunction<void>("_ZN7CCamera22CalculateDerivedValuesEbb", this, false, false);
 }
 

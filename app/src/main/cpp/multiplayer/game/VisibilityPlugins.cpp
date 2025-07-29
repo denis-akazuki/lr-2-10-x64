@@ -49,8 +49,9 @@ void CVisibilityPlugins::RenderAlphaAtomic(RpAtomic* atomic, int32 alpha) {
 }
 
 void CVisibilityPlugins::InjectHooks() {
-    CHook::Write(g_libGTASA + (VER_x32 ? 0x00676200 : 0x84A480), &CVisibilityPlugins::ms_pedLodDist);
-    CHook::Write(g_libGTASA + (VER_x32 ? 0x00676530 : 0x84AAD0), &CVisibilityPlugins::ms_pCameraPosn);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x00676200 : 0x84A480), &ms_pedLodDist);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x00676530 : 0x84AAD0), &ms_pCameraPosn);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x00679CF8 : 0x851A08), &ms_weaponPedsForPC);
 }
 
 void CVisibilityPlugins::SetupVehicleVariables(RpClump *clump) {
@@ -64,6 +65,10 @@ void CVisibilityPlugins::RenderReallyDrawLastObjects() {
 // The function name is misleading, it returns the flags
 uint16 CVisibilityPlugins::GetAtomicId(RpAtomic* atomic) {
     return CHook::CallFunction<uint16>(g_libGTASA + (VER_x32 ? 0x5D4B54 + 1 : 0x6F9D68), atomic);
+}
+
+void CVisibilityPlugins::RenderWeaponPedsForPC() {
+    CHook::CallFunction<void>("_ZN18CVisibilityPlugins21RenderWeaponPedsForPCEv");
 }
 
 

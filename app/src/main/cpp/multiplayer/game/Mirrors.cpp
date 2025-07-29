@@ -10,6 +10,66 @@
 #include "app/app.h"
 #include "World.h"
 #include "Mobile/MobileSettings/MobileSettings.h"
+#include "VisibilityPlugins.h"
+
+void CMirrors::CreateBuffer()
+{
+    const int visualsQuality = CMobileSettings::ms_MobileSettings[MS_Visuals].value;
+    RwInt32 depth = RwRasterGetDepth(RwCameraGetRaster(Scene.m_pRwCamera));
+    switch (visualsQuality) {
+        case 0:
+        case 1:
+            depth = 16;
+            break;
+
+        case 2:
+            depth = 24;
+            break;
+    }
+
+    if (!pBuffer) {
+        const RwInt32 width = 512;
+        const RwInt32 height = 256;
+
+        pBuffer = RwRasterCreate(width, height, depth, rwRASTERTYPECAMERATEXTURE);
+        if (pBuffer && !(pZBuffer = RwRasterCreate(width, height, depth, rwRASTERTYPEZBUFFER))) {
+            RwRasterDestroy(pBuffer);
+            pBuffer = nullptr;
+        }
+    }
+
+    const int reflectionQuality = CMobileSettings::ms_MobileSettings[MS_CarReflections].value;
+    const RwInt32 newReflectionSize =
+            (reflectionQuality == 3) ? 256 :
+            (reflectionQuality == 2) ? 128 :
+            0;
+
+    if (reflBuffer[0]) {
+        const bool needResize = (newReflectionSize > 0) &&
+                                (reflBuffer[0]->height != newReflectionSize);
+
+        if (newReflectionSize == 0 || needResize) {
+            RwRasterDestroy(reflBuffer[0]);
+            RwRasterDestroy(reflBuffer[1]);
+            reflBuffer[0] = nullptr;
+            reflBuffer[1] = nullptr;
+        }
+    }
+
+    // Создание с проверкой ошибок
+    if (newReflectionSize > 0 && !reflBuffer[0]) {
+        reflBuffer[0] = RwRasterCreate(newReflectionSize, newReflectionSize,
+                                       depth, rwRASTERTYPECAMERATEXTURE);
+        reflBuffer[1] = reflBuffer[0] ?
+                        RwRasterCreate(newReflectionSize, newReflectionSize, depth, rwRASTERTYPEZBUFFER) :
+                        nullptr;
+
+        if (!reflBuffer[1]) {
+            if (reflBuffer[0]) RwRasterDestroy(reflBuffer[0]);
+            reflBuffer[0] = nullptr;
+        }
+    }
+}
 
 void CMirrors::RenderReflections()
 {
@@ -17,38 +77,8 @@ void CMirrors::RenderReflections()
     if (carReflections < 2)
         return;
 
-    std::vector<CEntity*> hiddenEntities;
-    if (pNetGame) {
-        auto pPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
-        if (pPed && pPed->m_pPed) {
-            pPed->m_pPed->m_bIsVisible = false;
-            hiddenEntities.push_back(pPed->m_pPed);
-        }
-
-        for (const auto& pair : CPlayerPool::spawnedPlayers) {
-            const auto pPed = pair.second->GetPlayerPed()->m_pPed;
-            if (pPed && !pPed->m_bRemoveFromWorld) {
-                pPed->m_bIsVisible = false;
-                hiddenEntities.push_back(pPed);
-            }
-        }
-
-        for (auto* pEntity : CObject::objectToIdMap) {
-            if (pEntity && !pEntity->m_bRemoveFromWorld) {
-                pEntity->m_bIsVisible = false;
-                hiddenEntities.push_back(pEntity);
-            }
-        }
-    }
-
     CHook::CallFunction<void>("_ZN8CMirrors12CreateBufferEv");
     if (!FindPlayerPed(-1) || !reflBuffer[0]) {
-        for (auto* pEntity : hiddenEntities) {
-            if (pEntity) {
-                pEntity->m_bIsVisible = true;
-            }
-        }
-        hiddenEntities.clear();
         return;
     }
 
@@ -115,19 +145,52 @@ void CMirrors::RenderReflections()
     TheCamera.m_sphereMapRadius = 0.0f;
     Scene.m_pRwCamera->farPlane = originalFarPlane;
     Scene.m_pRwCamera->fogPlane = originalFogPlane;
+}
 
-    for (auto* pEntity : hiddenEntities) {
-        if (pEntity) {
-            pEntity->m_bIsVisible = true;
-        }
+void CMirrors::BeforeMainRender() {
+    if (TypeOfMirror == MIRROR_TYPE_NONE)
+        return;
+
+    RwRaster* prevCamRaster  = RwCameraGetRaster(Scene.m_pRwCamera);
+    RwRaster* prevCamZRaster = RwCameraGetZRaster(Scene.m_pRwCamera);
+
+    RwCameraSetRaster(Scene.m_pRwCamera, pBuffer);
+    RwCameraSetZRaster(Scene.m_pRwCamera, pZBuffer);
+
+    CCamera& TheCamera = *reinterpret_cast<CCamera*>(g_libGTASA + (VER_x32 ? 0x00951FA8 : 0xBBA8D0));
+    TheCamera.SetCameraUpForMirror();
+
+    RwRGBA color{ 0, 0, 0, 255 };
+    RwCameraClear(Scene.m_pRwCamera, &color, rwCAMERACLEARZ | rwCAMERACLEARIMAGE);
+
+    Scene.m_pRwCamera->viewWindow.y = -Scene.m_pRwCamera->viewWindow.y;
+
+    if (RsCameraBeginUpdate(Scene.m_pRwCamera)) {
+        bRenderingReflection = true;
+
+        DefinedState();
+        CHook::CallFunction<void>("_Z11RenderSceneb", true);
+        CVisibilityPlugins::RenderWeaponPedsForPC();
+        CVisibilityPlugins::ms_weaponPedsForPC.Clear();
+
+        bRenderingReflection = false;
+        RwCameraEndUpdate(Scene.m_pRwCamera);
+
+        RwCameraSetRaster(Scene.m_pRwCamera, prevCamRaster);
+        RwCameraSetZRaster(Scene.m_pRwCamera, prevCamZRaster);
+
+        TheCamera.RestoreCameraAfterMirror();
     }
-    hiddenEntities.clear();
 }
 
 void CMirrors::InjectHooks() {
     CHook::Write(g_libGTASA + (VER_x32 ? 0x679504 : 0x850A28), &reflBuffer);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x678B40 : 0x84F6B0), &pBuffer);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x6784DC : 0x84E9E0), &pZBuffer);
     CHook::Write(g_libGTASA + (VER_x32 ? 0x677EB8 : 0x84DDA0), &TypeOfMirror);
     CHook::Write(g_libGTASA + (VER_x32 ? 0x6763E8 : 0x84A848), &bRenderingReflection);
 
+    CHook::Redirect("_ZN8CMirrors12CreateBufferEv", &CreateBuffer);
     CHook::Redirect("_ZN8CMirrors17RenderReflectionsEv", &RenderReflections);
+    CHook::Redirect("_ZN8CMirrors16BeforeMainRenderEv", &BeforeMainRender);
 }

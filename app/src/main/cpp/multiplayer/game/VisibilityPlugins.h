@@ -5,6 +5,8 @@
 #pragma once
 
 #include "common.h"
+#include "Entity/Ped/Ped.h"
+#include "LinkList.h"
 
 enum eAtomicComponentFlag {
     ATOMIC_IS_NOT_PRESENT = 0x0,
@@ -32,6 +34,8 @@ public:
     static inline float ms_pedLodDist{};
     static inline RwV3d* ms_pCameraPosn{};
 
+    static inline CLinkList<CPedGta*> ms_weaponPedsForPC;
+
 public:
     static void InjectHooks();
 
@@ -51,5 +55,6 @@ public:
     static void RenderAlphaAtomic(RpAtomic *atomic, int32 alpha);
     static void SetupVehicleVariables(RpClump* clump);
     static void RenderFadingEntities();
+    static void RenderWeaponPedsForPC();
 };
 

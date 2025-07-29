@@ -379,12 +379,15 @@ public:
     static inline float m_f3rdPersonCHairMultX{0.53f};
     static inline float m_f3rdPersonCHairMultY{0.4f};
 
+    static inline CMatrix preMirrorMat;
+
 public:
     static void InjectHooks();
 
     void Init();
 
     void Restore();
+    void SetCameraUpForMirror();
     void RestoreCameraAfterMirror();
     void RestoreWithJumpCut();
     void RenderMotionBlur();
