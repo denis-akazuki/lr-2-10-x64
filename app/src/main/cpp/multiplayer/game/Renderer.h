@@ -24,6 +24,9 @@ public:
     static void InjectHooks();
 
     static void RenderFadingInEntities();
+    static void RenderFadingInUnderwaterEntities();
+    static void RenderRoads();
+    static void RenderEverythingBarRoads();
 };
 
 

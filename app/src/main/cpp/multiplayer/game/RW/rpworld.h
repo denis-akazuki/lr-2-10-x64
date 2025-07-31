@@ -560,9 +560,11 @@ struct RpLight
     RwLinkList          WorldSectorsInLight; /**< WorldSectorsInLight */
     RwLLLink            inWorld; /**< inWorld */
     RwUInt16            lightFrame; /**< lightFrame */
-    RwUInt16            pad;
+    RwUInt8             isMainLight;
+    RwUInt8             pad;
 };
 #endif /* (!defined(DOXYGEN)) */
+static_assert(sizeof(RpLight) == (VER_x32 ? 0x40 : 0x68));
 
 /**
  * \ingroup rplight

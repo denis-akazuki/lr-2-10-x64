@@ -216,6 +216,7 @@ struct RwLLLink
     RwLLLink *next;
     RwLLLink *prev;
 };
+static_assert(sizeof(RwLLLink) == (VER_x32 ? 0x8 : 0x10));
 
 #define rwLLLinkGetData(linkvar,type,entry)                             \
     ((type *)(((RwUInt8 *)(linkvar))-offsetof(type,entry)))
@@ -252,6 +253,7 @@ struct RwLinkList
 {
     RwLLLink link;
 };
+static_assert(sizeof(RwLinkList) == (VER_x32 ? 0x8 : 0x10));
 
 #define rwLinkListInitialize(list)                                      \
     ( (list)->link.next = ((RwLLLink *)(list)),                         \

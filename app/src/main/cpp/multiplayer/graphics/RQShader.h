@@ -79,6 +79,9 @@ public:
     static void InjectHooks();
 
     static bool BuildSource(uint32 flags, const char **pixelSource, const char **vertexSource);
+
+public:
+    static inline unsigned int curShaderStateFlags;
 };
 
 //extern ShaderCreator vertexSrc;

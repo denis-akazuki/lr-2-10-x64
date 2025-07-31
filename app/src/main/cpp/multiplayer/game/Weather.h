@@ -40,6 +40,7 @@ public:
 
 public:
     static void InjectHooks();
+    static void RenderRainStreaks();
 };
 
 

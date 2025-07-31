@@ -5,6 +5,10 @@
 #include "Weather.h"
 #include "../util/patch.h"
 
+void CWeather::RenderRainStreaks() {
+    CHook::CallFunction<void>("_ZN8CWeather17RenderRainStreaksEv");
+}
+
 void CWeather::InjectHooks() {
     CHook::Write(g_libGTASA + (VER_x32 ? 0x006798D0 : 0x8511C8), &bScriptsForceRain);
     CHook::Write(g_libGTASA + (VER_x32 ? 0x0067616C : 0x84A358), &Wind);

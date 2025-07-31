@@ -61,3 +61,11 @@ void CCoronas::Init() {
 void CCoronas::Render() {
     CHook::CallFunction<void>(g_libGTASA + (VER_x32 ? 0x005A23B8 + 1 : 0x6C5CD4) );
 }
+
+void CCoronas::RenderReflections() {
+    CHook::CallFunction<void>("_ZN8CCoronas17RenderReflectionsEv");
+}
+
+void CCoronas::RenderSunReflection() {
+    CHook::CallFunction<void>("_ZN8CCoronas19RenderSunReflectionEv");
+}

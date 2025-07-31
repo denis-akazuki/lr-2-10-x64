@@ -1,6 +1,7 @@
 //
 // Created by traw-GG on 14.07.2025.
 //
+#include <GLES3/gl32.h>
 #include "Mirrors.h"
 #include "game.h"
 #include "net/netgame.h"
@@ -11,23 +12,21 @@
 #include "World.h"
 #include "Mobile/MobileSettings/MobileSettings.h"
 #include "VisibilityPlugins.h"
+#include "graphics/RQShader.h"
+#include "app/app_game.h"
+
+void emu_SetRenderingSphere(float* direction, GLboolean with) {
+    if (with) {
+        RQShader::curShaderStateFlags |= FLAG_SPHERE_XFORM;
+    } else {
+        RQShader::curShaderStateFlags &= ~FLAG_SPHERE_XFORM;
+    }
+}
 
 void CMirrors::CreateBuffer()
 {
-    const int visualsQuality = CMobileSettings::ms_MobileSettings[MS_Visuals].value;
-    RwInt32 depth = RwRasterGetDepth(RwCameraGetRaster(Scene.m_pRwCamera));
-    switch (visualsQuality) {
-        case 0:
-        case 1:
-            depth = 16;
-            break;
-
-        case 2:
-            depth = 24;
-            break;
-    }
-
     if (!pBuffer) {
+        const RwInt32 depth = RwRasterGetDepth(RwCameraGetRaster(Scene.m_pRwCamera));
         const RwInt32 width = 512;
         const RwInt32 height = 256;
 
@@ -58,6 +57,7 @@ void CMirrors::CreateBuffer()
 
     // Создание с проверкой ошибок
     if (newReflectionSize > 0 && !reflBuffer[0]) {
+        const RwInt32 depth = RwRasterGetDepth(RwCameraGetRaster(Scene.m_pRwCamera));
         reflBuffer[0] = RwRasterCreate(newReflectionSize, newReflectionSize,
                                        depth, rwRASTERTYPECAMERATEXTURE);
         reflBuffer[1] = reflBuffer[0] ?
@@ -102,7 +102,7 @@ void CMirrors::RenderReflections()
     const float originalFogPlane = Scene.m_pRwCamera->fogPlane;
 
     memcpy(&Scene.m_pRwCamera->frameBuffer, reflBuffer, sizeof(RwRaster*)*2);
-    CHook::CallFunction<void>("_Z22emu_SetRenderingSpherePfh", nullptr, 1);
+    emu_SetRenderingSphere(nullptr, 1);
 
     RwRGBA skyColor(
             std::max<uint16_t>(CTimeCycle::m_CurrentColours.m_nSkyTopRed, 64u),
@@ -118,26 +118,17 @@ void CMirrors::RenderReflections()
         Scene.m_pRwCamera->farPlane = reflectionRadius;
         Scene.m_pRwCamera->fogPlane = reflectionRadius * 0.75f;
 
-        CVector reflectionPos;
-        if (*(bool*)(g_libGTASA + (VER_x32 ? 0x9421C5 : 0xBA8925))) {
-            reflectionPos = TheCamera.GetPosition();
-        } else {
-            FindPlayerPed(-1)->GetBonePosition(&reflectionPos, BONE_NECK, false);
-            reflectionPos.z -= 2.0f;
-        }
-
         bRenderingReflection = true;
-        CHook::CallFunction<void>("_Z21emu_SetCameraPositionPf", &reflectionPos.x);
         DefinedState();
 
         CHook::CallFunction<void>("_ZN9CRenderer23ConstructReflectionListEv");
-        CHook::CallFunction<void>("_Z11RenderSceneb", false);
+        RenderScene();
 
         bRenderingReflection = false;
         RwCameraEndUpdate(Scene.m_pRwCamera);
     }
 
-    CHook::CallFunction<void>("_Z22emu_SetRenderingSpherePfh", nullptr, 0);
+    emu_SetRenderingSphere(nullptr, 0);
     Scene.m_pRwCamera->frameBuffer = originalFrameBuffer;
     Scene.m_pRwCamera->zBuffer = originalZBuffer;
     TypeOfMirror = originalMirrorType;
@@ -169,7 +160,7 @@ void CMirrors::BeforeMainRender() {
         bRenderingReflection = true;
 
         DefinedState();
-        CHook::CallFunction<void>("_Z11RenderSceneb", true);
+        RenderScene();
         CVisibilityPlugins::RenderWeaponPedsForPC();
         CVisibilityPlugins::ms_weaponPedsForPC.Clear();
 

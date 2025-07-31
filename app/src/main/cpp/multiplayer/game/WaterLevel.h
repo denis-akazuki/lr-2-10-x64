@@ -10,6 +10,7 @@ class CWaterLevel {
 
 public:
     static void RenderWaterFog();
+    static void RenderWater();
 };
 
 

@@ -16,6 +16,18 @@ void CRenderer::RenderFadingInEntities() {
     CVisibilityPlugins::RenderFadingEntities();
 }
 
+void CRenderer::RenderFadingInUnderwaterEntities() {
+    CHook::CallFunction<void>("_ZN9CRenderer32RenderFadingInUnderwaterEntitiesEv");
+}
+
+void CRenderer::RenderRoads() {
+    CHook::CallFunction<void>("_ZN9CRenderer11RenderRoadsEv");
+}
+
+void CRenderer::RenderEverythingBarRoads() {
+    CHook::CallFunction<void>("_ZN9CRenderer24RenderEverythingBarRoadsEv");
+}
+
 void CRenderer::InjectHooks() {
     CHook::Write(g_libGTASA + (VER_x32 ? 0x6764D0 : 0x84AA10), &ms_bRenderOutsideTunnels);
     CHook::Write(g_libGTASA + (VER_x32 ? 0x67914C : 0x8502C8), &m_loadingPriority);
