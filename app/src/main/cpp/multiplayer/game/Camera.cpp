@@ -77,7 +77,7 @@ void CCamera::InterpolateCameraLookAt(CVector *posFrom, CVector *posTo, int time
 }
 
 bool CCamera::IsSphereVisible(const CVector* origin, float radius) {
-    return CHook::CallFunction<bool>("_ZN7CCamera15IsSphereVisibleERK7CVectorf", origin, radius);
+    return CHook::CallFunction<bool>("_ZN7CCamera15IsSphereVisibleERK7CVectorf", this, origin, radius);
 }
 
 void CCamera::SetCameraUpForMirror() {

@@ -37,6 +37,7 @@ public:
     static inline bool bIncludeCarTyres;
     static inline bool bIncludeDeadPeds;
 
+    static inline int ms_nCurrentScanCode;
     // Use GetRepeatSector() to access this array
     // static inline CRepeatSector ms_aRepeatSectors[MAX_REPEAT_SECTORS_Y][MAX_REPEAT_SECTORS_X];
 
@@ -51,6 +52,8 @@ public:
     static void Add(CEntity* entity);
     static void Remove(CEntity* entity);
     static void ProcessPedsAfterPreRender();
+
+    static void IncrementCurrentScanCode();
 
     static bool ProcessLineOfSight(const CVector* origin, const CVector* target, CColPoint* outColPoint, CEntity** outEntity, bool buildings, bool vehicles, bool peds, bool objects, bool dummies, bool doSeeThroughCheck, bool doCameraIgnoreCheck, bool doShootThroughCheck);
 

@@ -22,6 +22,7 @@
 #include "Weather.h"
 #include "PointLights.h"
 #include "Shadows.h"
+#include "World.h"
 
 void CEntity::UpdateRwFrame()
 {
@@ -89,6 +90,14 @@ float CEntity::GetDistanceFromCamera()
     return DistanceBetweenPoints(GetPosition(), TheCamera.GetPosition());
 }
 
+bool CEntity::IsScanCodeCurrent() const {
+    return m_nScanCode == CWorld::ms_nCurrentScanCode;
+}
+
+void CEntity::SetCurrentScanCode() {
+    m_nScanCode = CWorld::ms_nCurrentScanCode;
+}
+
 bool CEntity::IsInCurrentArea() const
 {
     return m_nAreaCode == CGame::currArea;
@@ -103,6 +112,22 @@ void CEntity::UpdateRW() {
         m_matrix->UpdateRwMatrix(parentMatrix);
     else
         m_placement.UpdateRwMatrix(parentMatrix);
+}
+
+bool CEntity::IsVisible()
+{
+    if (!m_pRwObject || !m_bIsVisible)
+        return false;
+
+    return GetIsOnScreen();
+}
+
+bool CEntity::GetIsOnScreen() {
+    CVector thisVec;
+    GetBoundCentre(thisVec);
+
+    CCamera& TheCamera = *reinterpret_cast<CCamera*>(g_libGTASA + (VER_x32 ? 0x00951FA8 : 0xBBA8D0));
+    return TheCamera.IsSphereVisible(&thisVec, CModelInfo::GetModelInfo(m_nModelIndex)->GetColModel()->GetBoundRadius());
 }
 
 RwMatrix* CEntity::GetModellingMatrix() {

@@ -29,6 +29,7 @@ void CWorld::InjectHooks() {
     CHook::Write(g_libGTASA + (VER_x32 ? 0x006761FC : 0x84A478), &bIncludeBikers);
     CHook::Write(g_libGTASA + (VER_x32 ? 0x006765D4 : 0x84AC18), &bIncludeCarTyres);
     CHook::Write(g_libGTASA + (VER_x32 ? 0x00675F9C : 0x849FC0), &bIncludeDeadPeds);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x00676698 : 0x84ADA0), &ms_nCurrentScanCode);
 
     CHook::InstallPLT(g_libGTASA + (VER_x32 ? 0x675C58 : 0x849A20), &ProcessPedsAfterPreRender);
 }
@@ -78,5 +79,38 @@ void CWorld::ProcessPedsAfterPreRender() {
         if (!pPed->m_bRemoveFromWorld) {
             pPed->GetIntelligence()->ProcessAfterPreRender();
         }
+    }
+}
+
+void CWorld::ClearScanCodes() {
+    const auto ProcessList = [](const CPtrList& list) {
+        for (CPtrNode* node = list.GetNode(); node; node = node->GetNext()) {
+            static_cast<CEntity*>(node->m_item)->m_nScanCode = 0;
+        }
+    };
+
+    for (auto y = 0; y < MAX_SECTORS_Y; y++) {
+        for (auto x = 0; x < MAX_SECTORS_X; x++) {
+            const auto& sector = *GetSector(x, y);
+            ProcessList(sector.m_buildings);
+            ProcessList(sector.m_dummies);
+        }
+    }
+
+    for (auto y = 0; y < MAX_REPEAT_SECTORS_Y; y++) {
+        for (auto x = 0; x < MAX_REPEAT_SECTORS_X; x++) {
+            for (const auto& list : GetRepeatSector(x, y)->m_lists) {
+                ProcessList(list);
+            }
+        }
+    }
+}
+
+void CWorld::IncrementCurrentScanCode() {
+    if (ms_nCurrentScanCode >= 65535u) {
+        ClearScanCodes();
+        ms_nCurrentScanCode = 1;
+    } else {
+        ms_nCurrentScanCode++;
     }
 }

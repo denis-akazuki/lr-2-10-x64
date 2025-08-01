@@ -15,6 +15,7 @@
 #include "IplStore.h"
 #include "Camera.h"
 #include "Renderer.h"
+#include "World.h"
 #include <algorithm>
 #include <functional>
 #include <vector>
@@ -217,6 +218,10 @@ void CStreaming::InjectHooks() {
 
     CHook::Write(g_libGTASA + (VER_x32 ? 0x00677564 : 0x84CB10), &ms_rwObjectInstances);
     CHook::Write(g_libGTASA + (VER_x32 ? 0x00677DD0 : 0x84DBD0), &ms_aInfoForModel);
+
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x00678F3C : 0x84FEA8), &ms_bLoadingScene);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x006783F0 : 0x84E808), &ms_numPedsLoaded);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x00677E00 : 0x84DC30), &ms_vehiclesLoaded);
 
     CHook::Redirect("_ZN10CStreaming13InitImageListEv", &InitImageList);
     CHook::Redirect("_ZN10CStreaming12MakeSpaceForEi", &MakeSpaceFor);
@@ -884,19 +889,242 @@ void CStreaming::RetryLoadFile(int32 chIdx) {
 }
 
 void CStreaming::MakeSpaceFor(size_t memoryToCleanInBytes) {
-    auto lastmemused = ms_memoryUsed;
     while (ms_memoryUsed >= ms_memoryAvailable - memoryToCleanInBytes) {
-        lastmemused = ms_memoryUsed;
-        if (!RemoveLeastUsedModel(0) || lastmemused == ms_memoryUsed) {
-          //  DeleteRwObjectsBehindCamera(ms_memoryAvailable - memoryToCleanInBytes);
+        if (!RemoveLeastUsedModel(STREAMING_LOADING_SCENE)) {
+            DeleteRwObjectsBehindCamera(ms_memoryAvailable - memoryToCleanInBytes);
             return;
         }
     }
 }
 
-//
 void CStreaming::DeleteRwObjectsBehindCamera(size_t memoryToCleanInBytes) {
-    CHook::CallFunction<void>(g_libGTASA + (VER_x32 ? 0x002D5CD8 + 1 : 0x3984F0), memoryToCleanInBytes);
+    if (ms_memoryUsed < memoryToCleanInBytes)
+        return;
+
+    const auto START_OFFSET_XY = 10;
+    const auto END_OFFSET_XY = 2;
+
+    CCamera& TheCamera = *reinterpret_cast<CCamera*>(g_libGTASA + (VER_x32 ? 0x00951FA8 : 0xBBA8D0));
+    const CVector& cameraPos = TheCamera.GetPosition();
+    const int32 pointSecX = CWorld::GetSectorX(cameraPos.x),
+            pointSecY = CWorld::GetSectorY(cameraPos.y);
+    const CVector2D& camFwd = TheCamera.GetForward();
+    if (std::fabs(camFwd.y) < std::fabs(camFwd.x)) {
+        int32 sectorStartY = std::max(pointSecY - START_OFFSET_XY, 0);
+        int32 sectorEndY = std::min(pointSecY + START_OFFSET_XY, MAX_SECTORS_Y - 1);
+        int32 sectorStartX = 0;
+        int32 sectorEndX = 0;
+        int32 factorX = 0;
+
+        if (camFwd.x <= 0.0f) {
+            sectorStartX = std::min(pointSecX + START_OFFSET_XY, MAX_SECTORS_X - 1);
+            sectorEndX = std::min(pointSecX + END_OFFSET_XY, MAX_SECTORS_X - 1);
+            factorX = -1;
+        } else {
+            sectorStartX = std::max(pointSecX - START_OFFSET_XY, 0);
+            sectorEndX = std::max(pointSecX - END_OFFSET_XY, 0);
+            factorX = +1;
+        }
+
+        CWorld::IncrementCurrentScanCode();
+        for (int32 sectorX = sectorStartX; sectorX != sectorEndX; sectorX += factorX) {
+            for (int32 sectorY = sectorStartY; sectorY <= sectorEndY; sectorY++) {
+                CRepeatSector* repeatSector = GetRepeatSector(sectorX, sectorY);
+                CSector* sector = GetSector(sectorX, sectorY);
+                if (DeleteRwObjectsBehindCameraInSectorList(sector->m_buildings, memoryToCleanInBytes) ||
+                    DeleteRwObjectsBehindCameraInSectorList(sector->m_dummies, memoryToCleanInBytes) ||
+                    DeleteRwObjectsBehindCameraInSectorList(repeatSector->GetList(REPEATSECTOR_OBJECTS), memoryToCleanInBytes)
+                        ) {
+                    return;
+                }
+            }
+        }
+
+        if (camFwd.x <= 0.0f) {
+            sectorEndX = std::min(pointSecX + END_OFFSET_XY, MAX_SECTORS_X - 1);
+            sectorStartX = std::max(pointSecX - START_OFFSET_XY, 0);
+            factorX = -1;
+        } else {
+            sectorEndX = std::max(pointSecX - END_OFFSET_XY, 0);
+            sectorStartX = std::min(pointSecX + START_OFFSET_XY, MAX_SECTORS_X - 1);
+            factorX = +1;
+        }
+
+        CWorld::IncrementCurrentScanCode();
+        for (int32 sectorX = sectorStartX; sectorX != sectorEndX; sectorX -= factorX) {
+            for (int32 sectorY = sectorStartY; sectorY <= sectorEndY; sectorY++) {
+                CRepeatSector* repeatSector = GetRepeatSector(sectorX, sectorY);
+                CSector* sector = GetSector(sectorX, sectorY);
+                if (DeleteRwObjectsNotInFrustumInSectorList(sector->m_buildings, memoryToCleanInBytes) ||
+                    DeleteRwObjectsNotInFrustumInSectorList(sector->m_dummies, memoryToCleanInBytes) ||
+                    DeleteRwObjectsNotInFrustumInSectorList(repeatSector->GetList(REPEATSECTOR_OBJECTS), memoryToCleanInBytes)
+                        ) {
+                    return;
+                }
+            }
+        }
+
+        CWorld::IncrementCurrentScanCode();
+        for (int32 sectorX = sectorStartX; sectorX != sectorEndX; sectorX -= factorX) {
+            for (int32 sectorY = sectorStartY; sectorY <= sectorEndY; sectorY++) {
+                CRepeatSector* repeatSector = GetRepeatSector(sectorX, sectorY);
+                CSector* sector = GetSector(sectorX, sectorY);
+                if (DeleteRwObjectsBehindCameraInSectorList(sector->m_buildings, memoryToCleanInBytes) ||
+                    DeleteRwObjectsBehindCameraInSectorList(sector->m_dummies, memoryToCleanInBytes) ||
+                    DeleteRwObjectsBehindCameraInSectorList(repeatSector->GetList(REPEATSECTOR_OBJECTS), memoryToCleanInBytes)
+                        ) {
+                    return;
+                }
+            }
+        }
+    }
+    else {
+        int32 sectorStartX = std::max(pointSecX - START_OFFSET_XY, 0);
+        int32 sectorEndX = std::min(pointSecX + START_OFFSET_XY, MAX_SECTORS_X - 1);
+        int32 sectorStartY = 0;
+        int32 sectorEndY = 0;
+        int32 factorY = 0;
+        if (camFwd.y <= 0.0f) {
+            sectorEndY = std::min(pointSecY + END_OFFSET_XY, MAX_SECTORS_Y - 1);
+            sectorStartY = std::min(pointSecY + START_OFFSET_XY, MAX_SECTORS_Y - 1);
+            factorY = -1;
+        } else  {
+            sectorStartY = std::max(pointSecY - START_OFFSET_XY, 0);
+            sectorEndY = std::max(pointSecY - END_OFFSET_XY, 0);
+            factorY = +1;
+        }
+        CWorld::IncrementCurrentScanCode();
+        for (int32 sectorY = sectorStartY; sectorY != sectorEndY; sectorY += factorY) {
+            for (int32 sectorX = sectorStartX; sectorX <= sectorEndX; sectorX++) {
+                CRepeatSector* repeatSector = GetRepeatSector(sectorX, sectorY);
+                CSector* sector = GetSector(sectorX, sectorY);
+                if (DeleteRwObjectsBehindCameraInSectorList(sector->m_buildings, memoryToCleanInBytes) ||
+                    DeleteRwObjectsBehindCameraInSectorList(sector->m_dummies, memoryToCleanInBytes) ||
+                    DeleteRwObjectsBehindCameraInSectorList(repeatSector->GetList(REPEATSECTOR_OBJECTS), memoryToCleanInBytes)
+                        ) {
+                    return;
+                }
+            }
+        }
+        if (camFwd.y <= 0.0f) {
+            sectorEndY = std::min(pointSecY + END_OFFSET_XY, MAX_SECTORS_Y - 1);
+            sectorStartY = std::max(pointSecY - START_OFFSET_XY, 0);
+            factorY = -1;
+        }
+        else {
+            sectorEndY = std::max(pointSecY - END_OFFSET_XY, 0);
+            sectorStartY = std::min(pointSecY + START_OFFSET_XY, MAX_SECTORS_Y - 1);
+            factorY = +1;
+        }
+        CWorld::IncrementCurrentScanCode();
+        for (int32 sectorY = sectorStartY; sectorY != sectorEndY; sectorY -= factorY) {
+            for (int32 sectorX = sectorStartX; sectorX <= sectorEndX; sectorX++) {
+                CRepeatSector* repeatSector = GetRepeatSector(sectorX, sectorY);
+                CSector* sector = GetSector(sectorX, sectorY);
+                if (DeleteRwObjectsNotInFrustumInSectorList(sector->m_buildings, memoryToCleanInBytes) ||
+                    DeleteRwObjectsNotInFrustumInSectorList(sector->m_dummies, memoryToCleanInBytes) ||
+                    DeleteRwObjectsNotInFrustumInSectorList(repeatSector->GetList(REPEATSECTOR_OBJECTS), memoryToCleanInBytes)
+                        ) {
+                    return;
+                }
+            }
+        }
+
+        if (RemoveReferencedTxds(memoryToCleanInBytes))
+            return;
+
+        // BUG: possibly missing CWorld::IncrementCurrentScanCode() here?
+        for (int32 sectorY = sectorStartY; sectorY != sectorEndY; sectorY -= factorY) {
+            for (int32 sectorX = sectorStartX; sectorX <= sectorEndX; sectorX++) {
+                CRepeatSector* repeatSector = GetRepeatSector(sectorX, sectorY);
+                CSector* sector = GetSector(sectorX, sectorY);
+                if (DeleteRwObjectsBehindCameraInSectorList(sector->m_buildings, memoryToCleanInBytes) ||
+                    DeleteRwObjectsBehindCameraInSectorList(sector->m_dummies, memoryToCleanInBytes) ||
+                    DeleteRwObjectsBehindCameraInSectorList(repeatSector->GetList(REPEATSECTOR_OBJECTS), memoryToCleanInBytes)
+                        ) {
+                    return;
+                }
+            }
+        }
+    }
+
+    while (ms_memoryUsed >= memoryToCleanInBytes) {
+        if (!RemoveLeastUsedModel(0)) {
+            break;
+        }
+    }
+}
+
+bool CStreaming::RemoveReferencedTxds(size_t goalMemoryUsageBytes) {
+    for (CStreamingInfo *si = ms_pEndLoadedList->GetPrev(), *next{}; si != ms_startLoadedList; si = next) {
+        next = si->GetPrev();
+        assert(next);
+
+        const auto modelId = GetModelFromInfo(si);
+        if (!IsModelTXD(modelId) || si->IsLoadingScene() || CTxdStore::GetNumRefs(ModelIdToTXD(modelId))) {
+            continue;
+        }
+        RemoveModel(modelId);
+        if (ms_memoryUsed < goalMemoryUsageBytes) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CStreaming::DeleteRwObjectsBehindCameraInSectorList(CPtrList& list, size_t memoryToCleanInBytes) {
+    for (CPtrNode* node = list.GetNode(), *next{}; node; node = next) {
+        next = node->GetNext();
+
+        auto* entity = static_cast<CEntity*>(node->m_item);
+        if (entity->IsScanCodeCurrent())
+            continue;
+
+        entity->SetCurrentScanCode();
+
+        const auto pPed = GamePool_FindPlayerPed();
+        if (!entity->m_bImBeingRendered && !entity->m_bStreamingDontDelete
+            && entity->m_pRwObject
+            && GetInfo(entity->m_nModelIndex).InList()
+            && pPed->m_pEntityStandingOn != entity
+                ) {
+            entity->DeleteRwObject();
+            if (!CModelInfo::GetModelInfo(entity->m_nModelIndex)->m_nRefCount) {
+                RemoveModel(entity->m_nModelIndex);
+                if (ms_memoryUsed < memoryToCleanInBytes) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+bool CStreaming::DeleteRwObjectsNotInFrustumInSectorList(CPtrList& list, size_t memoryToCleanInBytes) {
+    for (CPtrNode* node = list.GetNode(), *next{}; node; node = next) {
+        next = node->GetNext();
+
+        auto* entity = reinterpret_cast<CEntity*>(node->m_item);
+        if (entity->IsScanCodeCurrent())
+            continue;
+
+        entity->SetCurrentScanCode();
+
+        if (!entity->m_bImBeingRendered && !entity->m_bStreamingDontDelete
+            && entity->m_pRwObject
+            && (!entity->IsVisible() || entity->m_bOffscreen)
+            && GetInfo(entity->m_nModelIndex).InList()
+                ) {
+            entity->DeleteRwObject();
+            if (!CModelInfo::GetModelInfo(entity->m_nModelIndex)->m_nRefCount) {
+                RemoveModel(entity->m_nModelIndex);
+                if (ms_memoryUsed < memoryToCleanInBytes) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }
 
 // Function name is a little misleading, as it deletes the first entity it can.
@@ -947,11 +1175,36 @@ bool CStreaming::RemoveLeastUsedModel(int32 streamingFlags) {
         }
     }
 
-//    CCamera& TheCamera = *reinterpret_cast<CCamera*>(g_libGTASA + (VER_x32 ? 0x00951FA8 : 0xBBA8D0));
-//    if (TheCamera.GetPosition().z - TheCamera.CalculateGroundHeight(eGroundHeightType::ENTITY_BB_BOTTOM) <= 50.0f){
-//        return DeleteLeastUsedEntityRwObject(false, streamingFlags);
-//    }
+    CCamera& TheCamera = *reinterpret_cast<CCamera*>(g_libGTASA + (VER_x32 ? 0x00951FA8 : 0xBBA8D0));
+    if (TheCamera.GetPosition().z - TheCamera.CalculateGroundHeight(eGroundHeightType::ENTITY_BB_BOTTOM) > 50.0f
+        && (
+                ms_numPedsLoaded > 4
+                && RemoveLoadedZoneModel()
+                || ms_vehiclesLoaded.CountMembers() > 4
+                   && RemoveLoadedVehicle()
+        )
+        || !ms_bLoadingScene && (
+            DeleteLeastUsedEntityRwObject(false, streamingFlags)
+            || ms_numPedsLoaded > 4 && RemoveLoadedZoneModel()
+            || (ms_vehiclesLoaded.CountMembers() > 7 || !CGame::CanSeeOutSideFromCurrArea() && ms_vehiclesLoaded.CountMembers() > 4) && RemoveLoadedVehicle()
+    )
+        || DeleteLeastUsedEntityRwObject(true, streamingFlags)
+        || (
+                   ms_vehiclesLoaded.CountMembers() > 7 || !CGame::CanSeeOutSideFromCurrArea() && ms_vehiclesLoaded.CountMembers() > 4
+           ) && RemoveLoadedVehicle()
+        || ms_numPedsLoaded > 4 && RemoveLoadedZoneModel())
+    {
+        return true;
+    }
     return false;
+}
+
+bool CStreaming::RemoveLoadedZoneModel() {
+    return CHook::CallFunction<bool>("_ZN10CStreaming21RemoveLoadedZoneModelEv");
+}
+
+bool CStreaming::RemoveLoadedVehicle() {
+    return CHook::CallFunction<bool>("_ZN10CStreaming19RemoveLoadedVehicleEv");
 }
 
 bool CStreaming::HasVehicleUpgradeLoaded(int32 modelId) {

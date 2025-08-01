@@ -148,6 +148,7 @@ public:
     void CleanUpOldReference(CEntity** entity); // See helper SafeCleanUpOldReference
     // is entity touching entity
     bool GetIsTouching(CEntity* entity);
+    bool GetIsOnScreen();
     CVector* GetBoundCentre(CVector* pOutCentre);
     void GetBoundCentre(CVector& outCentre);
     CVector GetBoundCentre();
@@ -155,6 +156,7 @@ public:
     CVector TransformFromObjectSpace(const CVector& offset);
     CVector* TransformFromObjectSpace(CVector& outPos, const CVector& offset);
     void UpdateRW();
+    bool IsVisible();
 
     void SetCollisionChecking(bool bCheck);
     void ProcessLightsForEntity();
@@ -247,6 +249,9 @@ public:
     float GetDistanceFromPoint(float X, float Y, float Z) const;
     void SetInterior(int interiorId, bool needRefresh = false);
     bool IsInCurrentArea() const;
+
+    bool IsScanCodeCurrent() const;
+    void SetCurrentScanCode();
 };
 //#pragma pack(pop)
 

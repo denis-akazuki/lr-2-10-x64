@@ -16,6 +16,8 @@
 #include "chatwindow.h"
 #include "main.h"
 #include "Timer.h"
+#include "LoadedCarGroup.h"
+#include "PtrList.h"
 
 enum class eChannelState
 {
@@ -196,6 +198,10 @@ public:
     static inline int32 ms_streamingBufferSize;
    // static inline bool m_bModelStreamNotLoaded;
 
+    static inline CLoadedCarGroup ms_vehiclesLoaded;
+    static inline uint32 ms_numPedsLoaded;
+    static inline bool ms_bLoadingScene;
+
     static inline CStreamingInfo* ms_pEndRequestedList;
     static inline CStreamingInfo* ms_pStartRequestedList;
     static inline CStreamingInfo* ms_pEndLoadedList;
@@ -226,7 +232,10 @@ public:
     static void RemoveBigBuildings();
     static void MakeSpaceFor(size_t memoryToCleanInBytes);
     static bool RemoveLeastUsedModel(int32 streamingFlags);
+    static bool RemoveReferencedTxds(size_t goalMemoryUsageBytes);
     static void DeleteRwObjectsBehindCamera(size_t memoryToCleanInBytes);
+    static bool DeleteRwObjectsBehindCameraInSectorList(CPtrList& list, size_t memoryToCleanInBytes);
+    static bool DeleteRwObjectsNotInFrustumInSectorList(CPtrList& list, size_t memoryToCleanInBytes);
     static bool HasVehicleUpgradeLoaded(int32 modelId);
     static void FinishLoadingLargeFile(uint8* pFileBuffer, int32 modelId);
     static bool ConvertBufferToObject(uint8* fileBuffer, int32 modelId);
@@ -254,4 +263,7 @@ public:
     static int32 GetNextFileOnCd(uint32 streamLastPosn, bool bNotPriority);
 
     static bool DeleteLeastUsedEntityRwObject(bool bNotOnScreen, int32 streamingFlags);
+
+    static bool RemoveLoadedZoneModel();
+    static bool RemoveLoadedVehicle();
 };
