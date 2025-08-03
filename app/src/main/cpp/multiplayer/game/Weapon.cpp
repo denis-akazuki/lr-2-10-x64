@@ -8,6 +8,7 @@
 #include "World.h"
 #include "Camera.h"
 #include "Stats.h"
+#include "game.h"
 
 void CWeapon__Update(CWeapon* thiz, CPedGta* owner) {
     thiz->Update(owner);
@@ -396,7 +397,7 @@ bool CWeapon::Fire(CEntity* firedBy, CVector* startPosn, CVector* barrelPosn, CE
             case WEAPON_COUNTRYRIFLE:
             case WEAPON_MINIGUN: {
                 if (   firedByPed
-                       && firedByPed->m_nPedType == PEDTYPE_PLAYER1
+                       && firedByPed == GamePool_FindPlayerPed()
                        && notsa::contains({ MODE_M16_1STPERSON, MODE_HELICANNON_1STPERSON }, (eCamMode)TheCamera.PlayerWeaponMode.m_nMode)
                         ) {
                     return { FireM16_1stPerson(firedByPed), true };
@@ -429,7 +430,7 @@ bool CWeapon::Fire(CEntity* firedBy, CVector* startPosn, CVector* barrelPosn, CE
                         true
                 };
             case WEAPON_SNIPERRIFLE: {
-                if (firedByPed && firedByPed->m_nPedType == PEDTYPE_PLAYER1 && TheCamera.PlayerWeaponMode.m_nMode == MODE_SNIPER) {
+                if (firedByPed && firedByPed == GamePool_FindPlayerPed() && TheCamera.PlayerWeaponMode.m_nMode == MODE_SNIPER) {
                     return {
                             FireSniper(firedByPed, targetEnt, targetPosn),
                             true

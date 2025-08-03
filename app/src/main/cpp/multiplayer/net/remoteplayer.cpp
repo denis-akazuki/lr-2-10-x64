@@ -448,9 +448,7 @@ void CRemotePlayer::StoreBulletSyncData(BULLET_SYNC* pBulletSync)
 	}
 
 	m_byteWeaponShotID = pBulletSync->byteWeaponID;
-
     m_pPlayerPed->m_bHaveBulletData = true;
-
 	m_pPlayerPed->FireInstant();
 }
 

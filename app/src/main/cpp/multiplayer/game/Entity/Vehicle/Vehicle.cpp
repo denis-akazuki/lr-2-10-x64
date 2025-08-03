@@ -7,6 +7,7 @@
 #include "game/World.h"
 #include "game/Models/ModelInfo.h"
 #include "game/Coronas.h"
+#include "Camera.h"
 
 void CVehicleGta::RenderDriverAndPassengers() {
     if(IsRCVehicleModelID())
@@ -215,6 +216,115 @@ bool CVehicle__DoTailLightEffect(CVehicleGta* thisVehicle, int32_t lightId, CMat
     return true;
 }
 
+void DoHeadLightBeam(CVehicleGta* vehicle, int lightId, CMatrix* matrix, bool isRight)
+{
+    auto* modelInfo = CModelInfo::GetVehicleModelInfo(vehicle->m_nModelIndex);
+    CVector lightOffset = modelInfo->GetModelDummyPosition(static_cast<eVehicleDummy>(2 * lightId));
+
+    if (lightId == 1 && lightOffset.IsZero())
+        return;
+
+    if (!isRight) {
+        lightOffset.x = -lightOffset.x;
+    }
+
+    CVector worldPos;
+    worldPos.x = matrix->m_pos.x + matrix->m_right.x * lightOffset.x + matrix->m_forward.x * lightOffset.y + matrix->m_up.x * lightOffset.z;
+    worldPos.y = matrix->m_pos.y + matrix->m_right.y * lightOffset.x + matrix->m_forward.y * lightOffset.y + matrix->m_up.y * lightOffset.z;
+    worldPos.z = matrix->m_pos.z + matrix->m_right.z * lightOffset.x + matrix->m_forward.z * lightOffset.y + matrix->m_up.z * lightOffset.z;
+
+    CCamera& TheCamera = *reinterpret_cast<CCamera*>(g_libGTASA + (VER_x32 ? 0x00951FA8 : 0xBBA8D0));
+    CVector toCamera = TheCamera.GetPosition() - worldPos;
+    toCamera.Normalise();
+
+    RwRenderStateSet(rwRENDERSTATEZWRITEENABLE, RWRSTATE(FALSE));
+    RwRenderStateSet(rwRENDERSTATEZTESTENABLE, RWRSTATE(TRUE));
+    RwRenderStateSet(rwRENDERSTATEVERTEXALPHAENABLE, RWRSTATE(TRUE));
+    RwRenderStateSet(rwRENDERSTATESRCBLEND, RWRSTATE(rwBLENDSRCALPHA));
+    RwRenderStateSet(rwRENDERSTATEDESTBLEND, RWRSTATE(rwBLENDONE));
+    RwRenderStateSet(rwRENDERSTATESHADEMODE, RWRSTATE(rwSHADEMODEGOURAUD));
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, RWRSTATE(NULL));
+    RwRenderStateSet(rwRENDERSTATECULLMODE, RWRSTATE(rwCULLMODECULLNONE));
+    RwRenderStateSet(rwRENDERSTATEALPHATESTFUNCTION, RWRSTATE(rwALPHATESTFUNCTIONGREATER));
+    RwRenderStateSet(rwRENDERSTATEALPHATESTFUNCTIONREF, RWRSTATE(0));
+
+    float angleMult = 0.15f;
+    auto alpha = static_cast<uint8>((1.0f - fabs(DotProduct(toCamera, matrix->m_forward))) * 32.0f);
+
+    CVector beamDir;
+    beamDir.x = matrix->m_forward.x - (matrix->m_up.x * angleMult);
+    beamDir.y = matrix->m_forward.y - (matrix->m_up.y * angleMult);
+    beamDir.z = matrix->m_forward.z - (matrix->m_up.z * angleMult);
+    beamDir.Normalise();
+
+    CVector beamRight = CrossProduct(beamDir, toCamera);
+    beamRight.Normalise();
+
+    RxObjSpace3DVertex vertices[8];
+
+    RwRGBA whiteColor = {255, 255, 255, alpha};
+    RwRGBA transparentColor = {255, 255, 255, 0};
+
+    CVector baseLeft = worldPos - beamRight * 0.05f;
+    CVector baseRight = worldPos + beamRight * 0.05f;
+
+    CVector tipLeft = worldPos + beamDir * 3.0f - beamRight * 0.5f;
+    CVector tipRight = worldPos + beamDir * 3.0f + beamRight * 0.5f;
+
+    CVector midBase = worldPos + beamDir * 0.2f;
+    CVector midLeft = baseLeft + beamDir * 1.5f;
+    CVector midRight = baseRight + beamDir * 1.5f;
+    CVector center = worldPos + beamDir * 1.0f;
+
+    RxObjSpace3DVertexSetPreLitColor(&vertices[0], &whiteColor);
+    RxObjSpace3DVertexSetPos(&vertices[0], &baseLeft);
+
+    RxObjSpace3DVertexSetPreLitColor(&vertices[1], &whiteColor);
+    RxObjSpace3DVertexSetPos(&vertices[1], &baseRight);
+
+    RxObjSpace3DVertexSetPreLitColor(&vertices[2], &transparentColor);
+    RxObjSpace3DVertexSetPos(&vertices[2], &tipLeft);
+
+    RxObjSpace3DVertexSetPreLitColor(&vertices[3], &transparentColor);
+    RxObjSpace3DVertexSetPos(&vertices[3], &tipRight);
+
+    RxObjSpace3DVertexSetPreLitColor(&vertices[4], &whiteColor);
+    RxObjSpace3DVertexSetPos(&vertices[4], &midBase);
+
+    RxObjSpace3DVertexSetPreLitColor(&vertices[5], &whiteColor);
+    RxObjSpace3DVertexSetPos(&vertices[5], &midLeft);
+
+    RxObjSpace3DVertexSetPreLitColor(&vertices[6], &whiteColor);
+    RxObjSpace3DVertexSetPos(&vertices[6], &midRight);
+
+    RxObjSpace3DVertexSetPreLitColor(&vertices[7], &whiteColor);
+    RxObjSpace3DVertexSetPos(&vertices[7], &center);
+
+    static RwImVertexIndex indices[] = {
+            0, 1, 4,
+            1, 3, 4,
+            2, 3, 4,
+            0, 2, 4,
+            0, 5, 7,
+            5, 6, 7,
+            1, 6, 7,
+            0, 1, 7
+    };
+
+    if (RwIm3DTransform(vertices, 8, nullptr, rwIM3D_VERTEXRGBA | rwIM3D_VERTEXXYZ)) {
+        RwIm3DRenderIndexedPrimitive(rwPRIMTYPETRILIST, indices, std::size(indices));
+        RwIm3DEnd();
+    }
+
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, RWRSTATE(NULL));
+    RwRenderStateSet(rwRENDERSTATEZWRITEENABLE, RWRSTATE(TRUE));
+    RwRenderStateSet(rwRENDERSTATEZTESTENABLE, RWRSTATE(TRUE));
+    RwRenderStateSet(rwRENDERSTATESRCBLEND, RWRSTATE(rwBLENDSRCALPHA));
+    RwRenderStateSet(rwRENDERSTATEDESTBLEND, RWRSTATE(rwBLENDINVSRCALPHA));
+    RwRenderStateSet(rwRENDERSTATEVERTEXALPHAENABLE, RWRSTATE(FALSE));
+    RwRenderStateSet(rwRENDERSTATECULLMODE, RWRSTATE(rwCULLMODECULLBACK));
+}
+
 void CVehicleGta::InjectHooks() {
     // var
     CHook::Write(g_libGTASA + (VER_x32 ? 0x675F10 : 0x849EA8), &CVehicleGta::m_aSpecialColModel);
@@ -225,6 +335,7 @@ void CVehicleGta::InjectHooks() {
     CHook::Redirect("_ZN8CVehicle17DoTailLightEffectEiR7CMatrixhhjh", &CVehicle__DoTailLightEffect);
     CHook::InlineHook("_ZN8CVehicle15DoVehicleLightsER7CMatrixj", &CVehicle__DoVehicleLights_hook, &CVehicle__DoVehicleLights);
     CHook::Redirect("_ZN8CVehicle22GetVehicleLightsStatusEv", &CVehicle__GetVehicleLightsStatus_hook);
+    CHook::Redirect("_ZN8CVehicle15DoHeadLightBeamEiR7CMatrixh", &DoHeadLightBeam);
 }
 
 bool CVehicleGta::IsRCVehicleModelID() {
