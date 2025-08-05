@@ -1436,33 +1436,10 @@ uint32_t CWeapon__FireSniper_hook(CWeapon *pWeaponSlot, CPedGta *pFiringEntity, 
 
 void SendBulletSync(CVector *vecOrigin, CVector *vecEnd, CColPoint *colPoint, CEntity *pEntity)
 {
-    BULLET_SYNC data;
-
-    data.vecOrigin 	= *vecOrigin;
-    data.vecHit 	= colPoint->m_vecPoint;
-    if(pEntity) {
-
-		static CMatrix mat1;
-		memset(&mat1, 0, sizeof(CMatrix));
-
-		static CMatrix mat2;
-		memset(&mat2, 0, sizeof(CMatrix));
-
-		auto entMat = pEntity->GetMatrix().ToRwMatrix();
-		RwMatrixOrthoNormalize(reinterpret_cast<RwMatrix *>(&mat2), &entMat);
-
-		Invert(mat1, mat2);
-
-		ProjectMatrix(&data.vecOffset, &mat1, &colPoint->m_vecPoint);
-	}
-    else
-        data.vecOffset  = 0;
-
-
     uint8_t byteHitType = BULLET_HIT_TYPE_NONE;
     uint16  InstanceID  = INVALID_PLAYER_ID;
 
-    if(pEntity) {
+    if (pEntity) {
         InstanceID = CPlayerPool::FindRemotePlayerIDFromGtaPtr((CPedGta*)pEntity);
         if (InstanceID == INVALID_PLAYER_ID)
         {
@@ -1490,9 +1467,14 @@ void SendBulletSync(CVector *vecOrigin, CVector *vecEnd, CColPoint *colPoint, CE
         }
     }
 
-    data.hitId       	= InstanceID;
-    data.byteHitType    = static_cast<eBulletSyncHitType>(byteHitType);
-    data.byteWeaponID   = CGame::FindPlayerPed()->GetCurrentWeapon();
+    const BULLET_SYNC data = {
+            .byteHitType    = static_cast<eBulletSyncHitType>(byteHitType),
+            .hitId          = InstanceID,
+            .vecOrigin 	    = *vecOrigin,
+            .vecHit 	    = colPoint->m_vecPoint,
+            .vecOffset      = *vecEnd,
+            .byteWeaponID   = static_cast<uint8_t>(CGame::FindPlayerPed()->GetCurrentWeapon())
+    };
 
     RakNet::BitStream bsBullet;
     bsBullet.Write((char)ID_BULLET_SYNC);
