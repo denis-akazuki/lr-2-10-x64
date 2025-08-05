@@ -1623,6 +1623,19 @@ void ScrSetPlayerTeam(RPCParameters *rpcParams)
 	}
 }
 
+bool bDisableVehicleCollision = false;
+void ScrDisableRemoteVehicleCollision(RPCParameters *rpcParams)
+{
+    Log("RPC: ScrDisableRemoteVehicleCollisions");
+    unsigned char* Data = reinterpret_cast<unsigned char *>(rpcParams->input);
+    int iBitLength = rpcParams->numberOfBitsOfData;
+    RakNet::BitStream bsData((unsigned char*)Data, (iBitLength / 8) + 1, false);
+
+    bool bDisable;
+    bsData.Read(bDisable);
+    bDisableVehicleCollision = bDisable;
+}
+
 void RegisterScriptRPCs(RakClientInterface* pRakClient)
 {
     LOGRPC("Registering ScriptRPC's..");
@@ -1695,6 +1708,8 @@ void RegisterScriptRPCs(RakClientInterface* pRakClient)
 	pRakClient->RegisterAsRemoteProcedureCall(&RPC_ScrSetObjectRotation, ScrSetObjectRotation);
 
 	pRakClient->RegisterAsRemoteProcedureCall(&RPC_ScrSetPlayerDrunkLevel, ScrSetPlayerDrunkLevel);
+
+    pRakClient->RegisterAsRemoteProcedureCall(&RPC_ScrDisableRemoteVehicleCollision, ScrDisableRemoteVehicleCollision);
 }
 
 void UnRegisterScriptRPCs(RakClientInterface* pRakClient)
@@ -1773,4 +1788,6 @@ void UnRegisterScriptRPCs(RakClientInterface* pRakClient)
 	pRakClient->UnregisterAsRemoteProcedureCall(&RPC_ScrRemoveComponent);
 	pRakClient->UnregisterAsRemoteProcedureCall(&RPC_ScrSetObjectRotation);
 	pRakClient->UnregisterAsRemoteProcedureCall(&RPC_ScrMoveObject);
+
+    pRakClient->UnregisterAsRemoteProcedureCall(&RPC_ScrDisableRemoteVehicleCollision);
 }

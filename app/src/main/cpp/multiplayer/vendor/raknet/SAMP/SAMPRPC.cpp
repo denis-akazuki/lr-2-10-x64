@@ -66,6 +66,7 @@ int RPC_SetActorPos = 176;
 int RPC_SetActorFacingAngle = 175;
 int RPC_SetActorAnimation = 173;
 int RPC_ClearActorAnimations = 174;
+int RPC_ScrDisableRemoteVehicleCollision = 167;
 
 int RPC_ScrSetPlayerObjectMaterial = 0x54;
 int RPC_ScrSetPlayerTeam = 69;

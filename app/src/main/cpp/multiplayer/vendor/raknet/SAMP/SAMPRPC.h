@@ -63,6 +63,7 @@ extern int RPC_SetActorPos;
 extern int RPC_SetActorFacingAngle;
 extern int RPC_SetActorAnimation;
 extern int RPC_ClearActorAnimations;
+extern int RPC_ScrDisableRemoteVehicleCollision;
 
 extern int RPC_ScrSetPlayerObjectMaterial;
 extern int RPC_ScrSetPlayerTeam;

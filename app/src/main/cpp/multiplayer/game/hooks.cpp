@@ -995,14 +995,23 @@ uintptr_t g_dwRenderQueueOffset;
 
 #include "CRenderTarget.h"
 #include "CCustomPlateManager.h"
+#include "Entity/Vehicle/Bike.h"
+
+extern bool bDisableVehicleCollision;
 
 uint16_t g_usLastProcessedModelIndexAutomobile = 0;
 int g_iLastProcessedModelIndexAutoEnt = 0;
-void (*CAutomobile__ProcessEntityCollision)(CVehicleGta* a1, CEntity* a2, CColPoint *aColPoints);
-void CAutomobile__ProcessEntityCollision_hook(CVehicleGta* a1, CEntity* a2, CColPoint *aColPoints)
-{
-	g_usLastProcessedModelIndexAutomobile = a1->m_nModelIndex;
-	g_iLastProcessedModelIndexAutoEnt = a2->m_nModelIndex;
+int32 (*CAutomobile__ProcessEntityCollision)(CVehicleGta* thiz, CEntity* ent, CColPoint* aColPoints);
+int32 CAutomobile__ProcessEntityCollision_hook(CVehicleGta* thiz, CEntity* ent, CColPoint* aColPoints) {
+
+    g_usLastProcessedModelIndexAutomobile = thiz->m_nModelIndex;
+    g_iLastProcessedModelIndexAutoEnt = thiz->m_nModelIndex;
+
+    if (bDisableVehicleCollision) {
+        if (ent->IsVehicle() || ent->m_nType == ENTITY_TYPE_PED) {
+            return 0;
+        }
+    }
 
 	bool bReplace = false;
     CColLine* pOld = nullptr;
@@ -1010,11 +1019,11 @@ void CAutomobile__ProcessEntityCollision_hook(CVehicleGta* a1, CEntity* a2, CCol
 
 	if (pNetGame)
 	{
-		uint16_t vehId = CVehiclePool::FindIDFromGtaPtr(a1);
+		uint16_t vehId = CVehiclePool::FindIDFromGtaPtr(thiz);
 		CVehicle* pVeh = CVehiclePool::GetAt(vehId);
 		if (pVeh) {
 			if (pVeh->bHasSuspensionLines && pVeh->GetVehicleSubtype() == VEHICLE_SUBTYPE_CAR) {
-				pColData = CModelInfo::GetModelInfo(a1->m_nModelIndex)->AsVehicleModelInfoPtr()->m_pColModel->m_pColData;
+				pColData = CModelInfo::GetModelInfo(thiz->m_nModelIndex)->AsVehicleModelInfoPtr()->m_pColModel->m_pColData;
 				if (pColData && pVeh->m_pSuspensionLines) {
 					if (pColData->m_pLines) {
 						pOld = pColData->m_pLines;
@@ -1025,11 +1034,49 @@ void CAutomobile__ProcessEntityCollision_hook(CVehicleGta* a1, CEntity* a2, CCol
 			}
 		}
 	}
-	CAutomobile__ProcessEntityCollision(a1, a2, aColPoints);
-	if (bReplace)
-	{
+	auto result = CAutomobile__ProcessEntityCollision(thiz, ent, aColPoints);
+
+	if (bReplace) {
         pColData->m_pLines = pOld;
 	}
+
+    return result;
+}
+
+int32 (*CBike__ProcessEntityCollision)(CBike* thiz, CEntity* ent, CColPoint* aColPoints);
+int32 CBike__ProcessEntityCollision_hook(CBike* thiz, CEntity* ent, CColPoint* aColPoints) {
+
+    if (bDisableVehicleCollision) {
+        if (ent->IsVehicle() || ent->m_nType == ENTITY_TYPE_PED) {
+            return 0;
+        }
+    }
+
+    return CBike__ProcessEntityCollision(thiz, ent, aColPoints);
+}
+
+int32 (*CMonsterTruck__ProcessEntityCollision)(void* thiz, CEntity* ent, CColPoint* aColPoints);
+int32 CMonsterTruck__ProcessEntityCollision_hook(void* thiz, CEntity* ent, CColPoint* aColPoints) {
+
+    if (bDisableVehicleCollision) {
+        if (ent->IsVehicle() || ent->m_nType == ENTITY_TYPE_PED) {
+            return 0;
+        }
+    }
+
+    return CMonsterTruck__ProcessEntityCollision(thiz, ent, aColPoints);
+}
+
+int32 (*CTrailer__ProcessEntityCollision)(void* thiz, CEntity* ent, CColPoint* aColPoints);
+int32 CTrailer__ProcessEntityCollision_hook(void* thiz, CEntity* ent, CColPoint* aColPoints) {
+
+    if (bDisableVehicleCollision) {
+        if (ent->IsVehicle() || ent->m_nType == ENTITY_TYPE_PED) {
+            return 0;
+        }
+    }
+
+    return CTrailer__ProcessEntityCollision(thiz, ent, aColPoints);
 }
 
 void (*MainMenuScreen__OnExit)();
@@ -1306,17 +1353,18 @@ void FxEmitterBP_c__Render_hook(uintptr_t* a1, int a2, int a3, float a4, char a5
 int g_iLastProcessedSkinCollision = 228;
 int g_iLastProcessedEntityCollision = 228;
 
-void (*CPed__ProcessEntityCollision)(CPedGta* thiz, CEntity* ent, void* colPoint);
-void CPed__ProcessEntityCollision_hook(CPedGta* thiz, CEntity* ent, void* colPoint)
-{
+int32 (*CPed__ProcessEntityCollision)(CPedGta* thiz, CEntity* ent, CColPoint* colPoint);
+int32 CPed__ProcessEntityCollision_hook(CPedGta* thiz, CEntity* ent, CColPoint* colPoint) {
 	g_iLastProcessedSkinCollision = thiz->m_nModelIndex;
 	g_iLastProcessedEntityCollision = ent->m_nModelIndex;
 
-//	if(ent->m_nType == ENTITY_TYPE_PED) { // ��������� ������ �����
-//		return;
-//	}
+    if (bDisableVehicleCollision) {
+        if (ent->IsVehicle() || ent->m_nType == ENTITY_TYPE_PED) {
+            return 0;
+        }
+    }
 
-	CPed__ProcessEntityCollision(thiz, ent, colPoint);
+	return CPed__ProcessEntityCollision(thiz, ent, colPoint);
 }
 
 int (*CTaskSimpleGetUp__ProcessPed)(uintptr_t* thiz, CPedGta* ped);
@@ -1655,8 +1703,11 @@ void InstallHooks()
 	//CHook::InlineHook("_Z19_rwFreeListFreeRealP10RwFreeListPv", &_rwFreeListFreeReal_hook, &_rwFreeListFreeReal);
 
 	CHook::InlineHook("_ZN11CAutomobile22ProcessEntityCollisionEP7CEntityP9CColPoint", &CAutomobile__ProcessEntityCollision_hook, &CAutomobile__ProcessEntityCollision);
+    CHook::InlineHook("_ZN5CBike22ProcessEntityCollisionEP7CEntityP9CColPoint", &CBike__ProcessEntityCollision_hook, &CBike__ProcessEntityCollision);
+    CHook::InlineHook("_ZN13CMonsterTruck22ProcessEntityCollisionEP7CEntityP9CColPoint", &CMonsterTruck__ProcessEntityCollision_hook, &CMonsterTruck__ProcessEntityCollision);
+    CHook::InlineHook("_ZN8CTrailer22ProcessEntityCollisionEP7CEntityP9CColPoint", &CTrailer__ProcessEntityCollision_hook, &CTrailer__ProcessEntityCollision);
 
-	CHook::InlineHook("_ZN14MainMenuScreen6OnExitEv", &MainMenuScreen__OnExit_hook, &MainMenuScreen__OnExit);
+    CHook::InlineHook("_ZN14MainMenuScreen6OnExitEv", &MainMenuScreen__OnExit_hook, &MainMenuScreen__OnExit);
 
 	CHook::InlineHook("_ZN11CAutomobile9PreRenderEv", &CAutomobile__PreRender_hook, &CAutomobile__PreRender);
 	CHook::InlineHook("_ZN11CAutomobile17UpdateWheelMatrixEii", &CAutomobile__UpdateWheelMatrix_hook, &CAutomobile__UpdateWheelMatrix);
