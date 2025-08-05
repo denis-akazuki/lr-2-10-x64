@@ -12,7 +12,7 @@ public:
 //    static float& ms_fLODDistance;
     static inline float ms_fNearClipZ;
     static inline float ms_fFarClipZ;
-//    static float& ms_fAspectRatio;
+    static inline float ms_fAspectRatio;
 //
 //    static uint8& FadeRed;
 //    static uint8& FadeGreen;
@@ -22,7 +22,7 @@ public:
 public:
     static void InjectHooks();
 
-//    static void SetFOV(float fov);
+    static void SetFOV(float fFOV, bool isCinematic);
     static float GetFOV() { return ms_fFOV; }
 //
 //    static void SetNearClipZ(float nearClip) { ms_fNearClipZ = nearClip; }

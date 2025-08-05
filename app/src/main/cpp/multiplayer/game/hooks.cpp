@@ -1379,19 +1379,6 @@ RpMaterial* SetCompAlphaCB_hook(RpMaterial *pMaterial, void *pData)
 	return result;
 }
 
-void (*CDraw__SetFOV)(float thiz, float a2);
-void CDraw__SetFOV_hook(float thiz, float a2)
-{
-	float tmp = (float)((float)((float)(*(float *)&*(float *)(g_libGTASA + (VER_x32 ? 0x00A26A90 : 0xCC7F00)) - 1.3333) * 11.0) / 0.44444) + thiz;
-
-        if(CFirstPersonCamera::IsEnabled‎())
-           tmp = 120.0;
-        else if(tmp > 100)
-           tmp = 100.0;
-
-	*(float *)(g_libGTASA + (VER_x32 ? 0x006B1CB8 : 0x88E6BC)) = tmp;
-}
-
 bool (*CCollision__ProcessVerticalLine)(const CColLine *Line, const CMatrix *mat, CColModel *colModel, CColPoint *colPoint, float *fCollisionRatio, bool bSeeThroughStuff, bool bShootThroughStuff, CStoredCollPoly *pStoredPoly);
 bool CCollision__ProcessVerticalLine_hook(const CColLine *Line, const CMatrix *mat, CColModel *colModel, CColPoint *colPoint, float *fCollisionRatio, bool bSeeThroughStuff, bool bShootThroughStuff, CStoredCollPoly *pStoredPoly)
 {
@@ -1727,8 +1714,6 @@ void InstallHooks()
 
 
 	CHook::InlineHook("_Z23RwResourcesFreeResEntryP10RwResEntry", &RwResourcesFreeResEntry_hook, &RwResourcesFreeResEntry);
-
-	CHook::InlineHook("_ZN5CDraw6SetFOVEfb", &CDraw__SetFOV_hook, &CDraw__SetFOV);
 
     auto* RQCaps = (RQCapabilities*)(g_libGTASA + (VER_x32 ? 0x6B8B9C : 0x896130));
     if (RQCaps->hasTextureCompressionPVRTCCap) {
