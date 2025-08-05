@@ -636,8 +636,8 @@ void ScrVehicleParamsEx(RPCParameters* rpcParams)
 
 	//		pNetGame->GetVehiclePool()->AssignSpecialParamsToVehicle(VehicleId, objective,doors);
 
-	pVehicle->OpenDoor(eCarNodes::CAR_BOOT, eDoors::BOOT, boot);
-	pVehicle->OpenDoor(eCarNodes::CAR_BONNET, eDoors::BONNET, bonnet);
+	pVehicle->OpenDoor(eCarNodes::CAR_BOOT, eDoors::DOOR_BONNET, boot);
+	pVehicle->OpenDoor(eCarNodes::CAR_BONNET, eDoors::DOOR_BONNET, bonnet);
 
 	CSpeedometr::UpdateInfo();
 	CRadialMenu::Update();
@@ -1321,7 +1321,7 @@ int GetSampIDFromInternalBoneID(int internalBoneID)
         case 8:
             return ATTACH_BONE_JAW;
     }
-    return -1; // или другое значение, которое обозначит отсутствие соответствия
+    return -1; // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 }
 
 

@@ -264,26 +264,6 @@ struct ATTACHED_OBJECT_INFO
 VALIDATE_SIZE(ATTACHED_OBJECT_INFO, 52);
 //-----------------------------------------------------------
 
-enum eDoors
-{
-	BONNET = 0,
-	BOOT,
-	FRONT_LEFT_DOOR,
-	FRONT_RIGHT_DOOR,
-	REAR_LEFT_DOOR,
-	REAR_RIGHT_DOOR,
-	MAX_DOORS
-};
-
-enum eDoorStatus
-{
-	DT_DOOR_INTACT = 0,
-	DT_DOOR_SWINGING_FREE,
-	DT_DOOR_BASHED,
-	DT_DOOR_BASHED_AND_SWINGING_FREE,
-	DT_DOOR_MISSING
-};
-
 typedef struct _RES_ENTRY_OBJ
 {
 	PADDING(_pad0, 48); 	// 0-48
@@ -291,49 +271,6 @@ typedef struct _RES_ENTRY_OBJ
 	PADDING(_pad1, 4); 		//52-56
 } RES_ENTRY_OBJ;
 static_assert(sizeof(_RES_ENTRY_OBJ) == (VER_x32 ? 56 : 64)); // FIXME?
-
-enum eWheelPosition
-{
-	FRONT_LEFT_WHEEL = 0,
-	REAR_LEFT_WHEEL,
-	FRONT_RIGHT_WHEEL,
-	REAR_RIGHT_WHEEL,
-
-	MAX_WHEELS
-
-};
-
-typedef struct _DAMAGE_MANAGER_INTERFACE            // 28 bytes due to the way its packed (24 containing actual data)
-{
-	float fWheelDamageEffect;
-	uint8_t  bEngineStatus;            // old - wont be used
-	uint8_t  Wheel[MAX_WHEELS];
-	uint8_t  Door[MAX_DOORS];
-	uint32_t Lights;            // 2 bits per light
-	uint32_t Panels;            // 4 bits per panel
-} DAMAGE_MANAGER_INTERFACE;
-
-enum ePanels
-{
-	FRONT_LEFT_PANEL = 0,
-	FRONT_RIGHT_PANEL,
-	REAR_LEFT_PANEL,
-	REAR_RIGHT_PANEL,
-	WINDSCREEN_PANEL,            // needs to be in same order as in component.h
-	FRONT_BUMPER,
-	REAR_BUMPER,
-
-	MAX_PANELS            // MUST BE 8 OR LESS
-};
-
-enum eComponentStatus
-{
-	DT_PANEL_INTACT = 0,
-	//  DT_PANEL_SHIFTED,
-	DT_PANEL_BASHED,
-	DT_PANEL_BASHED2,
-	DT_PANEL_MISSING
-};
 
 #pragma pack(push, 1)
 struct AIM_SYNC_DATA

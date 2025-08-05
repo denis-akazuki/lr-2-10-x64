@@ -160,6 +160,7 @@ public:
 
 
 	CVehicleGta* 	m_pVehicle;
+    CDamageManager* m_pDamageManager;
 
 	// поворотники
 	CObject*		m_pLeftFrontTurnLighter = nullptr;
@@ -212,39 +213,29 @@ public:
 
 public:
 
-	bool HasDamageModel() const;
+    bool HasDamageModel() const;
 
-	void SetPanelStatus(uint8_t bPanel, uint8_t bPanelStatus) const;
+    void SetPanelStatus(ePanels bPanel, ePanelDamageState bPanelStatus) const;
 
-	uint8_t GetPanelStatus(uint8_t bPanel) const;
+    void ChangeVinylTo(int vinylIdx);
 
-	void ChangeVinylTo(int vinylIdx);
+    void SetDoorStatus(uint32_t dwDoorStatus, bool spawnFlyingComponen);
 
-	void SetDoorStatus(uint32_t dwDoorStatus, bool spawnFlyingComponen);
+    void SetPanelStatus(ePanelDamageState ulPanelStatus) const;
 
-	void SetPanelStatus(uint32_t ulPanelStatus);
+    uint8_t GetLightStatus(eLights bLight) const;
 
-	void SetLightStatus(uint8_t bLight, uint8_t bLightStatus);
+    uint8_t GetBikeWheelStatus(uint8_t bWheel) const;
 
-	uint8_t GetLightStatus(uint8_t bLight);
+    void SetDoorStatus(eDoors bDoor, eDoorStatus bDoorStatus, bool spawnFlyingComponen);
 
-	void SetLightStatus(uint8_t ucStatus);
+    uint8_t GetDoorStatus(eDoors bDoor);
 
-	void SetBikeWheelStatus(uint8_t bWheel, uint8_t bTireStatus);
+    void ProcessDamage();
 
-	void SetWheelStatus(eWheelPosition bWheel, uint8_t bTireStatus);
+    void GetDamageStatusEncoded(uint8_t *byteTyreFlags, uint8_t *byteLightFlags, uint32_t *dwDoorFlags, uint32_t *dwPanelFlags);
 
-	uint8_t GetBikeWheelStatus(uint8_t bWheel);
-
-	void SetDoorStatus(eDoors bDoor, uint8_t bDoorStatus, bool spawnFlyingComponen);
-
-	uint8_t GetDoorStatus(eDoors bDoor);
-
-	void ProcessDamage();
-
-	void GetDamageStatusEncoded(uint8_t *byteTyreFlags, uint8_t *byteLightFlags, uint32_t *dwDoorFlags, uint32_t *dwPanelFlags);
-
-	uint8_t GetWheelStatus(eWheelPosition bWheel);
+    uint8_t GetWheelStatus(eCarWheel bWheel) const;
 
 	VEHICLEID getSampId();
 

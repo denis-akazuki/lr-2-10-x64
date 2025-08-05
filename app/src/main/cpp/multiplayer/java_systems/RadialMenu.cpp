@@ -36,8 +36,8 @@ void CRadialMenu::Update() {
                             pVehicle->m_bIsLightOn == eLightsState::HIGH, // �������
                             pVehicle->m_iStrobsType != eStobsStatus::OFF, // ����������
                             pVehicle->neon.IsSet(), // neon
-                            pVehicle->m_bDoorsState[eDoors::BONNET], // �����
-                            pVehicle->m_bDoorsState[eDoors::BOOT]
+                            pVehicle->m_bDoorsState[eDoors::DOOR_BONNET], // �����
+                            pVehicle->m_bDoorsState[eDoors::DOOR_BOOT]
                             );
     }
 }
