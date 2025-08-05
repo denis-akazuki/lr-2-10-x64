@@ -5,6 +5,7 @@
 #pragma once
 
 #include "common.h"
+#include "sprite2d.h"
 
 // Thanks to Wesser for radar-related things
 enum eBlipAppearance : uint8 {
@@ -137,9 +138,46 @@ VALIDATE_SIZE(tBlipHandle, 0x4);
 
 using tBlipHandle = uint32; // TODO: Use struct above
 
-class CRadar {
+struct tRadarTrace {
+    eBlipColour  m_nColour;
+    uint32       m_nEntityHandle;
+    CVector      m_vPosition;
+    uint16       m_nCounter;
+    float        m_fSphereRadius;
+    uint16       m_nBlipSize;
+    uintptr_t*   m_pEntryExit;
+    eRadarSprite m_nBlipSprite;
 
+    bool         m_bBright : 1;              // It makes use of bright colors. Always set.
+    bool         m_bTrackingBlip : 1;        // It is available.
+    bool         m_bShortRange : 1;          // It doesn't show permanently on the radar.
+    bool         m_bFriendly : 1;            // It is affected by BLIP_COLOUR_THREAT.
+    bool         m_bBlipRemain : 1;          // It has the priority over the entity (it will still appear after the entity's deletion).
+    bool         m_bBlipFade : 1;            // Possibly a leftover. Always unset (unused).
+    uint8        m_nCoordBlipAppearance : 2; // see eBlipAppearance
+
+    eBlipDisplay    m_nBlipDisplayFlag : 2;
+    eBlipType       m_nBlipType : 4;
+    eBlipAppearance m_nAppearance : 2;
+
+    [[nodiscard]] auto HasSprite() const { return m_nBlipSprite != eRadarSprite::RADAR_SPRITE_NONE; }
+    [[nodiscard]] CRGBA GetStaticColour() const;
+    [[nodiscard]] CVector GetWorldPos() const;
+
+    std::pair<CVector2D, CVector2D> GetRadarAndScreenPos(float* radarPointDist) const;
+};
+
+class CRadar {
 public:
+    static constexpr uint32 MAX_RADAR_SPRITES = 64;
+    static constexpr uint32 MAX_RADAR_TRACES = 250;
+
+    static void InjectHooks();
+
+    static tBlipHandle SetCoordBlip(eBlipType type, CVector posn, eBlipColour color, eBlipDisplay blipDisplay, const char* scriptName);
+    static tBlipHandle GetNewUniqueBlipIndex(int32 index);
+    static int32 FindTraceNotTrackingBlipIndex();
+
     static void DrawLegend(int32 x, int32 y, eRadarSprite blipType);
     static float LimitRadarPoint(CVector2D& point);
     static void LimitToMap(float* x, float* y);
@@ -156,4 +194,43 @@ public:
     static void ClearBlip(tBlipHandle blip);
     static void SetupAirstripBlips();
     static void DrawBlips();
+
+    static void LimitToMap(float& x, float& y);
+    static bool DisplayThisBlip(eRadarSprite spriteId, int8 priority);
+    static void DrawRadarSprite(eRadarSprite spriteId, float x, float y, uint8 alpha);
+    std::pair<CVector2D, CVector2D> GetRadarAndScreenPos(float* radarPointDist) const;
+    static CVector2D TransformRealWorldPointToRadarSpace(const CVector2D& in);
+    static CVector2D TransformRadarPointToScreenSpace(const CVector2D& in);
+
+    static auto CachedRotateCounterclockwise(const CVector2D& point) {
+        return CVector2D{
+                getCachedCos() * point.x - getCachedSin() * point.y,
+                getCachedSin() * point.x + getCachedCos() * point.y
+        };
+    }
+
+    static auto CachedRotateClockwise(const CVector2D& point) {
+        return CVector2D{
+                +getCachedCos() * point.x + getCachedSin() * point.y,
+                -getCachedSin() * point.x + getCachedCos() * point.y
+        };
+    }
+
+    static float getCachedCos() {
+        return cachedCos = *(float*)(g_libGTASA + (VER_x32 ? 0x994EE8 : 0xC24864));
+    }
+
+    static float getCachedSin() {
+        return cachedSin = *(float*)(g_libGTASA + (VER_x32 ? 0x994EEC : 0xC24868));
+    }
+
+public:
+    static inline std::array<tRadarTrace, MAX_RADAR_TRACES> ms_RadarTrace;
+    static inline std::array<CSprite2d, MAX_RADAR_SPRITES> RadarBlipSprites;
+
+    static inline float cachedCos;
+    static inline float cachedSin;
+
+    static inline float m_radarRange;
+    static inline CVector2D vec2DRadarOrigin;
 };

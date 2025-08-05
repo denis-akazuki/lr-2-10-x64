@@ -181,25 +181,6 @@ uint32_t CHudColours__GetIntColour(uintptr* thiz, uint32 colour_id)
 }
 #endif
 
-int (*CRadar__SetCoordBlip)(int r0, float X, float Y, float Z, int r4, int r5, char *name);
-int CRadar__SetCoordBlip_hook(int r0, float X, float Y, float Z, int r4, int r5, char *name)
-{
-	if (pNetGame && !strncmp(name, "CODEWAY", 7))
-	{
-		float findZ = CWorld::FindGroundZForCoord(X, Y);
-		findZ += 1.5f;
-
-		Log("OnPlayerClickMap: %f, %f, %f", X, Y, Z);
-		RakNet::BitStream bsSend;
-		bsSend.Write(X);
-		bsSend.Write(Y);
-		bsSend.Write(findZ);
-		pNetGame->GetRakClient()->RPC(&RPC_MapMarker, &bsSend, HIGH_PRIORITY, RELIABLE, 0, false, UNASSIGNED_NETWORK_ID, nullptr);
-	}
-
-	return CRadar__SetCoordBlip(r0, X, Y, Z, r4, r5, name);
-}
-
 uint8_t bGZ = 0;
 void (*CRadar__DrawRadarGangOverlay)(uint8_t v1);
 void CRadar__DrawRadarGangOverlay_hook(uint8_t v1)
@@ -1658,7 +1639,6 @@ void InstallHooks()
     //
 	CHook::Redirect("_ZN11CHudColours12GetIntColourEh", &CHudColours__GetIntColour); // dangerous
 	CHook::Redirect("_ZN6CRadar19GetRadarTraceColourEjhh", &CRadar__GetRadarTraceColor); // dangerous
-	CHook::InlineHook("_ZN6CRadar12SetCoordBlipE9eBlipType7CVectorj12eBlipDisplayPc", &CRadar__SetCoordBlip_hook, &CRadar__SetCoordBlip);
 	CHook::InlineHook("_ZN6CRadar20DrawRadarGangOverlayEb", &CRadar__DrawRadarGangOverlay_hook, &CRadar__DrawRadarGangOverlay);
 
 	//CHook::InlineHook("_Z15RwFrameAddChildP7RwFrameS0_", &RwFrameAddChild_hook, &RwFrameAddChild);

@@ -7,7 +7,7 @@
 #include "game.h"
 
 void CDraw::SetFOV(float fFOV, bool isCinematic) {
-    fFOV = (((ms_fAspectRatio - 1.3333) * 11.0) / 0.44444) + fFOV;
+    fFOV = (float)(((ms_fAspectRatio - 1.3333) * 11.0) / 0.44444) + fFOV;
 
     if (CFirstPersonCamera::IsEnabled())
         fFOV = 120.0;
