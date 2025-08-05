@@ -628,7 +628,7 @@ void AllVehicles__ProcessControl_hook(uintptr_t thiz)
 
 		// CBmx
 		case 0x83C070:
-		call_addr = 0x693978;
+        call_addr = 0x68A9AC;
 		break;
 
 		// CMonsterTruck
