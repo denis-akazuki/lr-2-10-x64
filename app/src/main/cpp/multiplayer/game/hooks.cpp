@@ -1384,7 +1384,7 @@ void CDraw__SetFOV_hook(float thiz, float a2)
 {
 	float tmp = (float)((float)((float)(*(float *)&*(float *)(g_libGTASA + (VER_x32 ? 0x00A26A90 : 0xCC7F00)) - 1.3333) * 11.0) / 0.44444) + thiz;
 
-        if(CFirstPersonCamera::m_bEnabled)
+        if(CFirstPersonCamera::IsEnabled‎())
            tmp = 120.0;
         else if(tmp > 100)
            tmp = 100.0;
