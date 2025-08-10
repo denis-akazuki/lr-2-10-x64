@@ -23,7 +23,7 @@ enum eBikeNodes {
     BIKE_NUM_NODES
 };
 
-struct CBike : CVehicleGta {
+struct CBike : CVehicle {
     static constexpr auto NUM_SUSP_LINES = 4;
 public:
     RwFrame* m_aBikeNodes[BIKE_NUM_NODES];

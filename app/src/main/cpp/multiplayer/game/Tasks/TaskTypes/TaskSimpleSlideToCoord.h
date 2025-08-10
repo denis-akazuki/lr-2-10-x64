@@ -23,8 +23,8 @@ public:
 
     CTask* Clone() const override;
     eTaskType GetTaskType() const override { return Type; }
-    bool MakeAbortable(CPedGta* ped, eAbortPriority priority = ABORT_PRIORITY_URGENT, const CEvent* event = nullptr) override;
-    bool ProcessPed(CPedGta* ped) override;
+    bool MakeAbortable(CPed* ped, eAbortPriority priority = ABORT_PRIORITY_URGENT, const CEvent* event = nullptr) override;
+    bool ProcessPed(CPed* ped) override;
 
 private:
     static void InjectHooks();

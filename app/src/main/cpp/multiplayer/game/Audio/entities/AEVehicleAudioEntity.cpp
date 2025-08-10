@@ -124,7 +124,7 @@ void CAEVehicleAudioEntity::Initialise(CEntity* entity) {
     field_240 = 0.0f;
 
     m_Settings = GetVehicleAudioSettings(entity->m_nModelIndex);
-    m_bModelWithSiren = reinterpret_cast<CVehicleGta*>(entity)->UsesSiren();
+    m_bModelWithSiren = reinterpret_cast<CVehicle*>(entity)->UsesSiren();
     if (m_Settings.m_nRadioType == eRadioType::RADIO_UNKNOWN) {
         m_Settings.m_nRadioID = eRadioID::RADIO_OFF;
     }
@@ -232,7 +232,7 @@ void CAEVehicleAudioEntity::Initialise(CEntity* entity) {
     }
 }
 
-void CAEVehicleAudioEntity_Initialise_hooked(CAEVehicleAudioEntity* thiz, CVehicleGta* pVehicle) {
+void CAEVehicleAudioEntity_Initialise_hooked(CAEVehicleAudioEntity* thiz, CVehicle* pVehicle) {
     thiz->Initialise(pVehicle);
 }
 

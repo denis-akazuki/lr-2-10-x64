@@ -30,7 +30,7 @@ bool CObjectPool::New(uint16_t objectId, int iModel, CVector vecPos, CVector vec
 	return true;
 }
 
-CObject *CObjectPool::GetObjectFromGtaPtr(CEntity *pGtaObject)
+CObjectSamp *CObjectPool::GetObjectFromGtaPtr(CEntity *pGtaObject)
 {
 	for(auto &pair : list) {
 		auto pObject = pair.second;

@@ -2,7 +2,6 @@
 #include "game.h"
 #include "../net/netgame.h"
 #include "common.h"
-#include "vehicle.h"
 
 #include "..//CDebugInfo.h"
 #include "util/patch.h"
@@ -24,7 +23,7 @@ CPedSamp* g_pCurrentFiredPed;
 CPedSamp::CPedSamp()
 {
 	m_dwGTAId = 1;
-	m_pPed = (CPedGta*)GamePool_FindPlayerPed();
+	m_pPed = (CPed*)GamePool_FindPlayerPed();
 	m_bHaveBulletData = false;
 
 	m_bytePlayerNumber = 0;
@@ -74,7 +73,7 @@ CPedSamp::CPedSamp(uint8_t bytePlayerNumber, int iSkin, float fX, float fY, floa
 	memset(&RemotePlayerKeys[m_bytePlayerNumber], 0, sizeof(PAD_KEYS));
 }
 
-bool IsValidGamePed(CPedGta* pPed);
+bool IsValidGamePed(CPed* pPed);
 
 CPedSamp::~CPedSamp()
 {
@@ -98,7 +97,7 @@ CPedSamp::~CPedSamp()
 		*(uint32_t*)(m_pPed->m_pPlayerData + 76) = 0;
 		// CPedSamp::Destructor
 
-		//(( void (*)(CPedGta*))(*(void**)(m_pPed->vtable+0x4)))(m_pPed);
+		//(( void (*)(CPed*))(*(void**)(m_pPed->vtable+0x4)))(m_pPed);
 		((void (*)(uintptr_t))(g_libGTASA + (VER_x32 ? 0x004CE6A0 + 1 : 0x5CDC64)))((uintptr_t)m_pPed);
 		//ScriptCommand(&DELETE_CHAR, m_dwGTAId);
 
@@ -271,7 +270,7 @@ BYTE CPedSamp::GetCurrentWeapon()
 }
 
 // 0.3.7
-CVehicleGta* CPedSamp::GetGtaVehicle()
+CVehicle* CPedSamp::GetGtaVehicle()
 {
 	return m_pPed->pVehicle;
 }
@@ -350,7 +349,7 @@ void CPedSamp::EnterVehicle(int iVehicleID, bool bPassenger)
 		return;
 	}
 
-	CVehicleGta* ThisVehicleType;
+	CVehicle* ThisVehicleType;
 	if((ThisVehicleType = GamePool_Vehicle_GetAt(iVehicleID)) == 0) return;
 	if (ThisVehicleType->fHealth == 0.0f) return;
 
@@ -375,7 +374,7 @@ void CPedSamp::ExitCurrentVehicle()
 		return;
 	}
 
-	//CVehicleGta* ThisVehicleType = 0;
+	//CVehicle* ThisVehicleType = 0;
 
 	if(m_pPed->bInVehicle)
 	{
@@ -392,10 +391,10 @@ VEHICLEID CPedSamp::GetCurrentSampVehicleID()
 
 	if(!m_pPed->pVehicle)return INVALID_VEHICLE_ID;
 
-	return CVehiclePool::FindIDFromGtaPtr((CVehicleGta *)m_pPed->pVehicle);
+	return CVehiclePool::FindIDFromGtaPtr((CVehicle *)m_pPed->pVehicle);
 }
 
-CVehicle* CPedSamp::GetCurrentVehicle()
+CVehicleSamp* CPedSamp::GetCurrentVehicle()
 {
 	if(!m_pPed || !m_pPed->IsInVehicle())
         return nullptr;
@@ -407,16 +406,16 @@ CVehicle* CPedSamp::GetCurrentVehicle()
 	return nullptr;
 }
 
-CVehicleGta* CPedSamp::GetCurrentGtaVehicle()
+CVehicle* CPedSamp::GetCurrentGtaVehicle()
 {
 	if(!m_pPed) return nullptr;
 
-	return (CVehicleGta *)m_pPed->pVehicle;
+	return (CVehicle *)m_pPed->pVehicle;
 }
 
 uint32_t CPedSamp::GetCurrentGTAVehicleID() {
 	if(!m_pPed) return 0;
-	return GamePool_Vehicle_GetIndex(reinterpret_cast<CVehicleGta *>(m_pPed->pVehicle));
+	return GamePool_Vehicle_GetIndex(reinterpret_cast<CVehicle *>(m_pPed->pVehicle));
 }
 
 // 0.3.7
@@ -552,12 +551,12 @@ void CPedSamp::GetWeaponInfoForFire(int bLeft, CVector* vecBone, CVector* vecOut
 		vecBone->z += pFireOffset->z + 0.15f;
 
 		// CPed::GetTransformedBonePosition
-		((void (*)(CPedGta*, CVector*, int, bool))(g_libGTASA + (VER_x32 ? 0x004A24A8 + 1 : 0x598670)))(m_pPed, vecOut, boneId, false);
+		((void (*)(CPed*, CVector*, int, bool))(g_libGTASA + (VER_x32 ? 0x004A24A8 + 1 : 0x598670)))(m_pPed, vecOut, boneId, false);
 	}
 }
 
-extern uint32_t (*CWeapon__FireInstantHit)(CWeapon* thiz, CPedGta* pFiringEntity, CVector* vecOrigin, CVector* muzzlePosn, CEntity* targetEntity, CVector *target, CVector* originForDriveBy, int arg6, int muzzle);
-extern uint32_t (*CWeapon__FireSniper)(CWeapon *pWeaponSlot, CPedGta *pFiringEntity, CEntity *a3, CVector *vecOrigin);
+extern uint32_t (*CWeapon__FireInstantHit)(CWeapon* thiz, CPed* pFiringEntity, CVector* vecOrigin, CVector* muzzlePosn, CEntity* targetEntity, CVector *target, CVector* originForDriveBy, int arg6, int muzzle);
+extern uint32_t (*CWeapon__FireSniper)(CWeapon *pWeaponSlot, CPed *pFiringEntity, CEntity *a3, CVector *vecOrigin);
 
 void CPedSamp::FireInstant() {
 	if(!m_pPed || !GamePool_Ped_GetAt(m_dwGTAId)) {
@@ -677,7 +676,7 @@ void CPedSamp::AttachObject(ATTACHED_OBJECT_INFO* pInfo, int iSlot)
 
 	CVector vecPos = m_pPed->GetPosition();
 	CVector vecRot{ 0.0f, 0.0f, 0.0f };
-    attach.pObject = new CObject(pInfo->dwModelId, vecPos.x, vecPos.y, vecPos.z, vecRot, 200.0f);
+    attach.pObject = new CObjectSamp(pInfo->dwModelId, vecPos.x, vecPos.y, vecPos.z, vecRot, 200.0f);
 	attach.pObject->m_pEntity->m_bUsesCollision = false;
 }
 
@@ -770,7 +769,7 @@ void CPedSamp::ProcessAttach()
                 continue;
             }
 
-            auto UpdateObject = [&matrix](CObject* obj) {
+            auto UpdateObject = [&matrix](CObjectSamp* obj) {
                 obj->m_pEntity->SetMatrix((CMatrix&)matrix);
                 obj->m_pEntity->UpdateRW();
                 obj->m_pEntity->UpdateRwFrame();
@@ -956,7 +955,7 @@ void CPedSamp::SetMoveAnim(int iAnimGroup)
 
 	m_pPed->m_nAnimGroup = static_cast<AssocGroupId>(iAnimGroup);
 
-	auto pPlayerPed = (CPlayerPedGta*)m_pPed;
+	auto pPlayerPed = (CPlayerPed*)m_pPed;
 	pPlayerPed->ReApplyMoveAnims();
 }
 

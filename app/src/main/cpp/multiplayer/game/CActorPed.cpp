@@ -44,11 +44,11 @@ CActorPed::~CActorPed()
 	Destroy();
 }
 
-bool IsValidGamePed(CPedGta* pPed)
+bool IsValidGamePed(CPed* pPed)
 {
 	
 	//IsPedPointerValid(CPed *) � 0x00435614
-	if (((bool (*)(CPedGta*))(g_libGTASA + (VER_x32 ? 0x004A72C4 + 1 : 0x59DE5C)))(pPed)) {
+	if (((bool (*)(CPed*))(g_libGTASA + (VER_x32 ? 0x004A72C4 + 1 : 0x59DE5C)))(pPed)) {
 		return true;
 	}
 	return false;
@@ -60,7 +60,7 @@ void CActorPed::Destroy()
 
 	if (IsValidGamePed(m_pPed)) 
 	{
-		((void (*)(CPedGta*))(g_libGTASA + (VER_x32 ? 0x004CE6A0 + 1 : 0x5CDC64)))(m_pPed);
+		((void (*)(CPed*))(g_libGTASA + (VER_x32 ? 0x004CE6A0 + 1 : 0x5CDC64)))(m_pPed);
 	}
 
 	m_pPed = nullptr;

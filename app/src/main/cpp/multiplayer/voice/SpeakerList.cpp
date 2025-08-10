@@ -3,7 +3,7 @@
 #include "../game/common.h"
 #include "../game/util.h"
 #include "../game/game.h"
-#include "../game/playerped.h"
+#include "../game/PedSamp.h"
 #include "../net/netgame.h"
 #include "../game/Entity/Ped/Ped.h"
 #include "SpeakerList.h"

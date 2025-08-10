@@ -645,7 +645,7 @@ void ProcessIncommingEvent(BYTE bytePlayerID, int iEventType, uint32_t dwParam1,
 	int iPaintJob;
 	int iComponent;
 	int iWait;
-	CVehicle* pVehicle;
+	CVehicleSamp* pVehicle;
 	CRemotePlayer* pRemote;
 
 	switch (iEventType) 
@@ -657,7 +657,7 @@ void ProcessIncommingEvent(BYTE bytePlayerID, int iEventType, uint32_t dwParam1,
 		iComponent = (int)dwParam2;
 
 		if(CStreaming::TryLoadModel(iComponent)) {
-            CVehicleGta* pVeh = GamePool_Vehicle_GetAt(iVehicleID);
+            CVehicle* pVeh = GamePool_Vehicle_GetAt(iVehicleID);
             if (pVeh)
                 CHook::CallFunction<int32_t>(g_libGTASA + (VER_x32 ? 0x0058C66C + 1 : 0x6AFF4C), pVeh, iComponent);
         }
@@ -773,7 +773,7 @@ void VehicleDamage(RPCParameters* rpcParams)
 		bsData.Read(byteLightStatus);
 		bsData.Read(byteTireStatus);
 
-		CVehicle* pVehicle = CVehiclePool::GetAt(vehId);
+		CVehicleSamp* pVehicle = CVehiclePool::GetAt(vehId);
 		if (pVehicle)
 			pVehicle->UpdateDamageStatus(dwPanelStatus, dwDoorStatus, byteLightStatus, byteTireStatus);
 	}

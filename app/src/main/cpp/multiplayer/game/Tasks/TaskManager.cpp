@@ -26,7 +26,7 @@ static void DeleteTaskAndNull(CTask*& task) {
 //}
 
 // 0x6816A0
-CTaskManager::CTaskManager(CPedGta* ped) :
+CTaskManager::CTaskManager(CPed* ped) :
         m_pPed{ped}
 {
 }

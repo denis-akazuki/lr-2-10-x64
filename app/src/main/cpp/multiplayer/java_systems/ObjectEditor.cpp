@@ -30,7 +30,7 @@ void CObjectEditor::Start(int slot)
 }
 
 
-void CObjectEditor::Start(CObject* object)
+void CObjectEditor::Start(CObjectSamp* object)
 {
     if(!object) {
         CChatWindow::AddMessage("Invalid object id");
@@ -161,7 +161,7 @@ Java_com_russia_game_gui_AttachEdit_AttachClick(JNIEnv *env, jobject thiz, jint 
         int slot = CObjectEditor::iEditedId;
         auto attach = pPlayer->GetAttachedObject(slot);
 
-        CObject *pObject = nullptr;
+        CObjectSamp *pObject = nullptr;
         if (CObjectEditor::editType != CObjectEditor::TYPE_PLAYER_ATTACH) {
             if (CObjectEditor::pObject)
                 pObject = CObjectEditor::pObject;

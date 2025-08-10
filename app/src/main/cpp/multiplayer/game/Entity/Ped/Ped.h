@@ -19,8 +19,8 @@
 #include "game/PlayerPedData.h"
 #include "Enums/ePedBones.h"
 
-struct CVehicleGta;
-struct CPlayerPedGta;
+struct CVehicle;
+struct CPlayerPed;
 
 enum ePedNode : int32 {
     PED_NODE_UPPER_TORSO     = 1,
@@ -88,7 +88,7 @@ enum ePedCreatedBy : uint8 {
 
 static inline int16 m_sGunFlashBlendStart = 10'000; // 0x8D1370
 
-struct CPedGta : CPhysical {
+struct CPed : CPhysical {
 #if VER_x32
     uint8_t             m_PedAudioEntity[0x15C];
 #else
@@ -287,8 +287,8 @@ struct CPedGta : CPhysical {
     CEntity*        m_pEntityStandingOn;
     float           m_fHitHeadHeight;
 
-    CVehicleGta*    pVehicle;
-    CVehicleGta*    m_VehDeadInFrontOf;
+    CVehicle*    pVehicle;
+    CVehicle*    m_VehDeadInFrontOf;
     uintptr_t       *m_pAccident;
     ePedType        m_nPedType;
     uintptr_t*      m_pStats;
@@ -339,8 +339,8 @@ struct CPedGta : CPhysical {
     uint32          LastTalkSfx;
 
 public:
-    CPedGta(ePedType pedType);
-    ~CPedGta() override;
+    CPed(ePedType pedType);
+    ~CPed() override;
 
     CVector GetBonePosition(ePedBones boneId, bool updateSkinBones = false);
     void GetBonePosition(CVector* outVec, ePedBones bone, bool updateSkinBones);
@@ -360,7 +360,7 @@ public:
     bool IsStateDying() const noexcept { return m_nPedState == PEDSTATE_DEAD || m_nPedState == PEDSTATE_DIE; }
     bool IsEnteringCar();
     bool IsExitingVehicle();
-    CPlayerPedGta* AsPlayer()    { return reinterpret_cast<CPlayerPedGta*>(this); }
+    CPlayerPed* AsPlayer()    { return reinterpret_cast<CPlayerPed*>(this); }
 
     CWeapon& GetWeaponInSlot(size_t slot) noexcept { return m_aWeapons[slot]; }
     CWeapon& GetWeaponInSlot(eWeaponSlot slot) noexcept { return m_aWeapons[(size_t)slot]; }
@@ -396,4 +396,4 @@ public:
     bool DoGunFlash(int32 duration, bool isLeftHand);
 };
 
-VALIDATE_SIZE(CPedGta, (VER_x32 ? 0x7A4 : 0x988));
+VALIDATE_SIZE(CPed, (VER_x32 ? 0x7A4 : 0x988));

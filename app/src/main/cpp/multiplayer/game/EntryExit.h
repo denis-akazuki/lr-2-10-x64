@@ -8,8 +8,8 @@
 #include "Vector.h"
 #include "Enums/eAreaCodes.h"
 
-class CObjectGta;
-class CPedGta;
+class CObject;
+class CPed;
 class CPlayerPed;
 class CEntryExit;
 
@@ -71,7 +71,7 @@ public:
     CEntryExit* m_pLink{};
 
     static bool& ms_bWarping;
-    static CObjectGta*& ms_pDoor;
+    static CObject*& ms_pDoor;
     static CEntryExit*& ms_spawnPoint;
 
 public:

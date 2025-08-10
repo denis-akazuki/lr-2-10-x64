@@ -8,7 +8,7 @@ enum class eObjectAttachType {
     TO_VEHICLE,
 };
 
-class CObject
+class CObjectSamp
 {
 public:
 	RwMatrix	        m_matTarget;
@@ -38,8 +38,8 @@ public:
 
     static inline       std::vector<CEntity*> objectToIdMap {};
 
-	CObject(int iModel, float fPosX, float fPosY, float fPosZ, CVector vecRot, float fDrawDistance);
-	~CObject();
+	CObjectSamp(int iModel, float fPosX, float fPosY, float fPosZ, CVector vecRot, float fDrawDistance);
+	~CObjectSamp();
 
 	void Process(float fElapsedTime);
 	float DistanceRemaining(RwMatrix *matPos);
@@ -48,7 +48,7 @@ public:
 	void MoveTo(float x, float y, float z, float speed, float rX, float rY, float rZ);
 
 	void AttachToVehicle(uint16_t usVehID, CVector* pVecOffset, CVector* pVecRot);
-	void ProcessAttachToVehicle(CVehicle* pVehicle);
+	void ProcessAttachToVehicle(CVehicleSamp* pVehicle);
 
 	void InstantRotate(float x, float y, float z);
 	void StopMoving();

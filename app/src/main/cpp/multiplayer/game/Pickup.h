@@ -6,7 +6,7 @@
 
 
 #include "CompressedVector.h"
-#include "Entity/Ped/PlayerPedGta.h"
+#include "Entity/Ped/PlayerPed.h"
 #include "game/Entity/Object/Object.h"
 
 enum ePickupPropertyText : int32 {
@@ -45,7 +45,7 @@ enum ePickupType : uint8 {
 class CPickup {
 public:
     float            m_fRevenueValue;
-    CObjectGta*      m_pObject;
+    CObject*      m_pObject;
     uint32           m_nAmmo;
     uint32           m_nRegenerationTime;
     CompressedVector m_vecPos;
@@ -74,12 +74,12 @@ public:
     void SetYCoord(float coord) { m_vecPos.y = static_cast<int16>(coord * 8.0f); }
     void SetZCoord(float coord) { m_vecPos.z = static_cast<int16>(coord * 8.0f); }
 
-    void ExtractAmmoFromPickup(CPlayerPedGta* player);
+    void ExtractAmmoFromPickup(CPlayerPed* player);
     [[nodiscard]] bool IsVisible();
     void GetRidOfObjects();
     bool PickUpShouldBeInvisible();
     void Remove();
-    void GiveUsAPickUpObject(CObjectGta** obj, int32 slotIndex);
+    void GiveUsAPickUpObject(CObject** obj, int32 slotIndex);
     bool Update();
     void ProcessGunShot(CVector* origin, CVector* target);
 

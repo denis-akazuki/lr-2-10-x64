@@ -33,7 +33,7 @@ public:
 //    static inline int32& PlayerOnWeaponPickup = *(int32*)0x97D640;
 //    static inline int32& StaticCamStartTime = *(int32*)0x978618;
 //    static inline CVector* StaticCamCoors = (CVector*)0x97D660;
-//    static inline CVehicleGta*& pPlayerVehicle = *(CVehicleGta**)0x97861C;
+//    static inline CVehicle*& pPlayerVehicle = *(CVehicle**)0x97861C;
 //    static inline bool& bPickUpcamActivated = *(bool*)0x978620;
  //   static inline uint16 CollectedPickUpIndex;
  //   static inline std::array<int32, MAX_COLLECTED_PICKUPS> aPickUpsCollected;
@@ -57,7 +57,7 @@ public:
     static void DoMoneyEffects(CEntity* entity);
     static void DoPickUpEffects(CEntity* entity);
 
-    static CPickup* FindPickUpForThisObject(CObject* object);
+    static CPickup* FindPickUpForThisObject(CObjectSamp* object);
     static tPickupReference GenerateNewOne(CVector coors, uint32 modelId, ePickupType pickupType, uint32 ammo, uint32 moneyPerDay = 0u, bool isEmpty = false, char* message = nullptr);
     static tPickupReference GenerateNewOne_WeaponType(CVector coors, eWeaponType weaponType, ePickupType pickupType, uint32 ammo, bool isEmpty, char* message);
     static int32 GetActualPickupIndex(tPickupReference pickupIndex);

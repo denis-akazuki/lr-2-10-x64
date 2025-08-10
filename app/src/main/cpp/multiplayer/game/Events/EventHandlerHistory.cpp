@@ -72,7 +72,7 @@ bool CEventHandlerHistory::IsRespondingToEvent(eEventType eventType)
 }
 
 // 0x4BC4B0
-void CEventHandlerHistory::RecordCurrentEvent(CPedGta* ped, CEvent& event)
+void CEventHandlerHistory::RecordCurrentEvent(CPed* ped, CEvent& event)
 {
     if (event.GetEventType() != EVENT_SCRIPT_COMMAND) {
         if (CEventHandler::IsTemporaryEvent(event)) {
@@ -117,7 +117,7 @@ bool CEventHandlerHistory::TakesPriorityOverCurrentEvent(CEvent& event)
 }
 
 // 0x4B8C20
-void CEventHandlerHistory::TickStoredEvent(CPedGta* ped)
+void CEventHandlerHistory::TickStoredEvent(CPed* ped)
 {
     if (m_storedActiveEvent && !m_tempEvent) {
         m_nonTempEvent = m_storedActiveEvent;

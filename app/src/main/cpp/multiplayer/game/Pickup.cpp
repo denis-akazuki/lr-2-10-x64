@@ -9,7 +9,7 @@
 #include "net/netgame.h"
 
 
-// Delete pickup's object (CObject)
+// Delete pickup's object (CObjectSamp)
 void CPickup::GetRidOfObjects() {
     CHook::CallFunction<void>(g_libGTASA + (VER_x32 ? 0x0031D790 + 1 : 0x3E4A20), this);
 
@@ -21,8 +21,8 @@ void CPickup::GetRidOfObjects() {
 //    }
 }
 
-// Creates an object (CObject) for pickup. slotIndex - object to replace; use -1 (or any negative value) to create a new object
-void CPickup::GiveUsAPickUpObject(CObjectGta** obj, int32 slotIndex) {
+// Creates an object (CObjectSamp) for pickup. slotIndex - object to replace; use -1 (or any negative value) to create a new object
+void CPickup::GiveUsAPickUpObject(CObject** obj, int32 slotIndex) {
     CHook::CallFunction<void>(g_libGTASA + (VER_x32 ? 0x0031D510 + 1 : 0x3E46D4), this, obj, slotIndex);
 }
 

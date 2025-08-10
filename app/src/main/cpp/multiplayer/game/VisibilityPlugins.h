@@ -34,7 +34,7 @@ public:
     static inline float ms_pedLodDist{};
     static inline RwV3d* ms_pCameraPosn{};
 
-    static inline CLinkList<CPedGta*> ms_weaponPedsForPC;
+    static inline CLinkList<CPed*> ms_weaponPedsForPC;
 
 public:
     static void InjectHooks();

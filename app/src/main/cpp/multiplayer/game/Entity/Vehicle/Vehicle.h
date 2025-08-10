@@ -35,10 +35,10 @@ enum eCarLock : uint32 {
     CARLOCK_SKIP_SHUT_DOORS
 };
 
-struct CPedGta;
+struct CPed;
 
 //#pragma pack(push, 1)
-struct CVehicleGta : CPhysical
+struct CVehicle : CPhysical
 {
     CAEVehicleAudioEntity m_VehicleAudioEntity;
     tHandlingData* m_pHandlingData;
@@ -171,8 +171,8 @@ struct CVehicleGta : CPhysical
     float m_wheelScale;
     unsigned short m_nAlarmState;
     short  m_nForcedRandomRouteSeed; // if this is non-zero the random wander gets deterministic
-    CPedGta* pDriver;			// 1120-1124	;driver
-    CPedGta* m_apPassengers[8];	// 1124-1152	;m_apPassengers
+    CPed* pDriver;			// 1120-1124	;driver
+    CPed* m_apPassengers[8];	// 1124-1152	;m_apPassengers
     unsigned char  m_nNumPassengers;
     unsigned char  m_nNumGettingIn;
     unsigned char  m_nGettingInFlags;
@@ -214,8 +214,8 @@ struct CVehicleGta : CPhysical
     float   m_fGearChangeCount; // used as parameter for cTransmission::CalculateDriveAcceleration, but doesn't change
     float   m_fWheelSpinForAudio;
     float fHealth;				// 1224-1228	;m_fHealth
-    CVehicleGta* m_pTractor;
-    CVehicleGta* m_pTrailer;
+    CVehicle* m_pTractor;
+    CVehicle* m_pTrailer;
     uint8_t padd_2[3];
     bool m_bFireAutoFlare;
     CEntity *pBombOwner;
@@ -334,17 +334,17 @@ public:
 public:
     static void InjectHooks();
 
-    bool AddPassenger(CPedGta* passenger);
-    bool AddPassenger(CPedGta* passenger, uint8 seatNumber);
-    void RemovePassenger(CPedGta* passenger);
-    void SetDriver(CPedGta* driver);
+    bool AddPassenger(CPed* passenger);
+    bool AddPassenger(CPed* passenger, uint8 seatNumber);
+    void RemovePassenger(CPed* passenger);
+    void SetDriver(CPed* driver);
     void RemoveDriver(bool arg0);
-    void ApplyTurnForceToOccupantOnEntry(CPedGta* passenger);
+    void ApplyTurnForceToOccupantOnEntry(CPed* passenger);
     void RenderDriverAndPassengers();
     void PreRenderDriverAndPassengers();
     // get special ride anim data for bile or quad
     CRideAnimData* GetRideAnimData() { return nullptr; }
-    int GetPassengerIndex(const CPedGta* ped);
+    int GetPassengerIndex(const CPed* ped);
 
     void AddVehicleUpgrade(int32 modelId);
     void RemoveVehicleUpgrade(int32 upgradeModelIndex);
@@ -357,4 +357,4 @@ public:
 };
 //#pragma pack(pop)
 
-VALIDATE_SIZE(CVehicleGta, (VER_x32 ? 0x5B4 : 0x758));
+VALIDATE_SIZE(CVehicle, (VER_x32 ? 0x5B4 : 0x758));

@@ -5,9 +5,9 @@
 #include "common.h"
 #include "pad.h"
 #include "Quaternion.h"
-#include "playerped.h"
-#include "vehicle.h"
-#include "object.h"
+#include "PedSamp.h"
+#include "VehicleSamp.h"
+#include "ObjectSamp.h"
 #include "font.h"
 #include "scripting.h"
 #include "radarcolors.h"
@@ -57,7 +57,7 @@ public:
 	// 0.3.7
 	static void RemovePlayer(CPedSamp* pPlayer);
 	// 0.3.7
-	static CObject* NewObject(int iModel, float fPosX, float fPosY, float fPosZ, CVector vecRot, float fDrawDistastatic);
+	static CObjectSamp* NewObject(int iModel, float fPosX, float fPosY, float fPosZ, CVector vecRot, float fDrawDistastatic);
 	static uintptr CreatePickup(int iModel, int iType, CVector* pos, uint32* unk);
 
 	static float FindGroundZForCoord(float x, float y, float z);

@@ -144,7 +144,7 @@ void CShadows::CalcPedShadowValues(CVector sunPosn, float& displacementX, float&
     sideY = -sunPosn.y / 2.0f;
 }
 
-void CShadows::StoreCarLightShadow(CVehicleGta* vehicle, int32 id, RwTexture* texture, CVector* posn, float frontX, float frontY, float sideX, float sideY, uint8 red, uint8 green, uint8 blue, float maxViewAngleCosine) {
+void CShadows::StoreCarLightShadow(CVehicle* vehicle, int32 id, RwTexture* texture, CVector* posn, float frontX, float frontY, float sideX, float sideY, uint8 red, uint8 green, uint8 blue, float maxViewAngleCosine) {
     auto needTex = texture;
 
     CCamera& TheCamera = *reinterpret_cast<CCamera*>(g_libGTASA + (VER_x32 ? 0x00951FA8 : 0xBBA8D0));
@@ -154,7 +154,7 @@ void CShadows::StoreCarLightShadow(CVehicleGta* vehicle, int32 id, RwTexture* te
 
     // FIXME: move code to DoHeadLightReflectionTwin ( need reverse )
     uint16_t vehid = CVehiclePool::FindIDFromGtaPtr(vehicle);
-    CVehicle* pVeh = CVehiclePool::GetAt(vehid);
+    CVehicleSamp* pVeh = CVehiclePool::GetAt(vehid);
     if (pVeh)
     {
         pVeh->ProcessHeadlightsColor(red, green, blue);

@@ -2,7 +2,7 @@
 
 #include "../game/common.h"
 #include "game/Core/Quaternion.h"
-#include "../game/playerped.h"
+#include "../game/PedSamp.h"
 #include "game/Enums/eWeaponType.h"
 
 // spectate

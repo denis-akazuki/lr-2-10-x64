@@ -3,7 +3,7 @@
 #include "util/patch.h"
 #include "Vector.h"
 
-class CVehicle;
+class CVehicleSamp;
 
 enum eDoorState : uint8 {
     DOOR_NOTHING,
@@ -27,8 +27,8 @@ public:
     static float& DOOR_SPEED_MAX_CAPPED; // 0.5f
 
 public:
-    bool  Process(CVehicle* vehicle, CVector& arg1, CVector& arg2, Const CVector& arg3);
-    bool  ProcessImpact(CVehicle* vehicle, CVector& arg1, CVector& arg2, Const CVector& arg3);
+    bool  Process(CVehicleSamp* vehicle, CVector& arg1, CVector& arg2, Const CVector& arg3);
+    bool  ProcessImpact(CVehicleSamp* vehicle, CVector& arg1, CVector& arg2, Const CVector& arg3);
     void  Open(float openRatio);
     float GetAngleOpenRatio();
     bool  IsClosed();

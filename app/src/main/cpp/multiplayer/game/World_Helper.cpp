@@ -13,7 +13,7 @@ CPlayerInfoGta& FindPlayerInfo(int32 playerId) {
 
 // Returns player ped
 // 0x56E210
-CPlayerPedGta* FindPlayerPed(int32 playerId) {
+CPlayerPed* FindPlayerPed(int32 playerId) {
     if(playerId == -1)
         playerId = CWorld::PlayerInFocus;
 
@@ -33,8 +33,8 @@ bool PlayerIsEnteringCar()
 
 // Returns player vehicle
 // 0x56E0D0
-CVehicleGta* FindPlayerVehicle(int32 playerId, bool bIncludeRemote) {
-    CPlayerPedGta* player = FindPlayerPed(playerId);
+CVehicle* FindPlayerVehicle(int32 playerId, bool bIncludeRemote) {
+    CPlayerPed* player = FindPlayerPed(playerId);
     if (!player || !player->bInVehicle)
         return nullptr;
 

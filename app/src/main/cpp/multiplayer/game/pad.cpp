@@ -418,7 +418,7 @@ uint16_t CPad__GetAccelerate_hook(uintptr_t thiz)
 		{
 			if (pPlayerPed)
 			{
-				CVehicleGta* pGtaVehicle = pPlayerPed->GetGtaVehicle();
+				CVehicle* pGtaVehicle = pPlayerPed->GetGtaVehicle();
 				if (pGtaVehicle)
 				{
 					if (pGtaVehicle->m_nVehicleFlags.bEngineOn == 0)
@@ -491,8 +491,8 @@ uint32_t CVehicle__UsesSiren_hook(uintptr_t* thiz)
 }
 
 extern float * pfCameraExtZoom;
-void (*CPed__ProcessControl)(CPlayerPedGta* thiz);
-void CPed__ProcessControl_hook(CPlayerPedGta* thiz)
+void (*CPed__ProcessControl)(CPlayerPed* thiz);
+void CPed__ProcessControl_hook(CPlayerPed* thiz)
 {
 	dwCurPlayerActor = reinterpret_cast<uintptr_t>(thiz);
 	byteCurPlayer = FindPlayerNumFromPedPtr(dwCurPlayerActor);
@@ -547,7 +547,7 @@ void CPed__ProcessControl_hook(CPlayerPedGta* thiz)
 
 void AllVehicles__ProcessControl_hook(uintptr_t thiz)
 {
-	CVehicleGta *pVehicle = (CVehicleGta*)thiz;
+	CVehicle *pVehicle = (CVehicle*)thiz;
 	uintptr_t this_vtable = *(uintptr_t*)pVehicle;
 	this_vtable -= g_libGTASA;
 
@@ -688,7 +688,7 @@ void AllVehicles__ProcessControl_hook(uintptr_t thiz)
 	}
 
 	// VEHTYPE::ProcessControl()
-    (( void (*)(CVehicleGta*))(g_libGTASA + call_addr + (VER_x32 ? 1 : 0)))(pVehicle);
+    (( void (*)(CVehicle*))(g_libGTASA + call_addr + (VER_x32 ? 1 : 0)))(pVehicle);
 }
 
 
@@ -746,8 +746,8 @@ void CAutomobile__FireTruckControl_hook(uintptr_t* thiz, uintptr_t* pFire)
 	//return res;
 }
 
-uint32_t(*CCamera_IsTargetingActive)(CCamera* thiz, CPedGta* pPed);
-uint32_t CCamera_IsTargetingActive_hook(CCamera* thiz, CPedGta* pPed)
+uint32_t(*CCamera_IsTargetingActive)(CCamera* thiz, CPed* pPed);
+uint32_t CCamera_IsTargetingActive_hook(CCamera* thiz, CPed* pPed)
 {
 	if (pPed != GamePool_FindPlayerPed())
 	{

@@ -103,9 +103,9 @@ void CGame::RemovePlayer(CPedSamp* pPlayer)
 	}
 }
 
-CObject *CGame::NewObject(int iModel, float fPosX, float fPosY, float fPosZ, CVector vecRot, float fDrawDistance)
+CObjectSamp *CGame::NewObject(int iModel, float fPosX, float fPosY, float fPosZ, CVector vecRot, float fDrawDistance)
 {
-	return new CObject(iModel, fPosX, fPosY, fPosZ, vecRot, fDrawDistance);
+	return new CObjectSamp(iModel, fPosX, fPosY, fPosZ, vecRot, fDrawDistance);
 }
 
 uintptr CGame::CreatePickup(int iModel, int iType, CVector* pos, uint32* unk)

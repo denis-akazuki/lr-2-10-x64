@@ -13,7 +13,7 @@
 // rather, use one of the derived classes.
 class CTaskComplexEnterCar : public CTaskComplex {
 public:
-    CVehicleGta*                  m_car{};                            /// Vehicle to get into/onto
+    CVehicle*                  m_car{};                            /// Vehicle to get into/onto
     bool                          m_bAsDriver : 1{};                  /// Enter as driver
     bool                          m_bQuitAfterOpeningDoor : 1{};      /// Stop after opening the door
     bool                          m_bQuitAfterDraggingPedOut : 1{};   /// Stop after dragging the ped out from the target seat
@@ -28,8 +28,8 @@ public:
     CVector                       m_targetDoorPos{};                  /// Target door's position (Persumeably calculated using `CCarEnterExit::GetPositionToOpenCarDoor`)
     uintptr*                      m_lineUpUtil{};                     /// Line up utility
     bool                          m_aborting{};                       /// Whenever `MakeAbortable` was called (?)
-    CPedGta*                      m_draggedPed{};                     /// The ped we're dragging out rn (that was at targetSeat)
-    uint8                         m_doorFlagsSet{};                   /// used for CVehicleGta::SetGettingInFlags
+    CPed*                      m_draggedPed{};                     /// The ped we're dragging out rn (that was at targetSeat)
+    uint8                         m_doorFlagsSet{};                   /// used for CVehicle::SetGettingInFlags
     float                         m_cruiseSpeed{-1.f};                /// How fast to go after we've entered. Only used when `m_bAsDriver` is set
     int32                         m_enterCarStartTime{};              /// When we started entering the vehicle (`CTimer::GetTimeMs()`)
 
@@ -37,17 +37,17 @@ public:
     static void InjectHooks();
 
     // Shouldn't be used directly, use `CTaskComplexEnterCarAsDriver` or `CTaskComplexEnterCarAsPassenger` instead
-    CTaskComplexEnterCar(CVehicleGta* targetVehicle, bool bAsDriver, bool bQuitAfterOpeningDoor, bool bQuitAfterDraggingPedOut, bool bCarryOnAfterFallingOff = false);
+    CTaskComplexEnterCar(CVehicle* targetVehicle, bool bAsDriver, bool bQuitAfterOpeningDoor, bool bQuitAfterDraggingPedOut, bool bCarryOnAfterFallingOff = false);
     ~CTaskComplexEnterCar() override;
 
-    bool           MakeAbortable(CPedGta* ped, eAbortPriority priority = ABORT_PRIORITY_URGENT, const CEvent* event = nullptr) override;
-    CTask*         CreateNextSubTask(CPedGta* ped) override;
-    CTask*         CreateFirstSubTask(CPedGta* ped) override;
-    CTask*         ControlSubTask(CPedGta* ped) override;
-    CTask*         CreateSubTask(eTaskType type, CPedGta* ped);
-    virtual CTask* CreateNextSubTask_AfterSimpleCarAlign(CPedGta* ped);
+    bool           MakeAbortable(CPed* ped, eAbortPriority priority = ABORT_PRIORITY_URGENT, const CEvent* event = nullptr) override;
+    CTask*         CreateNextSubTask(CPed* ped) override;
+    CTask*         CreateFirstSubTask(CPed* ped) override;
+    CTask*         ControlSubTask(CPed* ped) override;
+    CTask*         CreateSubTask(eTaskType type, CPed* ped);
+    virtual CTask* CreateNextSubTask_AfterSimpleCarAlign(CPed* ped);
     CVector        GetTargetPos();
-    CVehicleGta*   GetCameraAvoidVehicle();
+    CVehicle*   GetCameraAvoidVehicle();
 
     auto GetTarget() const { return m_car; }
 

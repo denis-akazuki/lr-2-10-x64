@@ -139,9 +139,9 @@ RwMatrix* CEntity::GetModellingMatrix() {
 
 CColModel* CEntity::GetColModel() const {
     if (IsVehicle()) {
-        const auto veh = static_cast<const CVehicleGta*>(this);
+        const auto veh = static_cast<const CVehicle*>(this);
         if (veh->m_vehicleSpecialColIndex > -1) {
-            return &CVehicleGta::m_aSpecialColModel[veh->m_vehicleSpecialColIndex];
+            return &CVehicle::m_aSpecialColModel[veh->m_vehicleSpecialColIndex];
         }
     }
 

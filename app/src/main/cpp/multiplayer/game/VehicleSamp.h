@@ -87,11 +87,11 @@ enum eTurnState
 void* GetSuspensionLinesFromModel(int nModelIndex, int& numWheels);
 CCollisionData* GetCollisionDataFromModel(int nModelIndex);
 
-class CVehicle
+class CVehicleSamp
 {
 public:
-	CVehicle(int iType, float fPosX, float fPosY, float fPosZ, float fRotation = 0.0f, bool bSiren = false);
-	~CVehicle();
+	CVehicleSamp(int iType, float fPosX, float fPosY, float fPosZ, float fRotation = 0.0f, bool bSiren = false);
+	~CVehicleSamp();
 
 	void SetHealth(float fHealth);
 	float GetHealth();
@@ -114,7 +114,7 @@ public:
 
 	void AttachTrailer();
 	void DetachTrailer();
-	void SetTrailer(CVehicle* pTrailer);
+	void SetTrailer(CVehicleSamp* pTrailer);
 
 	unsigned int GetVehicleSubtype() const;
 
@@ -159,14 +159,14 @@ public:
 	RwTexture*  pPlateTexture = nullptr;
 
 
-	CVehicleGta* 	m_pVehicle;
+	CVehicle* 	m_pVehicle;
     CDamageManager* m_pDamageManager;
 
 	// поворотники
-	CObject*		m_pLeftFrontTurnLighter = nullptr;
-	CObject*		m_pRightFrontTurnLighter = nullptr;
-	CObject*		m_pLeftRearTurnLighter = nullptr;
-	CObject*		m_pRightRearTurnLighter = nullptr;
+	CObjectSamp*		m_pLeftFrontTurnLighter = nullptr;
+	CObjectSamp*		m_pRightFrontTurnLighter = nullptr;
+	CObjectSamp*		m_pLeftRearTurnLighter = nullptr;
+	CObjectSamp*		m_pRightRearTurnLighter = nullptr;
 	eTurnState 		m_iTurnState = TURN_OFF;
 	bool 			m_bIsOnRightTurnLight = false;
 	bool 			m_bIsOnLeftTurnLight = false;
@@ -174,7 +174,7 @@ public:
     bool            m_bDoorsState[eDoors::MAX_DOORS] {};
 	float 			m_fDefaultWheelSize = 0.0f;
 
-	CVehicle* 		m_pTrailer = nullptr;
+	CVehicleSamp* 		m_pTrailer = nullptr;
     uintptr		    m_dwMarkerID = 0;
 	bool 			m_bIsInvulnerable = false;
 	uint8_t			m_byteObjectiveVehicle = 0; // Is this a special objective vehicle? 0/1

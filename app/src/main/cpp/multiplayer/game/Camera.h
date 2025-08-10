@@ -391,7 +391,7 @@ public:
     void RestoreCameraAfterMirror();
     void RestoreWithJumpCut();
     void RenderMotionBlur();
-    void ResetDuckingSystem(CPedGta *ped);
+    void ResetDuckingSystem(CPed *ped);
 
     void CalculateDerivedValues(bool bForMirror, bool bOriented);
     void CalculateFrustumPlanes(bool bForMirror);

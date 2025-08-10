@@ -29,7 +29,7 @@ public:
     static void Init();
 
     void Process();
-    void Render(CVehicleGta* veh) const;
+    void Render(CVehicle* veh) const;
 
     bool IsSet() { return neonType != eNeonTypes::OFF; }
 };

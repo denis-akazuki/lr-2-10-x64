@@ -9,7 +9,7 @@
 #include "common.h"
 
 class AnimBlendFrameData;
-class CPedGta;
+class CPed;
 
 // Return flags from MoveLimb() function
 enum MoveLimbResult { CANT_REACH_TARGET, HAVENT_REACHED_TARGET, REACHED_TARGET };
@@ -34,7 +34,7 @@ VALIDATE_SIZE(LimbMovementInfo, 0x18);
 
 class CPedIK {
 public:
-    CPedGta* m_pPed{nullptr};
+    CPed* m_pPed{nullptr};
     LimbOrientation m_TorsoOrient{};
     float m_fSlopePitch{0.0f};
     float m_fSlopePitchLimitMult{0.0f};
@@ -72,7 +72,7 @@ public:
 
 public:
     CPedIK() = default; // NOTSA
-    explicit CPedIK(CPedGta* ped) : m_pPed(ped) {} // 0x5FD8C0
+    explicit CPedIK(CPed* ped) : m_pPed(ped) {} // 0x5FD8C0
 
     void RotateTorso(AnimBlendFrameData* bone, LimbOrientation& orientation, bool flag);
     void RotateTorsoForArm(const CVector& direction);

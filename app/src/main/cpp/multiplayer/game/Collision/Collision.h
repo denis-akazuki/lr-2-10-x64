@@ -12,7 +12,7 @@
 #include <array>
 
 struct  CEntity;
-struct  CVehicleGta;
+struct  CVehicle;
 struct CColCacheEntry;
 class  CColSphere;
 class  CColBox;
@@ -88,7 +88,7 @@ public:
     static bool ProcessVerticalLineTriangle(const CColLine& line, const CompressedVector* verts, const CColTriangle& tri, const CColTrianglePlane& triPlane, CColPoint& colPoint, float& maxTouchDistance, CStoredCollPoly* collPoly);
     static bool IsStoredPolyStillValidVerticalLine(const CVector& lineOrigin, float lineDist, CColPoint& colPoint, CStoredCollPoly* collPoly);
     static CColBox GetBoundingBoxFromTwoSpheres(const CColSphere& spA, const CColSphere& spB);
-    static bool IsThisVehicleSittingOnMe(CVehicleGta* vehicle, CVehicleGta* vehicleOnMe);
+    static bool IsThisVehicleSittingOnMe(CVehicle* vehicle, CVehicle* vehicleOnMe);
     static bool CheckCameraCollisionPeds(int32 sectorX, int32 sectorY, const CVector& pos, const CVector& dir, float& /*unused*/);
     static bool CheckPeds(const CVector& src, const CVector& normal, float& nearest);
     static bool SphereCastVsBBox(const CColSphere& sphere1, const CColSphere& sphere2, const CColBox& box);

@@ -1,6 +1,6 @@
 #pragma once
 #include "aimstuff.h"
-#include "vehicle.h"
+#include "VehicleSamp.h"
 #include "Weapon.h"
 #include "game/Enums/ePedState.h"
 
@@ -11,7 +11,7 @@ public:
     uint8_t		m_bytePlayerNumber;
     uintptr 	m_dwArrow;
     bool        lToggle;
-    CPedGta*	m_pPed;
+    CPed*	m_pPed;
 
     uint8_t m_iCurrentSpecialAction = 0;
     int drunk_level = 0;
@@ -47,7 +47,7 @@ public:
 	void SetDead();
 	// 0.3.7
 	void ApplyCommandTask(char* a2, int a4, int a5, int a6, CVector* a7, char a8, float a9, int a10, int a11, char a12);
-	CVehicleGta* GetGtaVehicle();
+	CVehicle* GetGtaVehicle();
 	// 0.3.7
 	void SetInitialState() const;
 	// 0.3.7
@@ -102,7 +102,7 @@ public:
 	void ApplyAnimation( char *szAnimName, char *szAnimFile, float fT, bool opt1, bool opt2, bool opt3, bool opt4, int iUnk );
 
 	void SetActionTrigger(ePedState action);
-	CPedGta * GetGtaActor() { return m_pPed; };
+	CPed * GetGtaActor() { return m_pPed; };
 
 	void AttachObject(ATTACHED_OBJECT_INFO* pInfo, int iSlot);
 	void SetAttachOffset(int iSlot, CVector pos, CVector rot);
@@ -136,8 +136,8 @@ public:
     void SetWeaponAmmo(int iWeaponID, int iAmmo);
 
 	CVector *GetCurrentWeaponFireOffset();
-	CVehicle *GetCurrentVehicle();
-	CVehicleGta *GetCurrentGtaVehicle();
+	CVehicleSamp *GetCurrentVehicle();
+	CVehicle *GetCurrentGtaVehicle();
 	uint32_t GetCurrentGTAVehicleID();
 	VEHICLEID GetCurrentSampVehicleID();
 };

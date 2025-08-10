@@ -13,7 +13,7 @@ public:
 	void ApplyAnimation(char* szAnimName, char* szAnimFile, float fDelta, int bLoop, int bLockX, int bLockY, int bFreeze, int uiTime);
 
 public:
-	CPedGta* 	m_pPed{};
+	CPed* 	m_pPed{};
     uintptr 	m_dwGTAId{};
 	char 		m_szName[MAX_PLAYER_NAME * 2] = ""; // utf x2?
 };

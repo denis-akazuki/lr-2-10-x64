@@ -3,7 +3,7 @@
 #include "util/patch.h"
 #include "Vector.h"
 
-class CVehicle;
+class CVehicleSamp;
 struct RwFrame;
 
 class  CBouncingPanel {
@@ -28,6 +28,6 @@ public:
     void ResetPanel();
     void SetPanel(int16 frameId, int16 axis, float angleLimit);
     float GetAngleChange(float velocity) const;
-    void ProcessPanel(CVehicle* vehicle, RwFrame* frame, CVector arg2, CVector arg3, float arg4, float arg5);
+    void ProcessPanel(CVehicleSamp* vehicle, RwFrame* frame, CVector arg2, CVector arg3, float arg4, float arg5);
 };
 VALIDATE_SIZE(CBouncingPanel, 0x20);

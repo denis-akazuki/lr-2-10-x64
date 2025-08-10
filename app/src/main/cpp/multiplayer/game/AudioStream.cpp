@@ -104,7 +104,7 @@ void CAudioStream::ProcessAttached()
 
 	if (m_iAttachType == TOVEHICLE)
 	{
-		CVehicle* pVeh = CVehiclePool::GetAt(m_iAttachedTo);
+		CVehicleSamp* pVeh = CVehiclePool::GetAt(m_iAttachedTo);
 		if (!pVeh || !pVeh->m_pVehicle)
 		{
             if(m_hStream)

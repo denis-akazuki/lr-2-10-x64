@@ -2,12 +2,12 @@
 // Created on 04.05.2023.
 //
 
-#include "PlayerPedGta.h"
+#include "PlayerPed.h"
 #include "game/Plugins/RpAnimBlendPlugin/RpAnimBlend.h"
 #include "game/Animation/AnimManager.h"
 #include "util/patch.h"
 
-void CPlayerPedGta::ReApplyMoveAnims() {
+void CPlayerPed::ReApplyMoveAnims() {
    // Log("ReApplyMoveAnims");
 
     constexpr AnimationId anims[]{
@@ -31,7 +31,7 @@ void CPlayerPedGta::ReApplyMoveAnims() {
     }
 }
 
-float CPlayerPedGta::GetWeaponRadiusOnScreen() {
+float CPlayerPed::GetWeaponRadiusOnScreen() {
     CWeapon& wep = GetActiveWeapon();
     CWeaponInfo& wepInfo = wep.GetWeaponInfo(this);
 
@@ -57,10 +57,10 @@ float CPlayerPedGta::GetWeaponRadiusOnScreen() {
 
 // --- hooks
 
-void ReApplyMoveAnims_hook(CPlayerPedGta* thiz) {
+void ReApplyMoveAnims_hook(CPlayerPed* thiz) {
     thiz->ReApplyMoveAnims();
 }
 
-void CPlayerPedGta::InjectHooks() {
+void CPlayerPed::InjectHooks() {
     CHook::Redirect("_ZN10CPlayerPed16ReApplyMoveAnimsEv", &ReApplyMoveAnims_hook);
 }

@@ -419,7 +419,7 @@ void CStreaming::Update() {
     LoadRequestedModels();
 
     if (pLocalPed->IsInVehicle()) {
-        CVehicleGta* remoteVehicle = pLocalPed->pVehicle;
+        CVehicle* remoteVehicle = pLocalPed->pVehicle;
 
         CColStore::AddCollisionNeededAtPosn(&playerPos);
         CIplStore::AddIplsNeededAtPosn(&playerPos);

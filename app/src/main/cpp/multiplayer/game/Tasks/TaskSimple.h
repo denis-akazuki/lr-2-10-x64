@@ -8,7 +8,7 @@
 
 #include "Task.h"
 
-class CPedGta;
+class CPed;
 
 class CTaskSimple : public CTask {
 public:
@@ -17,7 +17,7 @@ public:
 
     CTask* GetSubTask() override;
     bool IsSimple() override;
-    virtual bool ProcessPed(CPedGta* ped) = 0;
-    virtual bool SetPedPosition(CPedGta* ped);
+    virtual bool ProcessPed(CPed* ped) = 0;
+    virtual bool SetPedPosition(CPed* ped);
 };
 VALIDATE_SIZE(CTaskSimple, (VER_x32 ? 0x8 : 0x10));

@@ -54,7 +54,7 @@ void CSkyBox::Process() {
     m_bNeedRender = false;
 }
 
-CObject* CSkyBox::CreateObjectScaled(int iModel, float fScale)
+CObjectSamp* CSkyBox::CreateObjectScaled(int iModel, float fScale)
 {
     if (!pNetGame)
         return nullptr;
@@ -64,7 +64,7 @@ CObject* CSkyBox::CreateObjectScaled(int iModel, float fScale)
     CVector vecRot(0.f, 0.f, 0.f);
     CVector vecScale(fScale);
 
-    auto *object = new CObject(iModel, 0.0f, 0.0f, 0.0f, vecRot, 0.0f);
+    auto *object = new CObjectSamp(iModel, 0.0f, 0.0f, 0.0f, vecRot, 0.0f);
 
     object->m_pEntity->m_bUsesCollision = false;
 
@@ -188,7 +188,7 @@ bool CSkyBox::IsNeedRender()
     return m_bNeedRender;
 }
 
-CObject *CSkyBox::GetSkyObject()
+CObjectSamp *CSkyBox::GetSkyObject()
 {
     return m_pSkyObject;
 }

@@ -2,12 +2,12 @@
 
 #include "game/Entity/Entity.h"
 
-CPedGta* GamePool_FindPlayerPed();
-CPedGta* GamePool_Ped_GetAt(int iID);
-int GamePool_Ped_GetIndex(CPedGta *pActor);
+CPed* GamePool_FindPlayerPed();
+CPed* GamePool_Ped_GetAt(int iID);
+int GamePool_Ped_GetIndex(CPed *pActor);
 
-CVehicleGta *GamePool_Vehicle_GetAt(int iID);
-int GamePool_Vehicle_GetIndex(CVehicleGta *pVehicle);
+CVehicle *GamePool_Vehicle_GetAt(int iID);
+int GamePool_Vehicle_GetIndex(CVehicle *pVehicle);
 
 CPhysical *GamePool_Object_GetAt(int iID);
 

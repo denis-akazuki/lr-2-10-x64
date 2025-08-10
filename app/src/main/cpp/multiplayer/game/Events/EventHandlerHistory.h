@@ -6,7 +6,7 @@
 
 class CEvent;
 class CTask;
-class CPedGta;
+class CPed;
 
 class CEventHandlerHistory {
 public:
@@ -31,10 +31,10 @@ public:
     int32 GetCurrentEventPriority();
     CEvent* GetStoredActiveEvent() { return m_storedActiveEvent; }
     bool IsRespondingToEvent(eEventType eventType);
-    void RecordCurrentEvent(CPedGta* ped, CEvent& event);
+    void RecordCurrentEvent(CPed* ped, CEvent& event);
     void StoreActiveEvent();
     bool TakesPriorityOverCurrentEvent(CEvent& event);
-    void TickStoredEvent(CPedGta* ped);
+    void TickStoredEvent(CPed* ped);
 };
 
 VALIDATE_SIZE(CEventHandlerHistory, (VER_x32 ? 0x1C : 0x30));

@@ -9,7 +9,7 @@
 #include "../CSettings.h"
 #include "../util/CJavaWrapper.h"
 #include "../util/util.h"
-#include "../game/vehicle.h"
+#include "../game/VehicleSamp.h"
 #include "../game/Widgets/WidgetGta.h"
 #include "../game/Entity/Ped/Ped.h"
 #include "../java_systems/HUD.h"

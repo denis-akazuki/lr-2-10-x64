@@ -1858,12 +1858,12 @@ const char g_szAnimBlockNames[][40] = {
 uintptr_t dwPlayerPedPtrs[PLAYER_PED_SLOTS];
 
 
-CPedGta* GamePool_FindPlayerPed()
+CPed* GamePool_FindPlayerPed()
 {
-	return *(CPedGta**)CWorld::Players;
+	return *(CPed**)CWorld::Players;
 }
 
-int32_t CUtil::FindPlayerSlotWithPedPointer(CPedGta* pPlayersPed)
+int32_t CUtil::FindPlayerSlotWithPedPointer(CPed* pPlayersPed)
 {
     for(int i = 0; i < MAX_PLAYERS; ++i)
     {
@@ -1874,19 +1874,19 @@ int32_t CUtil::FindPlayerSlotWithPedPointer(CPedGta* pPlayersPed)
 }
 
 
-CPedGta* GamePool_Ped_GetAt(int iID)
+CPed* GamePool_Ped_GetAt(int iID)
 {
-	return (( CPedGta* (*)(int))(g_libGTASA + (VER_x32 ? 0x00483DB8 + 1 : 0x575D0C)))(iID);
+	return (( CPed* (*)(int))(g_libGTASA + (VER_x32 ? 0x00483DB8 + 1 : 0x575D0C)))(iID);
 }
 
-CVehicleGta *GamePool_Vehicle_GetAt(int iID)
+CVehicle *GamePool_Vehicle_GetAt(int iID)
 {
-	return (( CVehicleGta* (*)(int))(g_libGTASA + (VER_x32 ? 0x00483D9E + 1 : 0x575CE8)))(iID);
+	return (( CVehicle* (*)(int))(g_libGTASA + (VER_x32 ? 0x00483D9E + 1 : 0x575CE8)))(iID);
 }
 
-int GamePool_Vehicle_GetIndex(CVehicleGta *pVehicle)
+int GamePool_Vehicle_GetIndex(CVehicle *pVehicle)
 {
-    return (( int (*)(CVehicleGta*))(g_libGTASA + (VER_x32 ? 0x00483D90 + 1 : 0x575CD8)))(pVehicle);
+    return (( int (*)(CVehicle*))(g_libGTASA + (VER_x32 ? 0x00483D90 + 1 : 0x575CD8)))(pVehicle);
 }
 
 CPhysical *GamePool_Object_GetAt(int iID)

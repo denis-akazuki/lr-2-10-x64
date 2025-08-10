@@ -28,7 +28,7 @@ void CPedIntelligence::FlushIntelligence() {
 }
 
 //
-//CPedIntelligence::CPedIntelligence(CPedGta* ped) :
+//CPedIntelligence::CPedIntelligence(CPed* ped) :
 //        m_pPed{ ped },
 //        m_TaskMgr{ CTaskManager(ped) },
 //        m_eventHandler{ CEventHandler(ped) }
@@ -79,10 +79,10 @@ void CPedIntelligence::FlushImmediately(bool bSetPrimaryDefaultTask) {
 //
 //    int32 objectType = -1;
 //    bool bIsEntityVisible = false;
-//    CObjectGta* objectToHold = nullptr;
+//    CObject* objectToHold = nullptr;
 //    CTaskSimpleHoldEntity* taskSimpleHoldEntityCloned = nullptr;
 //    if (taskSimpleHoldEntity && taskSimpleHoldEntity->GetTaskType() == TASK_SIMPLE_HOLD_ENTITY) {
-//        objectToHold = (CObjectGta*)taskSimpleHoldEntity->m_pEntityToHold;
+//        objectToHold = (CObject*)taskSimpleHoldEntity->m_pEntityToHold;
 //        if (objectToHold) {
 //            if (objectToHold->IsObject()) {
 //                objectType = objectToHold->m_nObjectType;
@@ -168,7 +168,7 @@ void CPedIntelligence::FlushImmediately(bool bSetPrimaryDefaultTask) {
 ////
 ////    if (m_pPed->bInVehicle)
 ////    {
-////        CVehicleGta* vehicle = m_pPed->pVehicle;
+////        CVehicle* vehicle = m_pPed->pVehicle;
 ////        if (vehicle && vehicle->IsBike()) {
 ////            vehicle->AsBike()->FixHandsToBars(m_pPed);
 ////        }

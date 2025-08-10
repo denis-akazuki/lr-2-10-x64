@@ -22,7 +22,7 @@ void StreamAtObject::Tick() noexcept
 
     if(!pNetGame) return;
 
-    CObject *pObject = CObjectPool::GetAt(this->objectId);
+    CObjectSamp *pObject = CObjectPool::GetAt(this->objectId);
     if(!pObject) return;
 
     for(const auto& channel : this->GetChannels())
@@ -44,7 +44,7 @@ void StreamAtObject::OnChannelCreate(const Channel& channel) noexcept
 
     if(!pNetGame) return;
 
-    CObject *pObject = CObjectPool::GetAt(this->objectId);
+    CObjectSamp *pObject = CObjectPool::GetAt(this->objectId);
     if(!pObject) return;
 
     BASS_ChannelSet3DPosition(channel.GetHandle(),

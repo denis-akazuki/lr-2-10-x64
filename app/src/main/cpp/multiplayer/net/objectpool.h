@@ -2,7 +2,7 @@
 
 #define INVALID_OBJECT_ID	0xFFF9
 
-class CObjectPool : public CNetPool<CObject*>
+class CObjectPool : public CNetPool<CObjectSamp*>
 {
 public:
 	static void Free();
@@ -12,7 +12,7 @@ public:
 
 	static uint16_t FindIDFromGtaPtr(CEntity *pGtaObject);
 
-	static CObject *GetObjectFromGtaPtr(CEntity *pGtaObject);
+	static CObjectSamp *GetObjectFromGtaPtr(CEntity *pGtaObject);
 
 	static void Process();
 };

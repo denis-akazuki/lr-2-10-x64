@@ -18,7 +18,7 @@ enum eCopType : uint32 { // TODO: Fix naming
     COP_TYPE_CSHER = 7
 };
 
-class CCopPed : public CPedGta {
+class CCopPed : public CPed {
 public:
     bool        m_bRoadBlockCop;
     bool        m_bRemoveIfNonVisible;
@@ -26,7 +26,7 @@ public:
     uint32      m_CopType;
     uint32      m_nStuckCounter;
     CCopPed*    m_pPartner;
-    CPedGta*    m_aCriminalsImAfter[5];
+    CPed*    m_aCriminalsImAfter[5];
     bool        m_bIAmDriver;
     uint8       pad1[3];
 

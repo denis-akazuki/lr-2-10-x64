@@ -9,9 +9,9 @@
 #include "Ped.h"
 
 
-class CPlayerPedGta : public CPedGta {
+class CPlayerPed : public CPed {
 public:
-    CPedGta* m_p3rdPersonMouseTarget;
+    CPed* m_p3rdPersonMouseTarget;
     int32 field_7A0;
 
     // did we display "JCK_HLP" message
@@ -25,7 +25,7 @@ public:
 public:
     static void InjectHooks();
 
-    CPlayerPedGta(int32 playerId, bool bGroupCreated);
+    CPlayerPed(int32 playerId, bool bGroupCreated);
 
     bool Load_Reversed();
     bool Save_Reversed();
@@ -37,6 +37,6 @@ public:
     void ReApplyMoveAnims();
 };
 
-VALIDATE_SIZE(CPlayerPedGta, (VER_x32 ? 0x7AC : 0x998));
+VALIDATE_SIZE(CPlayerPed, (VER_x32 ? 0x7AC : 0x998));
 
 

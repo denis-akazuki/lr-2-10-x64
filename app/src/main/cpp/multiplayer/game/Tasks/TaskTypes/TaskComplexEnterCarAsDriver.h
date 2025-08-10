@@ -12,8 +12,8 @@ class CTaskComplexEnterCarAsDriver : public CTaskComplexEnterCar {
 public:
     static constexpr auto Type = TASK_COMPLEX_ENTER_CAR_AS_DRIVER;
 
-    explicit CTaskComplexEnterCarAsDriver(CVehicleGta* targetVehicle);
-    CTaskComplexEnterCarAsDriver(CVehicleGta* targetVehicle, eMoveState moveState);
+    explicit CTaskComplexEnterCarAsDriver(CVehicle* targetVehicle);
+    CTaskComplexEnterCarAsDriver(CVehicle* targetVehicle, eMoveState moveState);
     CTaskComplexEnterCarAsDriver(const CTaskComplexEnterCarAsDriver&);
     ~CTaskComplexEnterCarAsDriver() override = default;
 

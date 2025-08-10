@@ -6,7 +6,7 @@
 #include "RW/rwcore.h"
 #include "game/Core/Vector.h"
 #include "main.h"
-#include "playerped.h"
+#include "PedSamp.h"
 #include "Entity/Ped/Ped.h"
 #include "util.h"
 #include "game/Plugins/RpAnimBlendPlugin/RpAnimBlend.h"
@@ -16,7 +16,7 @@
 #include "net/netgame.h"
 #include "Pools.h"
 #include "Streaming.h"
-#include "object.h"
+#include "ObjectSamp.h"
 #include "game.h"
 #include "SkyBox.h"
 

@@ -9,7 +9,7 @@
 #include "../util/patch.h"
 #include "../net/netgame.h"
 #include "game.h"
-#include "Entity/Ped/PlayerPedGta.h"
+#include "Entity/Ped/PlayerPed.h"
 
 void CCrossHair::Init()
 {
@@ -43,7 +43,7 @@ void CCrossHair::Render()
     {
         static float fCHairScreenMultX = (RsGlobal->maximumWidth - (RsGlobal->maximumHeight / 9 * 16)) / 2 + ((RsGlobal->maximumHeight / 9 * 16) * 0.524);
         static float fFixedOffset = RsGlobal->maximumWidth / (RsGlobal->maximumWidth - (RsGlobal->maximumHeight / 9 * 16)) * 2.0;
-        const auto gunRadius = reinterpret_cast<CPlayerPedGta*>(pPed)->GetWeaponRadiusOnScreen();
+        const auto gunRadius = reinterpret_cast<CPlayerPed*>(pPed)->GetWeaponRadiusOnScreen();
         static float fCHairScreenMultY = (RsGlobal->maximumHeight / 9 * 16) / 10 * 6 * 0.4 + fFixedOffset;
 
         RwRenderStateSet(rwRENDERSTATETEXTUREFILTER, RWRSTATE(rwFILTERLINEAR));

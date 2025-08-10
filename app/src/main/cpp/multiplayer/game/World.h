@@ -126,6 +126,6 @@ CRepeatSector* GetRepeatSector(int32 x, int32 y);
 
 
 CPlayerInfoGta&   FindPlayerInfo(int32 playerId = -1);
-CPlayerPedGta*    FindPlayerPed(int32 playerId = -1);
-CVehicleGta*      FindPlayerVehicle(int32 playerId = -1, bool bIncludeRemote = false);
+CPlayerPed*    FindPlayerPed(int32 playerId = -1);
+CVehicle*      FindPlayerVehicle(int32 playerId = -1, bool bIncludeRemote = false);
 bool              PlayerIsEnteringCar();

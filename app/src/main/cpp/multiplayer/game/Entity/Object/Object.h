@@ -19,7 +19,7 @@ enum eObjectType {
 };
 
 #pragma pack(push, 1)
-class CObjectGta : public CPhysical {
+class CObject : public CPhysical {
 public:
     uintptr*            m_pControlCodeList;
     uint8               m_nObjectType; // see enum eObjectType
@@ -89,5 +89,5 @@ public:
 };
 #pragma pack(pop)
 
-VALIDATE_SIZE(CObjectGta, (VER_x32 ? 0x184 : 0x1F8));
+VALIDATE_SIZE(CObject, (VER_x32 ? 0x184 : 0x1F8));
 

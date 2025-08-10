@@ -10,7 +10,7 @@
 #include "Task.h"
 #include <algorithm>
 
-class CPedGta;
+class CPed;
 
 enum ePrimaryTasks // array indexes
 {
@@ -43,12 +43,12 @@ class CTaskManager {
 public:
     CTask*      m_aPrimaryTasks[TASK_PRIMARY_MAX]{};
     CTask*      m_aSecondaryTasks[TASK_SECONDARY_MAX]{};
-    CPedGta*    m_pPed{};
+    CPed*    m_pPed{};
 
 public:
     static void InjectHooks();
 
-    explicit CTaskManager(CPedGta* ped);
+    explicit CTaskManager(CPed* ped);
     ~CTaskManager();
 
     /*!
@@ -317,7 +317,7 @@ protected:
     */
     void ChangeTaskInSlot(CTask*& taskInSlot, CTask* changeTo);
 private:
-    CTaskManager* Constructor(CPedGta* pPed) {
+    CTaskManager* Constructor(CPed* pPed) {
         return new CTaskManager(pPed);
       //  return this;
     }

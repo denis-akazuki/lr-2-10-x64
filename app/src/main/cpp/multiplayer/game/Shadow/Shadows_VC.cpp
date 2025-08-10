@@ -467,7 +467,7 @@
 //
 //
 //void
-//CShadows_VC::StoreShadowForVehicle(CVehicleGta *pCar, VEH_SHD_TYPE type)
+//CShadows_VC::StoreShadowForVehicle(CVehicle *pCar, VEH_SHD_TYPE type)
 //{
 //	ASSERT(pCar != nil);
 //
@@ -705,7 +705,7 @@
 //}
 //
 //void
-//CShadows_VC::StoreCarLightShadow(CVehicleGta *pCar, int32 nID, RwTexture *pTexture, CVector *pPosn,
+//CShadows_VC::StoreCarLightShadow(CVehicle *pCar, int32 nID, RwTexture *pTexture, CVector *pPosn,
 //							float fFrontX, float fFrontY, float fSideX, float fSideY, uint8 nRed, uint8 nGreen, uint8 nBlue,
 //							float fMaxViewAngle)
 //{
@@ -764,7 +764,7 @@
 //
 //#ifdef USE_CUTSCENE_SHADOW_FOR_PED
 //void
-//StoreShadowForCutscenePedObject(CPedGta *pObject, float fDisplacementX, float fDisplacementY,
+//StoreShadowForCutscenePedObject(CPed *pObject, float fDisplacementX, float fDisplacementY,
 //								float fFrontX, float fFrontY, float fSideX, float fSideY)
 //{
 //	ASSERT(pObject != nil);
@@ -836,7 +836,7 @@
 //
 //
 //void
-//CShadows_VC::StoreShadowForPed(CPedGta *pPed, float fDisplacementX, float fDisplacementY,
+//CShadows_VC::StoreShadowForPed(CPed *pPed, float fDisplacementX, float fDisplacementY,
 //							float fFrontX, float fFrontY, float fSideX, float fSideY)
 //{
 //	ASSERT(pPed != nil);
@@ -2405,7 +2405,7 @@
 //#endif
 //	if ( CTimeCycle::GetLightShadowStrength() != 0 )
 //	{
-//		CVehicleGta *pCar = FindPlayerVehicle();
+//		CVehicle *pCar = FindPlayerVehicle();
 //		if ( pCar == nil )
 //			; // R* cut it out for playerped
 //		else

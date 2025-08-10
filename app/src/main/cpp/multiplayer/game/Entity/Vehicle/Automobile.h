@@ -12,7 +12,7 @@
 #include "Enums/eCarWheel.h"
 #include "../Ped/Ped.h"
 
-class CAutomobile : public CVehicleGta {
+class CAutomobile : public CVehicle {
 public:
     CDamageManager                      m_damageManager;
     std::array<CDoor, 6>                m_doors;
@@ -42,7 +42,7 @@ public:
             float m_fHeliWheelSpeed4;
         };
     };
-    std::array<float, 4> m_fWheelBurnoutSpeed; // 0x858 - Passed to CVehicle::ProcessWheel as last 3rd parameter, but it's not used
+    std::array<float, 4> m_fWheelBurnoutSpeed; // 0x858 - Passed to CVehicleSamp::ProcessWheel as last 3rd parameter, but it's not used
     struct {
         bool bTaxiLight : 1 { true }; // AKA `bTaxiLightOn`
         bool bShouldNotChangeColour : 1 {}; // AKA `ucNPCFlagPad2`
@@ -77,7 +77,7 @@ public:
     std::array<CPhysical*, 4> m_apWheelCollisionEntity;
     std::array<CVector, 4>    m_vWheelCollisionPos; // Bike::m_avTouchPointsLocalSpace
 
-    CPedGta* m_pExplosionVictim;
+    CPed* m_pExplosionVictim;
     std::array<char, 24> field_928;
 
     float LeftDoorOpenForDriveBys;

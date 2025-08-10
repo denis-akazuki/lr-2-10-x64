@@ -14,28 +14,28 @@ public:
 
     CTask* Clone() const override { return new CTaskSimpleUseGun(m_TargetEntity, m_TargetPos, m_LastCmd, m_BurstLength, m_IsAimImmediate); }
     eTaskType GetTaskType() const override { return Type; };
-    bool MakeAbortable(CPedGta* ped, eAbortPriority priority = ABORT_PRIORITY_URGENT, const CEvent* event = nullptr) override;
-    bool ProcessPed(CPedGta* ped) override;
-    bool SetPedPosition(CPedGta* ped) override;
+    bool MakeAbortable(CPed* ped, eAbortPriority priority = ABORT_PRIORITY_URGENT, const CEvent* event = nullptr) override;
+    bool ProcessPed(CPed* ped) override;
+    bool SetPedPosition(CPed* ped) override;
 
-    void AbortIK(CPedGta* ped);
-    void AimGun(CPedGta* ped);
+    void AbortIK(CPed* ped);
+    void AimGun(CPed* ped);
 
-    void ClearAnim(CPedGta* ped);
+    void ClearAnim(CPed* ped);
 
-    bool ControlGun(CPedGta* ped, CEntity* target, eGunCommand cmd);
+    bool ControlGun(CPed* ped, CEntity* target, eGunCommand cmd);
     bool ControlGunMove(const CVector2D& moveSpeed);
 
     static void FinishGunAnimCB(CAnimBlendAssociation* anim, void* data);
 
-    void FireGun(CPedGta* ped, bool); // Originally returned a bool, but since the return value isn't used anywhere, we're going to make it void...
+    void FireGun(CPed* ped, bool); // Originally returned a bool, but since the return value isn't used anywhere, we're going to make it void...
     bool PlayerPassiveControlGun();
-    void RemoveStanceAnims(CPedGta* ped, float x);
-    static bool RequirePistolWhip(CPedGta* ped, CEntity* entity);
-    void Reset(CPedGta* ped, CEntity* targetEntity, CVector targetPos, eGunCommand, int16 burstLength);
+    void RemoveStanceAnims(CPed* ped, float x);
+    static bool RequirePistolWhip(CPed* ped, CEntity* entity);
+    void Reset(CPed* ped, CEntity* targetEntity, CVector targetPos, eGunCommand, int16 burstLength);
 
-    void SetMoveAnim(CPedGta* ped);
-    void StartAnim(CPedGta* ped);
+    void SetMoveAnim(CPed* ped);
+    void StartAnim(CPed* ped);
     void StartCountDown(uint8 numIdleFrames, char isMax);
 
     auto GetLastGunCommand() const { return m_LastCmd; }

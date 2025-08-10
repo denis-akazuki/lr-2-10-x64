@@ -565,7 +565,7 @@ void ScrPutPlayerInVehicle(RPCParameters *rpcParams)
 	if(pPed->m_pPed->IsInVehicle()) {
 		pPed->m_pPed->RemoveFromVehicle();
 	}
-	CVehicle *pVehicle = CVehiclePool::GetAt(vehicleid);
+	CVehicleSamp *pVehicle = CVehiclePool::GetAt(vehicleid);
 	if(!pVehicle)return;
  //   DLOG("seatid = %d", vehicleid);
 	if(seatid == 0) {
@@ -755,7 +755,7 @@ void ScrSetVehicleVelocity(RPCParameters *rpcParams)
 
 	if(pPlayerPed)
 	{
-		CVehicle *pVehicle = CVehiclePool::GetAt( CVehiclePool::FindIDFromGtaPtr(pPlayerPed->GetGtaVehicle()) );
+		CVehicleSamp *pVehicle = CVehiclePool::GetAt( CVehiclePool::FindIDFromGtaPtr(pPlayerPed->GetGtaVehicle()) );
 		if(pVehicle)
 			pVehicle->m_pVehicle->SetVelocity(vecMoveSpeed);
 	}
@@ -934,7 +934,7 @@ void ScrCreateObject(RPCParameters* rpcParams)
 
 	CObjectPool::New(wObjectID, ModelID, vecPos, vecRot, fDrawDistance);
 
-	CObject* pObject = CObjectPool::GetAt(wObjectID);
+	CObjectSamp* pObject = CObjectPool::GetAt(wObjectID);
 	if (!pObject) return;
 	if (attachedVehicleID != -1)
 	{
@@ -1055,7 +1055,7 @@ void ScrAttachObjectToPlayer(RPCParameters* rpcParams)
 	bsData.Read(rY);
 	bsData.Read(rZ);
 
-	CObject* pObject = CObjectPool::GetAt(wObjectID);
+	CObjectSamp* pObject = CObjectPool::GetAt(wObjectID);
 	if (!pObject) return;
 
 	if (wPlayerID == CPlayerPool::GetLocalPlayerID())
@@ -1500,7 +1500,7 @@ void ScrSetPlayerObjectMaterial(RPCParameters* rpcParams)
 	uint32_t col;
 	bsData.Read(col);
 	tex[texLength] = 0;
-	CObject* pObj = CObjectPool::GetAt(wObjectID);
+	CObjectSamp* pObj = CObjectPool::GetAt(wObjectID);
 	if (!pObj) return;
 
 	union color
@@ -1536,7 +1536,7 @@ void ScrSetVehicleZAngle(RPCParameters* rpcParams)
 	bsData.Read(VehicleId);
 	bsData.Read(fZAngle);
 
-	CVehicle* pVeh = CVehiclePool::GetAt(VehicleId);
+	CVehicleSamp* pVeh = CVehiclePool::GetAt(VehicleId);
 	if (!pVeh) return;
 	if (GamePool_Vehicle_GetAt(pVeh->m_dwGTAId))
 	{
@@ -1555,8 +1555,8 @@ void ScrAttachTrailerToVehicle(RPCParameters* rpcParams)
 	RakNet::BitStream bsData(Data, (iBitLength / 8) + 1, false);
 	bsData.Read(TrailerID);
 	bsData.Read(VehicleID);
-	CVehicle* pTrailer = CVehiclePool::GetAt(TrailerID);
-	CVehicle* pVehicle = CVehiclePool::GetAt(VehicleID);
+	CVehicleSamp* pTrailer = CVehiclePool::GetAt(TrailerID);
+	CVehicleSamp* pVehicle = CVehiclePool::GetAt(VehicleID);
 	if (!pVehicle) return;
 	if (!pTrailer) return;
 	pVehicle->SetTrailer(pTrailer);
@@ -1575,7 +1575,7 @@ void ScrDetachTrailerFromVehicle(RPCParameters* rpcParams)
 	VEHICLEID VehicleID;
 	RakNet::BitStream bsData(Data, (iBitLength / 8) + 1, false);
 	bsData.Read(VehicleID);
-	CVehicle* pVehicle = CVehiclePool::GetAt(VehicleID);
+	CVehicleSamp* pVehicle = CVehiclePool::GetAt(VehicleID);
 	if (!pVehicle) return;
 	pVehicle->DetachTrailer();
 	pVehicle->SetTrailer(NULL);
@@ -1622,7 +1622,7 @@ void ScrMoveObject(RPCParameters* rpcParams)
 	bsData.Read(roty);
 	bsData.Read(rotz);
 
-	CObject* pObject = CObjectPool::GetAt(byteObjectID);
+	CObjectSamp* pObject = CObjectPool::GetAt(byteObjectID);
 	if (pObject)
 	{
 		pObject->MoveTo(newx, newy, newz, speed, rotx, roty, rotz);

@@ -51,7 +51,7 @@ void CActorPool::Spawn(uint16_t actorId, int iSkin, CVector vecPos, float fRotat
 CActorPed *CActorPool::FindActorFromGta(CEntity *entity) {
     for(auto & pair : list) {
         auto &pActor = pair.second;
-		if(pActor->m_pPed == (CPedGta*)entity)
+		if(pActor->m_pPed == (CPed*)entity)
 			return pActor;
 	}
 	return nullptr;
@@ -60,7 +60,7 @@ CActorPed *CActorPool::FindActorFromGta(CEntity *entity) {
 ActorId CActorPool::FindActorIdFromGta(CEntity *entity) {
     for(auto & pair : list) {
         auto &pActor = pair.second;
-        if(pActor->m_pPed == (CPedGta*)entity)
+        if(pActor->m_pPed == (CPed*)entity)
             return pair.first;
     }
 

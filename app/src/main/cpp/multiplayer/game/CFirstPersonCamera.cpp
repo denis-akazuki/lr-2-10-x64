@@ -61,7 +61,7 @@ void CFirstPersonCamera::ProcessCameraOnFoot(CCam* pCam, CPedSamp* pPed)
     MakePlayerFaceCameraDirection(pCam, pPed);
 }
 
-void CFirstPersonCamera::ProcessCameraInVeh(CCam* pCam, CPedSamp* pPed, CVehicle* pVeh)
+void CFirstPersonCamera::ProcessCameraInVeh(CCam* pCam, CPedSamp* pPed, CVehicleSamp* pVeh)
 {
     if (!m_bEnabled || !pPed->GetGtaVehicle())
     {

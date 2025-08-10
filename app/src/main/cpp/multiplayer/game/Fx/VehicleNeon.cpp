@@ -50,7 +50,7 @@ void CVehicleNeon::Process() {
     }
 }
 
-void CVehicleNeon::Render(CVehicleGta* veh) const
+void CVehicleNeon::Render(CVehicle* veh) const
 {
     if(neonColor.a == 0)
         return;

@@ -33,10 +33,10 @@ public:
     explicit CTaskSimpleAnim(bool bHoldLastFrame);
     ~CTaskSimpleAnim() override;
 
-    bool MakeAbortable(CPedGta* ped, eAbortPriority priority = ABORT_PRIORITY_URGENT, const CEvent* event = nullptr) override;
+    bool MakeAbortable(CPed* ped, eAbortPriority priority = ABORT_PRIORITY_URGENT, const CEvent* event = nullptr) override;
     static void FinishRunAnimCB(CAnimBlendAssociation* blendAssoc, void* data); //data is CTaskSimpleAnim
 
     static void InjectHooks();
-    bool MakeAbortable_Reversed(CPedGta* ped, eAbortPriority priority, const CEvent* event);
+    bool MakeAbortable_Reversed(CPed* ped, eAbortPriority priority, const CEvent* event);
 };
 VALIDATE_SIZE(CTaskSimpleAnim, (VER_x32 ? 0x10 : 0x20));

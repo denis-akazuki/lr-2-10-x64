@@ -43,7 +43,7 @@ void CText3DLabelsPool::DrawAttachedToVehicle(CText3DLabel* pLabel)
 {
 	VEHICLEID vehId = pLabel->attachedToVehicleID;
 
-	CVehicle* pVehicle = CVehiclePool::GetAt(vehId);
+	CVehicleSamp* pVehicle = CVehiclePool::GetAt(vehId);
 	if (!pVehicle)
 	{
 		return;

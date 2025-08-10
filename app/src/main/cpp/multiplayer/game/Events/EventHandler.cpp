@@ -6,7 +6,7 @@
 #include "Event.h"
 #include "util/patch.h"
 
-CEventHandler::CEventHandler(CPedGta* ped) {
+CEventHandler::CEventHandler(CPed* ped) {
     m_ped                  = ped;
     m_physicalResponseTask = nullptr;
     m_eventResponseTask    = nullptr;

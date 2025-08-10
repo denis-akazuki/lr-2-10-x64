@@ -246,7 +246,7 @@ struct CAttachedPlayerObject
 	CVector 	    vecScale;
 	CRGBA 	        dwColor[2];
 
-	class CObject*  pObject;
+	class CObjectSamp*  pObject;
 	uint32_t 	    dwSampBone;
 };
 

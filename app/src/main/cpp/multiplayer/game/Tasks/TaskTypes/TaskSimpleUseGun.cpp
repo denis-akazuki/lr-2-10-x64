@@ -9,7 +9,7 @@
 #include "Animation/AnimManager.h"
 #include "util/patch.h"
 
-void CTaskSimpleUseGun::SetMoveAnim(CPedGta* ped) {
+void CTaskSimpleUseGun::SetMoveAnim(CPed* ped) {
    // DLOG("CTaskSimpleUseGun::SetMoveAn");
     const auto
             animGunStand   = RpAnimBlendClumpGetAssociation(ped->m_pRwClump, ANIM_ID_GUN_STAND),
@@ -151,7 +151,7 @@ void CTaskSimpleUseGun::FinishGunAnimCB(CAnimBlendAssociation *anim, void *data)
 
 }
 
-void CTaskSimpleUseGun__SetMoveAnim_hook(CTaskSimpleUseGun *thiz, CPedGta *pPed)
+void CTaskSimpleUseGun__SetMoveAnim_hook(CTaskSimpleUseGun *thiz, CPed *pPed)
 {
     thiz->SetMoveAnim(pPed);
 }

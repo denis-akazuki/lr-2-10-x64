@@ -24,9 +24,9 @@ class CPools {
 public:
     static inline CPool<CPtrNodeSingleLink>*            ms_pPtrNodeSingleLinkPool;
     static inline CPool<CPtrNodeDoubleLink>*            ms_pPtrNodeDoubleLinkPool;
-    static inline CPool<CPedGta, CCopPed>*              ms_pPedPool;
-    static inline CPool<CVehicleGta, CHeli>*            ms_pVehiclePool;
-    static inline CPool<CObjectGta, CCutsceneObject>*   ms_pObjectPool;
+    static inline CPool<CPed, CCopPed>*              ms_pPedPool;
+    static inline CPool<CVehicle, CHeli>*            ms_pVehiclePool;
+    static inline CPool<CObject, CCutsceneObject>*   ms_pObjectPool;
     static inline CPool<CTask, CTaskSimpleSlideToCoord>*ms_pTaskPool;
     static inline CPool<CEntryInfoNode>*                ms_pEntryInfoNodePool;
     static inline CPool<CDummy>*                        ms_pDummyPool;

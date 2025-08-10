@@ -12,8 +12,8 @@
 /* http://code.google.com/p/mtasa-blue/source/browse/tags/1.3.4/MTA10/game_sa/CCamSA.h */
 
 struct CEntity;
-struct CPedGta;
-struct CVehicleGta;
+struct CPed;
+struct CVehicle;
 
 //extern bool& gbFirstPersonRunThisFrame;
 
@@ -122,7 +122,7 @@ struct CCam
     float m_fIdealAlpha;
     float m_fPlayerVelocity;
     uintptr *m_pLastCarEntered;
-    CPedGta *m_pLastPedLookedAt;
+    CPed *m_pLastPedLookedAt;
     bool m_bFirstPersonRunAboutActive;
     uint8 pad1[3];
 };

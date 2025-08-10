@@ -11,7 +11,7 @@
 const float& CCarEnterExit::ms_fMaxSpeed_CanDragPedOut = *(float*)0x0;
 const float& CCarEnterExit::ms_fMaxSpeed_PlayerCanDragPedOut = *(float*)0x0;
 */
-int32 CCarEnterExit::ComputeTargetDoorToEnterAsPassenger(const CVehicleGta* vehicle, int32 psgrIdx) {
+int32 CCarEnterExit::ComputeTargetDoorToEnterAsPassenger(const CVehicle* vehicle, int32 psgrIdx) {
     if (vehicle->m_nVehicleFlags.bIsBus) {
         return 8;
     }
@@ -30,7 +30,7 @@ int32 CCarEnterExit::ComputeTargetDoorToEnterAsPassenger(const CVehicleGta* vehi
 
 
 
-bool CCarEnterExit::SetPedInCarDirect(CPedGta* ped, CVehicleGta* vehicle, int32 doorId, bool bAsDriver) {
+bool CCarEnterExit::SetPedInCarDirect(CPed* ped, CVehicle* vehicle, int32 doorId, bool bAsDriver) {
     // ����
 
 
@@ -61,9 +61,9 @@ bool CCarEnterExit::SetPedInCarDirect(CPedGta* ped, CVehicleGta* vehicle, int32 
 ////    // I assume the function is only ever called with `bAsDriver` if there are no passengers
 ////    // So that's why this code-path is only reachable if `bAsDriver` is false
 ////
-////    const auto SetMutalAcquaintanceWith = [ped](CPedGta* other) {
+////    const auto SetMutalAcquaintanceWith = [ped](CPed* other) {
 ////        if (other) {
-////            const auto SetWith = [](CPedGta* of, CPedGta* with) {
+////            const auto SetWith = [](CPed* of, CPed* with) {
 ////                if (!of->IsCreatedByMission()) {
 ////                    of->GetAcquaintance().SetAsAcquaintance(ACQUAINTANCE_RESPECT, CPedType::GetPedFlag(with->m_nPedType));
 ////                }

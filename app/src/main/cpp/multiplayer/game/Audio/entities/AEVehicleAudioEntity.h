@@ -12,7 +12,7 @@
 
 enum tWheelState : int32;
 
-class CVehicleGta;
+class CVehicle;
 
 enum eVehicleSoundType : int8 {
     VEHICLE_SOUND_CAR              = 0x0,
@@ -52,7 +52,7 @@ struct cVehicleParams {
     int32          nBaseVehicleType{ VEHICLE_TYPE_IGNORE };
     bool           bDistanceCalculated{ false };
     float          fDistSqr{ 0.0f };
-    CVehicleGta*   Vehicle{ nullptr };
+    CVehicle*   Vehicle{ nullptr };
     cTransmission* Transmission{ nullptr };
     uint32         nModelIndexMinusOffset{ 0 };
     float          fSpeed{ 0.0f };
@@ -112,7 +112,7 @@ public:
 };
 VALIDATE_SIZE(tVehicleAudioSettings, 0x24);
 
-class CPedGta;
+class CPed;
 
 class CAEVehicleAudioEntity : public CAEAudioEntity {
 public:

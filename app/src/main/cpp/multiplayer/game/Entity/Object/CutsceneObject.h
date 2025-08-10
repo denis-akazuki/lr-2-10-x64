@@ -6,12 +6,12 @@
 
 #include "Object.h"
 
-class CCutsceneObject : public CObjectGta {
+class CCutsceneObject : public CObject {
     union {
         RwFrame* m_pAttachToFrame;
         uint32   m_nAttachBone; // this one if m_pAttachmentObject != 0
     };
-    CObjectGta* m_pAttachmentObject;
+    CObject* m_pAttachmentObject;
     CVector     m_vWorldPosition;
     CVector     m_vForce;
 };

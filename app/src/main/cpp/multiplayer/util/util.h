@@ -4,18 +4,18 @@
 #include "game/RW/rwcore.h"
 #include "game/Enums/OSDeviceForm.h"
 
-class CVehicleGta;
-class CPedGta;
+class CVehicle;
+class CPed;
 
 class CUtil {
 public:
-    static bool IsValidGameVehicle(CVehicleGta *pVehicle);
-    static bool IsValidGamePed(CPedGta * pPed);
+    static bool IsValidGameVehicle(CVehicle *pVehicle);
+    static bool IsValidGamePed(CPed * pPed);
     static void WorldRemoveEntity(CEntity* pEnt);
 
     static const char *GetWeaponName(int iWeaponID);
 
-    static int32_t FindPlayerSlotWithPedPointer(CPedGta *pPlayersPed);
+    static int32_t FindPlayerSlotWithPedPointer(CPed *pPlayersPed);
 
     static RwTexture* GetTexture(const char* name);
 

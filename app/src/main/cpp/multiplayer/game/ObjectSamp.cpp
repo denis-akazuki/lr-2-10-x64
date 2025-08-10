@@ -18,7 +18,7 @@ float subAngle(float a1, float a2)
 	return fixAngle(fixAngle(a2) - a1);
 }
 
-CObject::CObject(int iModel, float fPosX, float fPosY, float fPosZ, CVector vecRot, float fDrawDistance)
+CObjectSamp::CObjectSamp(int iModel, float fPosX, float fPosY, float fPosZ, CVector vecRot, float fDrawDistance)
 {
 	if(!CModelInfo::GetModelInfo(iModel))
 		iModel = 18631; // вопросик
@@ -46,7 +46,7 @@ CObject::CObject(int iModel, float fPosX, float fPosY, float fPosZ, CVector vecR
 	InstantRotate(vecRot.x, vecRot.y, vecRot.z);
 }
 
-CObject::~CObject()
+CObjectSamp::~CObjectSamp()
 {
 	auto modelId = m_pEntity->m_nModelIndex;
 
@@ -63,11 +63,11 @@ CObject::~CObject()
 	CStreaming::RemoveModelIfNoRefs(modelId);
 }
 
-void CObject::Process(float fElapsedTime)
+void CObjectSamp::Process(float fElapsedTime)
 {
 	if (m_bAttachedType == eObjectAttachType::TO_VEHICLE)
 	{
-		CVehicle* pVehicle = CVehiclePool::GetAt(m_usAttachedVehicle);
+		CVehicleSamp* pVehicle = CVehiclePool::GetAt(m_usAttachedVehicle);
 		if (pVehicle)
 		{
 			if (pVehicle->m_pVehicle->IsAdded())
@@ -193,7 +193,7 @@ void CObject::Process(float fElapsedTime)
 	}
 }
 
-float CObject::DistanceRemaining(RwMatrix *matPos)
+float CObjectSamp::DistanceRemaining(RwMatrix *matPos)
 {
 
 	float	fSX,fSY,fSZ;
@@ -203,7 +203,7 @@ float CObject::DistanceRemaining(RwMatrix *matPos)
 	return (float)sqrt(fSX + fSY + fSZ);
 }
 
-void CObject::SetPos(float x, float y, float z)
+void CObjectSamp::SetPos(float x, float y, float z)
 {
 	if (GamePool_Object_GetAt(m_dwGTAId))
 	{
@@ -213,7 +213,7 @@ void CObject::SetPos(float x, float y, float z)
 
 
 
-void CObject::MoveTo(float fX, float fY, float fZ, float fSpeed, float fRotX, float fRotY, float fRotZ)
+void CObjectSamp::MoveTo(float fX, float fY, float fZ, float fSpeed, float fRotX, float fRotY, float fRotZ)
 {
 	RwMatrix mat;
 	m_pEntity->GetMatrix(&mat);
@@ -283,7 +283,7 @@ void CObject::MoveTo(float fX, float fY, float fZ, float fSpeed, float fRotX, fl
 	}
 }
 
-void CObject::AttachToVehicle(uint16_t usVehID, CVector* pVecOffset, CVector* pVecRot)
+void CObjectSamp::AttachToVehicle(uint16_t usVehID, CVector* pVecOffset, CVector* pVecRot)
 {
 	m_bAttachedType = eObjectAttachType::TO_VEHICLE;
 	m_usAttachedVehicle = usVehID;
@@ -296,7 +296,7 @@ void CObject::AttachToVehicle(uint16_t usVehID, CVector* pVecOffset, CVector* pV
 	m_vecAttachedRotation.z = pVecRot->z;
 }
 
-void CObject::ProcessAttachToVehicle(CVehicle* pVehicle)
+void CObjectSamp::ProcessAttachToVehicle(CVehicleSamp* pVehicle)
 {
 	if (GamePool_Object_GetAt(m_dwGTAId))
 	{
@@ -308,7 +308,7 @@ void CObject::ProcessAttachToVehicle(CVehicle* pVehicle)
 	}
 }
 
-void CObject::InstantRotate(float x, float y, float z)
+void CObjectSamp::InstantRotate(float x, float y, float z)
 {
 	if(!m_pEntity)return;
 	x = DegreesToRadians(x);
@@ -325,7 +325,7 @@ void CObject::InstantRotate(float x, float y, float z)
     m_pEntity->Add();
 }
 
-void CObject::StopMoving()
+void CObjectSamp::StopMoving()
 {
 	CVector vec = { 0.0f, 0.0f, 0.0f };
 	this->m_pEntity->ResetMoveSpeed();
@@ -333,7 +333,7 @@ void CObject::StopMoving()
 	m_bIsMoving = false;
 }
 
-void CObject::SetRot(float &radX, float &radY, float &radZ)
+void CObjectSamp::SetRot(float &radX, float &radY, float &radZ)
 {
     m_pEntity->Remove();
 
@@ -345,7 +345,7 @@ void CObject::SetRot(float &radX, float &radY, float &radZ)
     m_pEntity->Add();
 }
 
-void CObject::GetRotation(float* pfX,float* pfY,float* pfZ)
+void CObjectSamp::GetRotation(float* pfX,float* pfY,float* pfZ)
 {
 	if (!m_pEntity) return;
 

@@ -16,7 +16,7 @@ class CTaskSimpleDuck;
 class CPedIntelligence
 {
 public:
-    class CPedGta* m_pPed;
+    class CPed* m_pPed;
     CTaskManager   m_TaskMgr;
     CEventHandler  m_eventHandler;
     CEventGroup    m_eventGroup;
@@ -44,7 +44,7 @@ public:
 public:
     static void InjectHooks();
 
-    CPedIntelligence(CPedGta* ped);
+    CPedIntelligence(CPed* ped);
     ~CPedIntelligence();
 
     void Process();

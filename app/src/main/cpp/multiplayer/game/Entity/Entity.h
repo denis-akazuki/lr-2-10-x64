@@ -235,11 +235,11 @@ public:
     [[nodiscard]] bool IsDummy()    const { return m_nType == ENTITY_TYPE_DUMMY; }
 
     auto AsPhysical()         { return reinterpret_cast<class CPhysical*>(this); }
-    auto AsVehicle()          { return reinterpret_cast<class CVehicleGta*>(this); }
+    auto AsVehicle()          { return reinterpret_cast<class CVehicle*>(this); }
     auto AsAutomobile()       { return reinterpret_cast<class CAutomobile*>(this); }
     auto AsAutomobile() const { return reinterpret_cast<const class CAutomobile*>(this); }
-    auto AsPed()              { return reinterpret_cast<class CPedGta*>(this); }
-    auto AsObject()           { return reinterpret_cast<class CObject*>(this); }
+    auto AsPed()              { return reinterpret_cast<class CPed*>(this); }
+    auto AsObject()           { return reinterpret_cast<class CObjectSamp*>(this); }
     auto AsBuilding()         { return reinterpret_cast<class CBuilding*>(this); }
     auto AsDummy()            { return reinterpret_cast<class CDummy*>(this); }
 

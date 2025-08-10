@@ -24,9 +24,9 @@ void CPools::Initialise()
 
     CPools::ms_pPtrNodeSingleLinkPool   = new CPool<CPtrNodeSingleLink>(100000, "PtrNode Single");
     CPools::ms_pPtrNodeDoubleLinkPool   = new CPool<CPtrNodeDoubleLink>(60000, "PtrNode Double");
-    CPools::ms_pPedPool                 = new CPool<CPedGta, CCopPed>(240, "Peds");
-    CPools::ms_pVehiclePool             = new CPool<CVehicleGta, CHeli>(1000, "Vehicles");
-    CPools::ms_pObjectPool              = new CPool<CObjectGta, CCutsceneObject>(3000, "Objects");
+    CPools::ms_pPedPool                 = new CPool<CPed, CCopPed>(240, "Peds");
+    CPools::ms_pVehiclePool             = new CPool<CVehicle, CHeli>(1000, "Vehicles");
+    CPools::ms_pObjectPool              = new CPool<CObject, CCutsceneObject>(3000, "Objects");
     CPools::ms_pTaskPool                = new CPool<CTask, CTaskSimpleSlideToCoord>(10000, "Task");
     CPools::ms_pEntryInfoNodePool       = new CPool<CEntryInfoNode>(20000, "EntryInfoNodePool");
     CPools::ms_pDummyPool               = new CPool<CDummy>(40000, "Dummies");

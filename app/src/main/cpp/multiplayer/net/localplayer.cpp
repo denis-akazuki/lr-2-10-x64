@@ -298,7 +298,7 @@ bool CLocalPlayer::Process()
 					VEHICLEID ClosetVehicleID = CVehiclePool::FindNearestToLocalPlayerPed();
 
 					if (ClosetVehicleID != INVALID_VEHICLE_ID) {
-						CVehicle *pVehicle = CVehiclePool::GetAt(ClosetVehicleID);
+						CVehicleSamp *pVehicle = CVehiclePool::GetAt(ClosetVehicleID);
 						if (pVehicle && pVehicle->m_pVehicle->GetDistanceFromLocalPlayerPed() < 4.0f  && !pVehicle->m_pVehicle->IsTrailer()) {
 							//if(!pVehicle->m_bIsLocked)
 							if (pVehicle->m_pVehicle->m_nDoorLock != CARLOCK_LOCKED) {// ����� �������
@@ -392,7 +392,7 @@ void CLocalPlayer::GoEnterVehicle(bool passenger)
 	VEHICLEID ClosetVehicleID = CVehiclePool::FindNearestToLocalPlayerPed();
 	if (ClosetVehicleID != INVALID_VEHICLE_ID)
 	{
-		CVehicle* pVehicle = CVehiclePool::GetAt(ClosetVehicleID);
+		CVehicleSamp* pVehicle = CVehiclePool::GetAt(ClosetVehicleID);
 
 		if (pVehicle != nullptr && pVehicle->m_pVehicle->GetDistanceFromLocalPlayerPed() < 4.0f)
 		{
@@ -627,7 +627,7 @@ void CLocalPlayer::SendInCarFullSyncData()
 	uint16_t lrAnalog, udAnalog;
 	uint16_t wKeys = m_pPlayerPed->GetKeys(&lrAnalog, &udAnalog);
 
-	CVehicle *pVehicle = m_pPlayerPed->GetCurrentVehicle();
+	CVehicleSamp *pVehicle = m_pPlayerPed->GetCurrentVehicle();
 	if(!pVehicle || !pVehicle->m_pVehicle)return;
 
 	INCAR_SYNC_DATA icSync;
@@ -682,7 +682,7 @@ void CLocalPlayer::SendInCarFullSyncData()
 	{
 		RwMatrix matTrailer;
 		TRAILER_SYNC_DATA trSync;
-		CVehicle* pTrailer = CVehiclePool::GetAt(icSync.TrailerID);
+		CVehicleSamp* pTrailer = CVehiclePool::GetAt(icSync.TrailerID);
 
 		if (pTrailer && pTrailer->m_pVehicle)
 		{
@@ -871,7 +871,7 @@ void CLocalPlayer::ProcessSpectating()
 		}
 	}
 	else if(m_byteSpectateType == SPECTATE_TYPE_VEHICLE) {
-        CVehicle *pVehicle = nullptr;
+        CVehicleSamp *pVehicle = nullptr;
 
         pVehicle = CVehiclePool::GetAt((VEHICLEID) m_SpectateID);
         if (pVehicle) {

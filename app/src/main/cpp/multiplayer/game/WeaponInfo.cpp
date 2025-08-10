@@ -334,7 +334,7 @@ bool CWeaponInfo::TypeIsWeapon(eWeaponType type) {
     return type < WEAPON_LAST_WEAPON;
 }
 
-auto CWeaponInfo::GetWeaponInfo(CPedGta* ped) {
+auto CWeaponInfo::GetWeaponInfo(CPed* ped) {
     return GetWeaponInfo(ped->GetActiveWeapon().m_nType, ped->GetWeaponSkill());
 }
 

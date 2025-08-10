@@ -10,7 +10,7 @@
 #include "Camera.h"
 #include "net/netgame.h"
 
-void CVehicleGta::RenderDriverAndPassengers() {
+void CVehicle::RenderDriverAndPassengers() {
     if(IsRCVehicleModelID())
         return;
 
@@ -27,13 +27,13 @@ void CVehicleGta::RenderDriverAndPassengers() {
     }
 }
 
-void CVehicleGta::SetDriver(CPedGta* driver) {
+void CVehicle::SetDriver(CPed* driver) {
     CEntity::ChangeEntityReference(pDriver, driver);
 
     ApplyTurnForceToOccupantOnEntry(driver);
 }
 
-bool CVehicleGta::AddPassenger(CPedGta* passenger) {
+bool CVehicle::AddPassenger(CPed* passenger) {
     ApplyTurnForceToOccupantOnEntry(passenger);
 
     // Now, find a seat and place them into it
@@ -50,7 +50,7 @@ bool CVehicleGta::AddPassenger(CPedGta* passenger) {
     return false;
 }
 
-bool CVehicleGta::AddPassenger(CPedGta* passenger, uint8 seatIdx) {
+bool CVehicle::AddPassenger(CPed* passenger, uint8 seatIdx) {
     if (m_nVehicleFlags.bIsBus) {
         return AddPassenger(passenger);
     }
@@ -73,7 +73,7 @@ bool CVehicleGta::AddPassenger(CPedGta* passenger, uint8 seatIdx) {
     return true;
 }
 
-void CVehicleGta::ApplyTurnForceToOccupantOnEntry(CPedGta* passenger) {
+void CVehicle::ApplyTurnForceToOccupantOnEntry(CPed* passenger) {
     // Apply some turn force
     switch (m_nVehicleType) {
         case VEHICLE_TYPE_BIKE: {
@@ -93,7 +93,7 @@ void CVehicleGta::ApplyTurnForceToOccupantOnEntry(CPedGta* passenger) {
     }
 }
 
-int CVehicleGta::GetPassengerIndex(const CPedGta* passenger) {
+int CVehicle::GetPassengerIndex(const CPed* passenger) {
     for(int i = 0; i <  std::size(m_apPassengers); i++) {
         if(passenger == m_apPassengers[i])
             return i;
@@ -101,53 +101,53 @@ int CVehicleGta::GetPassengerIndex(const CPedGta* passenger) {
     return -1;
 }
 
-void CVehicleGta::AddVehicleUpgrade(int32 modelId) {
+void CVehicle::AddVehicleUpgrade(int32 modelId) {
     CHook::CallFunction<void>(g_libGTASA + (VER_x32 ? 0x0058C66C + 1 : 0x6AFF4C), this, modelId);
 }
 
-void CVehicleGta::RemoveVehicleUpgrade(int32 upgradeModelIndex) {
+void CVehicle::RemoveVehicleUpgrade(int32 upgradeModelIndex) {
     CHook::CallFunction<void>(g_libGTASA + (VER_x32 ? 0x58CC2C + 1 : 0x6B0718), this, upgradeModelIndex);
 }
 
 // 0x6D3000
-void CVehicleGta::SetGettingInFlags(uint8 doorId) {
+void CVehicle::SetGettingInFlags(uint8 doorId) {
     m_nGettingInFlags |= doorId;
 }
 
 // 0x6D3020
-void CVehicleGta::SetGettingOutFlags(uint8 doorId) {
+void CVehicle::SetGettingOutFlags(uint8 doorId) {
     m_nGettingOutFlags |= doorId;
 }
 
 // 0x6D3040
-void CVehicleGta::ClearGettingInFlags(uint8 doorId) {
+void CVehicle::ClearGettingInFlags(uint8 doorId) {
     m_nGettingInFlags &= ~doorId;
 }
 
 // 0x6D3060
-void CVehicleGta::ClearGettingOutFlags(uint8 doorId) {
+void CVehicle::ClearGettingOutFlags(uint8 doorId) {
     m_nGettingOutFlags &= ~doorId;
 }
 
 // ----------------------------------- hooks
 
-void RenderDriverAndPassengers_hook(CVehicleGta *thiz)
+void RenderDriverAndPassengers_hook(CVehicle *thiz)
 {
     thiz->RenderDriverAndPassengers();
 }
 
-void SetDriver_hook(CVehicleGta *thiz, CPedGta *pPed)
+void SetDriver_hook(CVehicle *thiz, CPed *pPed)
 {
     thiz->SetDriver(pPed);
 }
 
-bool CVehicle__GetVehicleLightsStatus_hook(CVehicleGta *pVehicle)
+bool CVehicle__GetVehicleLightsStatus_hook(CVehicle *pVehicle)
 {
     return pVehicle->GetLightsStatus();
 }
 
-void (*CVehicle__DoVehicleLights)(CVehicleGta* thiz, CMatrix *matVehicle, uint32 nLightFlags);
-void CVehicle__DoVehicleLights_hook(CVehicleGta* thiz, CMatrix *matVehicle, uint32 nLightFlags)
+void (*CVehicle__DoVehicleLights)(CVehicle* thiz, CMatrix *matVehicle, uint32 nLightFlags);
+void CVehicle__DoVehicleLights_hook(CVehicle* thiz, CMatrix *matVehicle, uint32 nLightFlags)
 {
     uint8_t old = thiz->m_nVehicleFlags.bEngineOn;
     thiz->m_nVehicleFlags.bEngineOn = 1;
@@ -155,7 +155,7 @@ void CVehicle__DoVehicleLights_hook(CVehicleGta* thiz, CMatrix *matVehicle, uint
     thiz->m_nVehicleFlags.bEngineOn = old;
 }
 
-bool CVehicleGta::DoTailLightEffect(int32_t lightId, CMatrix* matVehicle, int isRight, int forcedOff, uint32_t nLightFlags, int lightsOn) {
+bool CVehicle::DoTailLightEffect(int32_t lightId, CMatrix* matVehicle, int isRight, int forcedOff, uint32_t nLightFlags, int lightsOn) {
 
     constexpr int REVERSE_LIGHT_OFFSET = 5;
 
@@ -217,7 +217,7 @@ bool CVehicleGta::DoTailLightEffect(int32_t lightId, CMatrix* matVehicle, int is
     return true;
 }
 
-void CVehicleGta::DoHeadLightBeam(int lightId, CMatrix* matrix, bool isRight)
+void CVehicle::DoHeadLightBeam(int lightId, CMatrix* matrix, bool isRight)
 {
     auto* modelInfo = CModelInfo::GetVehicleModelInfo(m_nModelIndex);
     CVector lightOffset = modelInfo->GetModelDummyPosition(static_cast<eVehicleDummy>(2 * lightId));
@@ -329,15 +329,15 @@ void CVehicleGta::DoHeadLightBeam(int lightId, CMatrix* matrix, bool isRight)
     RwRenderStateSet(rwRENDERSTATECULLMODE, RWRSTATE(rwCULLMODECULLBACK));
 }
 
-bool DoTailLightEffect_hooked(CVehicleGta* vehicle, int32_t lightId, CMatrix* matVehicle, int isRight, int forcedOff, uint32_t nLightFlags, int lightsOn) {
+bool DoTailLightEffect_hooked(CVehicle* vehicle, int32_t lightId, CMatrix* matVehicle, int isRight, int forcedOff, uint32_t nLightFlags, int lightsOn) {
     return vehicle->DoTailLightEffect(lightId, matVehicle, isRight, forcedOff, nLightFlags, lightsOn);
 }
 
-void DoHeadLightBeam_hooked(CVehicleGta* vehicle, int lightId, CMatrix* matrix, bool isRight) {
+void DoHeadLightBeam_hooked(CVehicle* vehicle, int lightId, CMatrix* matrix, bool isRight) {
     vehicle->DoHeadLightBeam(lightId, matrix, isRight);
 }
 
-void CVehicleGta::InjectHooks() {
+void CVehicle::InjectHooks() {
     // var
     CHook::Write(g_libGTASA + (VER_x32 ? 0x675F10 : 0x849EA8), &m_aSpecialColModel);
 
@@ -350,7 +350,7 @@ void CVehicleGta::InjectHooks() {
     CHook::Redirect("_ZN8CVehicle15DoHeadLightBeamEiR7CMatrixh", &DoHeadLightBeam_hooked);
 }
 
-bool CVehicleGta::IsRCVehicleModelID() {
+bool CVehicle::IsRCVehicleModelID() {
     switch (m_nModelIndex) {
         case 441:
         case 464:
@@ -366,7 +366,7 @@ bool CVehicleGta::IsRCVehicleModelID() {
     return false;
 }
 
-bool CVehicleGta::UsesSiren() {
+bool CVehicle::UsesSiren() {
     switch (m_nModelIndex) {
         case MODEL_FIRETRUK:
         case MODEL_AMBULAN:
@@ -379,7 +379,7 @@ bool CVehicleGta::UsesSiren() {
     }
 }
 
-bool CVehicleGta::IsLawEnforcementVehicle() const {
+bool CVehicle::IsLawEnforcementVehicle() const {
     switch (m_nModelIndex) {
         case MODEL_ENFORCER:
         case MODEL_PREDATOR:

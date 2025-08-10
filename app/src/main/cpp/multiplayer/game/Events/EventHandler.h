@@ -13,11 +13,11 @@
 class CTask;
 class CEvent;
 class CEventDamage;
-class CPedGta;
+class CPed;
 
 class CEventHandler {
 public:
-    CPedGta*                m_ped;
+    CPed*                m_ped;
     CEventHandlerHistory    m_history;
     CTask*                  m_physicalResponseTask;
     CTask*                  m_eventResponseTask;
@@ -28,8 +28,8 @@ public:
 public:
     static void InjectHooks();
 
-    explicit CEventHandler(CPedGta* ped);
-    CEventHandler* Constructor(CPedGta* ped);
+    explicit CEventHandler(CPed* ped);
+    CEventHandler* Constructor(CPed* ped);
     ~CEventHandler() = default;
 
     void Flush();
@@ -37,11 +37,11 @@ public:
 
     eEventType GetCurrentEventType();
     void HandleEvents();
-    bool IsKillTaskAppropriate(CPedGta* ped1, CPedGta* ped2, const CEvent& event);
+    bool IsKillTaskAppropriate(CPed* ped1, CPed* ped2, const CEvent& event);
     static bool IsTemporaryEvent(const CEvent& event);
     void RecordActiveEvent(const CEvent& event);
     void RecordPassiveEvent(const CEvent& event);
-    static void RegisterKill(const CPedGta* ped, const CEntity* entity, eWeaponType weaponType, bool a4);
+    static void RegisterKill(const CPed* ped, const CEntity* entity, eWeaponType weaponType, bool a4);
     void SetEventResponseTask(const CEvent& event);
 
     void ComputeAreaCodesResponse(CEvent* event, CTask* task1, CTask* task2);
@@ -108,7 +108,7 @@ public:
     void ComputeWaterCannonResponse(CEvent* event, CTask* task1, CTask* task2);
 
     void ComputeEventResponseTask(CEvent* event, CTask* task);
-    CTask* ComputeEventResponseTask(CPedGta* ped, CEvent* event);
+    CTask* ComputeEventResponseTask(CPed* ped, CEvent* event);
 
     auto& GetHistory() { return m_history; }
 };

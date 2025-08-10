@@ -35,8 +35,8 @@ public:
                                            m_animFlags, m_fBlendDelta, m_Time,
                                            (m_nFlags & 2) >> 1, (m_nFlags & 0x10) >> 4, (m_nFlags & 0x20) >> 5, (m_nFlags & 4) >> 2); // todo: flags
     }
-    bool ProcessPed(CPedGta* ped) override;
-    void OffsetPedPosition(CPedGta* ped);
+    bool ProcessPed(CPed* ped) override;
+    void OffsetPedPosition(CPed* ped);
 
 private:
     static void InjectHooks();

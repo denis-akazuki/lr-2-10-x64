@@ -21,7 +21,7 @@ void StreamAtVehicle::Tick() noexcept
     this->LocalStream::Tick();
 
 
-    CVehicle *pVehicle = CVehiclePool::GetAt(this->vehicleId);
+    CVehicleSamp *pVehicle = CVehiclePool::GetAt(this->vehicleId);
     if(!pVehicle) return;
 
     for(const auto& channel : this->GetChannels())
@@ -42,7 +42,7 @@ void StreamAtVehicle::OnChannelCreate(const Channel& channel) noexcept
     this->LocalStream::OnChannelCreate(channel);
 
 
-    CVehicle *pVehicle = CVehiclePool::GetAt(this->vehicleId);
+    CVehicleSamp *pVehicle = CVehiclePool::GetAt(this->vehicleId);
     if(!pVehicle) return;
 
     BASS_ChannelSet3DPosition(channel.GetHandle(),

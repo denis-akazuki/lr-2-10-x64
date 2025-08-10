@@ -117,7 +117,7 @@ RpAtomic* CVehicleModelInfo::SetEditableMaterialsCB(RpAtomic* atomic, void* data
 
 RpMaterial* CVehicleModelInfo::SetEditableMaterialsCB(RpMaterial* mat, void* data)
 {
-    auto pVeh = (CVehicle*)data;
+    auto pVeh = (CVehicleSamp*)data;
     int color = *(int*)&mat->color;
 
     RwTexture*& texture = mat->texture;

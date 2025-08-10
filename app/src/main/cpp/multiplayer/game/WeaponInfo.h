@@ -11,7 +11,7 @@
 #include "Enums/eWeaponSkill.h"
 #include "Enums/eStats.h"
 
-struct CPedGta;
+struct CPed;
 
 constexpr static auto FIRST_WEAPON_WITH_SKILLS = WEAPON_PISTOL;
 constexpr static auto LAST_WEAPON_WITH_SKILLS  = WEAPON_TEC9;
@@ -111,7 +111,7 @@ public:
     auto GetCrouchReloadAnimationID() const -> AnimationId;
     auto GetWeaponReloadTime() const -> uint32;
 
-    static auto GetWeaponInfo(CPedGta* ped);
+    static auto GetWeaponInfo(CPed* ped);
     auto GetAnimLoopStart(bool isSet2 = false) const { return isSet2 ? m_fAnimLoop2Start : m_fAnimLoopStart; }
     auto GetAnimLoopEnd(bool isSet2 = false) const { return isSet2 ? m_fAnimLoop2End : m_fAnimLoopEnd; }
     const auto& GetAimingOffset() const { return g_GunAimingOffsets[m_nAimOffsetIndex]; }

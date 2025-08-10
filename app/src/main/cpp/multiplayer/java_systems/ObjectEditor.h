@@ -30,7 +30,7 @@ public:
     static inline eEditType editType    = TYPE_NONE;
     static inline bool      bIsToggle   = false;
     static inline bool      bPlayerObj  = false; // hueta by samp
-    static inline CObject*  pObject     = nullptr;
+    static inline CObjectSamp*  pObject     = nullptr;
 
 public:
     static void
@@ -40,6 +40,6 @@ public:
 
     static void Start(int slot);
     static void Start(uint16 objectId, bool isPlayerObject);
-    static void Start(CObject *object);
+    static void Start(CObjectSamp *object);
 };
 

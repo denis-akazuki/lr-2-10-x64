@@ -19,6 +19,6 @@ bool CTaskSimple::IsSimple() {
 }
 
 // 0x43E320
-bool CTaskSimple::SetPedPosition(CPedGta* ped) {
+bool CTaskSimple::SetPedPosition(CPed* ped) {
     return false;
 }

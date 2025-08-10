@@ -6,7 +6,7 @@
 
 #include "common.h"
 #include "game/Entity/Ped/Ped.h"
-#include "game/Entity/Ped/PlayerPedGta.h"
+#include "game/Entity/Ped/PlayerPed.h"
 #include "PlayerPedData.h"
 
 enum ePlayerState : uint8 {
@@ -18,10 +18,10 @@ enum ePlayerState : uint8 {
 };
 
 struct CPlayerInfoGta {
-    CPlayerPedGta   *m_pPed;
+    CPlayerPed   *m_pPed;
     CPlayerPedData  PlayerPedData;
-    CVehicleGta     *pRemoteVehicle;
-    CVehicleGta     *pSpecCar;
+    CVehicle     *pRemoteVehicle;
+    CVehicle     *pSpecCar;
     int32           Score;
     int32           DisplayScore;
     int32           CollectablesPickedUp;
@@ -32,7 +32,7 @@ struct CPlayerInfoGta {
     bool            bTaxiTimerScore;
     bool            m_bTryingToExitCar;
     uint8           pad0[2];
-    CVehicleGta     *pLastTargetVehicle;
+    CVehicle     *pLastTargetVehicle;
     ePlayerState    PlayerState;
 
     bool bAfterRemoteVehicleExplosion;

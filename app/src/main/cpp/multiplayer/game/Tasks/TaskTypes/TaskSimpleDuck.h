@@ -43,13 +43,13 @@ public:
     ~CTaskSimpleDuck();
 
     static void DeleteDuckAnimCB(CAnimBlendAssociation* assoc, void* task);
-    static bool CanPedDuck(CPedGta* ped);
+    static bool CanPedDuck(CPed* ped);
 
     bool IsTaskInUseByOtherTasks() const;
-    void AbortBecauseOfOtherDuck(CPedGta* ped); // May've been returning bool originally, unsure.
-    void RestartTask(CPedGta* ped);
+    void AbortBecauseOfOtherDuck(CPed* ped); // May've been returning bool originally, unsure.
+    void RestartTask(CPed* ped);
     void ControlDuckMove(CVector2D moveSpeed = {});
-    void SetMoveAnim(CPedGta*);
+    void SetMoveAnim(CPed*);
     void ForceStopMove();
     bool StopFireGun() const;
     void SetDuckTimer(uint16 time);

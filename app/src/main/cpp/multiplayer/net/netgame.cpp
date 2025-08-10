@@ -1028,7 +1028,7 @@ void CNetGame::Packet_CustomRPC(Packet *p) {
 //            bs.Read(vehId);
 //
 //            if (GetVehiclePool()) {
-//                CVehicle *pVeh = GetVehiclePool()->GetAt(vehId);
+//                CVehicleSamp *pVeh = GetVehiclePool()->GetAt(vehId);
 //                if (pVeh) {
 //                    pVeh->ResetVehicleHandling();
 //                }
@@ -1158,7 +1158,7 @@ void CNetGame::Packet_CustomRPC(Packet *p) {
 //            uint16_t veh, extra_comp;
 //            uint8_t comp;
 //            bs.Read(veh);
-//            CVehicle *pVehicle = nullptr;
+//            CVehicleSamp *pVehicle = nullptr;
 //
 //            if (m_pVehiclePool) {
 //                pVehicle = m_pVehiclePool->GetAt(veh);

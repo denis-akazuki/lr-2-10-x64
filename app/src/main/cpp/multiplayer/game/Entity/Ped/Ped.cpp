@@ -9,7 +9,7 @@
 #include "game/Streaming.h"
 #include "chatwindow.h"
 
-CVector CPedGta::GetBonePosition(ePedBones bone, bool updateSkinBones) {
+CVector CPed::GetBonePosition(ePedBones bone, bool updateSkinBones) {
     if (!bCalledPreRender) {
         if (!updateSkinBones) {
             return m_matrix->TransformPoint(GetPedBoneStdPosition(bone));
@@ -23,18 +23,18 @@ CVector CPedGta::GetBonePosition(ePedBones bone, bool updateSkinBones) {
     return GetPosition();
 }
 
-void CPedGta::GetBonePosition(CVector* outVec, ePedBones bone, bool updateSkinBones) {
+void CPed::GetBonePosition(CVector* outVec, ePedBones bone, bool updateSkinBones) {
     *outVec = GetBonePosition(bone, updateSkinBones);
 }
 
-RwMatrix* CPedGta::GetBoneMatrix(ePedBones bone) const {
+RwMatrix* CPed::GetBoneMatrix(ePedBones bone) const {
     if (const auto h = GetAnimHierarchyFromClump(m_pRwClump)) {
         return RpHAnimHierarchyGetNodeMatrix(h, bone);
     }
     return nullptr;
 }
 
-void CPedGta::RemoveFromVehicleAndPutAt(const CVector& pos)
+void CPed::RemoveFromVehicleAndPutAt(const CVector& pos)
 {
     if(!pVehicle) return;
 
@@ -49,7 +49,7 @@ void CPedGta::RemoveFromVehicleAndPutAt(const CVector& pos)
 /*!
 * @brief Clear gun aiming flag
 */
-void CPedGta::ClearAimFlag() {
+void CPed::ClearAimFlag() {
     if (bIsAimingGun) {
         bIsAimingGun = false;
         bIsRestoringGun = true;
@@ -65,7 +65,7 @@ void CPedGta::ClearAimFlag() {
 /*!
 * @addr 0x5DED90
 */
-bool CPedGta::CanUseTorsoWhenLooking() const {
+bool CPed::CanUseTorsoWhenLooking() const {
     switch (m_nPedState) {
         case PEDSTATE_DRIVING:
         case PEDSTATE_DRAGGED_FROM_CAR:
@@ -83,7 +83,7 @@ bool CPedGta::CanUseTorsoWhenLooking() const {
 * @addr 0x5E1950
 * @brief Clear ped look, and start restoring it
 */
-void CPedGta::ClearLookFlag() {
+void CPed::ClearLookFlag() {
     if (!bIsLooking) {
         return;
     }
@@ -105,7 +105,7 @@ void CPedGta::ClearLookFlag() {
 }
 
 
-void CPedGta::GiveWeapon(int iWeaponID, int iAmmo)
+void CPed::GiveWeapon(int iWeaponID, int iAmmo)
 {
     int iModelID = 0;
     iModelID = CUtil::GameGetWeaponModelIDFromWeaponID(iWeaponID);
@@ -119,7 +119,7 @@ void CPedGta::GiveWeapon(int iWeaponID, int iAmmo)
     CHook::CallFunction<void>(g_libGTASA + (VER_x32 ? 0x004A521C + 1 : 0x59B86C), this, iWeaponID);	// CPed::SetCurrentWeapon(thisptr, weapid)
 }
 
-eWeaponSlot CPedGta::GiveWeapon(eWeaponType weaponType, uint32 ammo, bool likeUnused) {
+eWeaponSlot CPed::GiveWeapon(eWeaponType weaponType, uint32 ammo, bool likeUnused) {
     return CHook::CallFunction<eWeaponSlot>("_ZN4CPed10GiveWeaponE11eWeaponTypejb", weaponType, ammo, likeUnused);
     /*const auto givenWepInfo = CWeaponInfo::GetWeaponInfo(weaponType);
     auto& wepInSlot = GetWeaponInSlot(givenWepInfo->m_nSlot);
@@ -180,7 +180,7 @@ eWeaponSlot CPedGta::GiveWeapon(eWeaponType weaponType, uint32 ammo, bool likeUn
 /*!
 * @addr 0x5DEC00
 */
-void CPedGta::SetMoveState(eMoveState moveState) {
+void CPed::SetMoveState(eMoveState moveState) {
     m_nMoveState = moveState;
 }
 
@@ -188,7 +188,7 @@ void CPedGta::SetMoveState(eMoveState moveState) {
 * @addr  0x5E4500
 * @brief Set ped's state. If he's now !IsAlive() blip is deleted (if `bClearRadarBlipOnDeath` is set) and `ReleaseCoverPoint()` is called.
 */
-void CPedGta::SetPedState(ePedState pedState) {
+void CPed::SetPedState(ePedState pedState) {
     m_nPedState = pedState;
 //    if (!IsAlive()) {
 //        ReleaseCoverPoint();
@@ -198,7 +198,7 @@ void CPedGta::SetPedState(ePedState pedState) {
 //    }
 }
 
-bool CPedGta::IsPlayer() const
+bool CPed::IsPlayer() const
 {
 //    switch (m_nPedType) {
 //        case PED_TYPE_PLAYER1:
@@ -212,7 +212,7 @@ bool CPedGta::IsPlayer() const
 /*!
  * �������� ����� �� ������. ��� ��������!
  */
-void CPedGta::RemoveFromVehicle()
+void CPed::RemoveFromVehicle()
 {
     if(!IsInVehicle())
         return;
@@ -228,7 +228,7 @@ void CPedGta::RemoveFromVehicle()
     Teleport(pos, false);
 }
 
-void CPedGta::StopNonPartialAnims() {
+void CPed::StopNonPartialAnims() {
     for (auto assoc = RpAnimBlendClumpGetFirstAssociation(m_pRwClump); assoc; assoc = RpAnimBlendGetNextAssociation(assoc)) {
         if ((assoc->m_nFlags & ANIMATION_PARTIAL) == 0) {
             assoc->SetFlag(ANIMATION_STARTED, false);
@@ -236,7 +236,7 @@ void CPedGta::StopNonPartialAnims() {
     }
 }
 
-CPedGta::CPedGta(ePedType pedType) : CPhysical(), m_pedIK{CPedIK(this)} {
+CPed::CPed(ePedType pedType) : CPhysical(), m_pedIK{CPedIK(this)} {
     m_vecAnimMovingShiftLocal = CVector2D();
 
     m_fHealth = 100.0f;
@@ -361,7 +361,7 @@ CPedGta::CPedGta(ePedType pedType) : CPhysical(), m_pedIK{CPedIK(this)} {
 //    }
 }
 
-int CPedGta::GetSampSeatId() {
+int CPed::GetSampSeatId() {
     if(!pVehicle)
         return -1;
 
@@ -378,29 +378,29 @@ int CPedGta::GetSampSeatId() {
     return (-1);
 }
 
-bool CPedGta::IsEnteringCar() {
+bool CPed::IsEnteringCar() {
     if ( GetTaskManager().CTaskManager::FindActiveTaskByType(TASK_COMPLEX_ENTER_CAR_AS_DRIVER) )
         return true;
 
     return GetTaskManager().CTaskManager::FindActiveTaskByType(TASK_COMPLEX_ENTER_CAR_AS_PASSENGER) != nullptr;
 }
 
-bool CPedGta::IsExitingVehicle() {
+bool CPed::IsExitingVehicle() {
     if ( GetTaskManager().CTaskManager::FindActiveTaskByType(TASK_COMPLEX_LEAVE_CAR) )
         return true;
 
     return false;
 }
 
-CPedGta::~CPedGta() {
+CPed::~CPed() {
     CHook::CallFunction<void>(g_libGTASA + (VER_x32 ? 0x49F6A4 + 1 : 0x59541C), this);
 }
 
-eWeaponSkill CPedGta::GetWeaponSkill() {
+eWeaponSkill CPed::GetWeaponSkill() {
     return GetWeaponSkill(GetActiveWeapon().m_nType);
 }
 
-eWeaponSkill CPedGta::GetWeaponSkill(eWeaponType weaponType)
+eWeaponSkill CPed::GetWeaponSkill(eWeaponType weaponType)
 {
     if (!CWeaponInfo::TypeHasSkillStats(weaponType)) {
         return eWeaponSkill::STD;
@@ -427,7 +427,7 @@ eWeaponSkill CPedGta::GetWeaponSkill(eWeaponType weaponType)
     }
 }
 
-void CPedGta::GetTransformedBonePosition(RwV3d& inOutPos, ePedBones bone, bool updateSkinBones) { // todo: fix this too!!!
+void CPed::GetTransformedBonePosition(RwV3d& inOutPos, ePedBones bone, bool updateSkinBones) { // todo: fix this too!!!
     // Pretty much the same as GetBonePosition..
     if (updateSkinBones) {
         if (!bCalledPreRender) {
@@ -443,7 +443,7 @@ void CPedGta::GetTransformedBonePosition(RwV3d& inOutPos, ePedBones bone, bool u
     RwV3dTransformPoints(&inOutPos, &inOutPos, 1, GetBoneMatrix(bone));
 }
 
-bool CPedGta::DoGunFlash(int32 duration, bool isLeftHand) {
+bool CPed::DoGunFlash(int32 duration, bool isLeftHand) {
     if (!m_pGunflashObject || !m_pWeaponObject) {
         return false;
     }
@@ -464,19 +464,19 @@ bool CPedGta::DoGunFlash(int32 duration, bool isLeftHand) {
     return true;
 }
 
-void CPedGta::SetCurrentWeapon(int32 slot) {
+void CPed::SetCurrentWeapon(int32 slot) {
     CHook::CallFunction<void>("_ZN4CPed16SetCurrentWeaponEi", this, slot);
 }
 
-void CPedGta::SetCurrentWeapon(eWeaponType weaponType) {
+void CPed::SetCurrentWeapon(eWeaponType weaponType) {
     SetCurrentWeapon(GetWeaponSlot(weaponType));
 }
 
-int32 CPedGta::GetWeaponSlot(eWeaponType weaponType) {
+int32 CPed::GetWeaponSlot(eWeaponType weaponType) {
     return CWeaponInfo::GetWeaponInfo(weaponType)->m_nSlot;
 }
 
-void CPedGta::SetAmmo(eWeaponType weaponType, uint32 ammo) {
+void CPed::SetAmmo(eWeaponType weaponType, uint32 ammo) {
     const auto wepSlot = GetWeaponSlot(weaponType);
     if (wepSlot != -1) {
         auto& wepInSlot = GetWeaponInSlot(wepSlot);

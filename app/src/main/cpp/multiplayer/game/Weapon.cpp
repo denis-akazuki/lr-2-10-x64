@@ -10,7 +10,7 @@
 #include "Stats.h"
 #include "game.h"
 
-void CWeapon__Update(CWeapon* thiz, CPedGta* owner) {
+void CWeapon__Update(CWeapon* thiz, CPed* owner) {
     thiz->Update(owner);
 }
 
@@ -30,7 +30,7 @@ CWeapon::CWeapon(eWeaponType weaponType, uint32_t ammo) :
     Reload();
 }
 
-void CWeapon::Reload(CPedGta* owner) {
+void CWeapon::Reload(CPed* owner) {
     if (!m_nTotalAmmo)
         return;
 
@@ -38,7 +38,7 @@ void CWeapon::Reload(CPedGta* owner) {
     m_nAmmoInClip = std::min(ammo, m_nTotalAmmo);
 }
 
-CWeaponInfo& CWeapon::GetWeaponInfo(CPedGta* owner) const {
+CWeaponInfo& CWeapon::GetWeaponInfo(CPed* owner) const {
     return GetWeaponInfo(owner ? owner->GetWeaponSkill(GetType()) : eWeaponSkill::STD);
 }
 
@@ -50,7 +50,7 @@ void CWeapon::StopWeaponEffect() {
     CHook::CallFunction<void>("_ZN7CWeapon16StopWeaponEffectEv", this);
 }
 
-void CWeapon::Update(CPedGta* owner) {
+void CWeapon::Update(CPed* owner) {
     const auto wi = &GetWeaponInfo(owner);
     const auto ao = &wi->GetAimingOffset();
 
@@ -154,7 +154,7 @@ float CWeapon::TargetWeaponRangeMultiplier(CEntity* victim, CEntity* weaponOwner
             break;
         }
         case ENTITY_TYPE_PED: {
-            CPedGta* pedVictim = victim->AsPed();
+            CPed* pedVictim = victim->AsPed();
 
             if (pedVictim->pVehicle && !pedVictim->pVehicle->IsBike()) {
                 return 3.0f;
@@ -215,7 +215,7 @@ void CWeapon::DoBulletImpact(CEntity* firedBy, CEntity* victim, const CVector& s
     CHook::CallFunction<void>("_ZN7CWeapon14DoBulletImpactEP7CEntityS1_P7CVectorS3_P9CColPointi", this, firedBy, victim, &startPoint, &endPoint, &hitCP, incrementalHit);
 }
 
-bool CWeapon::FireSniper(CPedGta* shooter, CEntity* victim, CVector* target) {
+bool CWeapon::FireSniper(CPed* shooter, CEntity* victim, CVector* target) {
     return CHook::CallFunction<bool>("_ZN7CWeapon10FireSniperEP4CPedP7CEntityP7CVector", this, shooter, victim, target);
 }
 
@@ -223,7 +223,7 @@ bool CWeapon::FireAreaEffect(CEntity* firingEntity, const CVector& origin, CEnti
     return CHook::CallFunction<bool>("_ZN7CWeapon14FireAreaEffectEP7CEntityP7CVectorS1_S3_", this, firingEntity, &origin, targetEntity, target);
 }
 
-bool CWeapon::FireM16_1stPerson(CPedGta* owner) {
+bool CWeapon::FireM16_1stPerson(CPed* owner) {
     const auto cam = &CCamera::GetActiveCamera();
 
     switch (cam->m_nMode) {

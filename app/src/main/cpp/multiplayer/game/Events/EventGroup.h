@@ -13,13 +13,13 @@
 #include "Event.h"
 #include "../common.h"
 
-class CPedGta;
+class CPed;
 
 const int32 TOTAL_EVENTS_PER_EVENTGROUP = 16;
 
 class CEventGroup {
 public:
-    CPedGta*    m_pPed;
+    CPed*    m_pPed;
     int32       m_count;
     CEvent*     m_events[TOTAL_EVENTS_PER_EVENTGROUP];
 };
