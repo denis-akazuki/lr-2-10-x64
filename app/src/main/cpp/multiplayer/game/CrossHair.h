@@ -2,22 +2,18 @@
 // Created on 10.11.2023.
 //
 
-#ifndef RUSSIA_CROSSHAIR_H
-#define RUSSIA_CROSSHAIR_H
-
+#pragma once
 
 #include "RW/RenderWare.h"
 #include "sprite2d.h"
+#include "Camera.h"
 
 class CCrossHair {
 public:
     static inline CSprite2d* pCircleTex;
-    static inline bool m_UsedCrossHair{};
 
 public:
     static void Init();
     static void Render();
+    static bool IsCircleCrosshairMode(eCamMode mode);
 };
-
-
-#endif //RUSSIA_CROSSHAIR_H

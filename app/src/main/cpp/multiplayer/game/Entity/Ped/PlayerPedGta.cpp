@@ -31,6 +31,29 @@ void CPlayerPedGta::ReApplyMoveAnims() {
     }
 }
 
+float CPlayerPedGta::GetWeaponRadiusOnScreen() {
+    CWeapon& wep = GetActiveWeapon();
+    CWeaponInfo& wepInfo = wep.GetWeaponInfo(this);
+
+    if (wep.IsTypeMelee())
+        return 0.0f;
+
+    const float accuracyProg = 0.5f / wepInfo.m_fAccuracy;
+    switch (wep.m_nType) {
+        case eWeaponType::WEAPON_SHOTGUN:
+        case eWeaponType::WEAPON_SPAS12_SHOTGUN:
+        case eWeaponType::WEAPON_SAWNOFF_SHOTGUN:
+            return std::max(0.2f, accuracyProg);
+
+        default: {
+            const float rangeProg = std::min(1.0f, 15.0f / wepInfo.m_fWeaponRange);
+            const float radius = (m_pPlayerData->m_fAttackButtonCounter * 0.5f + 1.0f) * rangeProg * accuracyProg;
+            if (bIsDucking)
+                return std::max(0.2f, radius / 2.0f);
+            return std::max(0.2f, radius);
+        }
+    }
+}
 
 // --- hooks
 

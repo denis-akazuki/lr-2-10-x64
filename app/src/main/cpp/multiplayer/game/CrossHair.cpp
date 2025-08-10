@@ -8,7 +8,8 @@
 #include "../main.h"
 #include "../util/patch.h"
 #include "../net/netgame.h"
-#include "Camera.h"
+#include "game.h"
+#include "Entity/Ped/PlayerPedGta.h"
 
 void CCrossHair::Init()
 {
@@ -17,21 +18,25 @@ void CCrossHair::Init()
     pCircleTex->m_pTexture = CUtil::LoadTextureFromDB("txd", "siteM16");
 }
 
+bool CCrossHair::IsCircleCrosshairMode(eCamMode mode)
+{
+    return mode == MODE_AIMWEAPON ||
+           mode == MODE_DW_CAM_MAN ||
+           (mode & 0xFFFD) == MODE_AIMWEAPON_ATTACHED;
+}
+
 void CCrossHair::Render()
 {
-    if(!CPlayerPool::GetLocalPlayer())
+    const auto pPed = GamePool_FindPlayerPed();
+    if (!pPed)
         return;
 
-    auto pPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
-
-    int iCamState = GameGetLocalPlayerCameraMode();
-
-    int v1 = iCamState & 0xFFFD;
-    if(iCamState == 53 || iCamState == 39 || v1 == 40)
+    const auto camMode = static_cast<eCamMode>(GameGetLocalPlayerCameraMode());
+    if (IsCircleCrosshairMode(camMode))
     {
         static float fCHairScreenMultX = (RsGlobal->maximumWidth - (RsGlobal->maximumHeight / 9 * 16)) / 2 + ((RsGlobal->maximumHeight / 9 * 16) * 0.524);
         static float fFixedOffset = RsGlobal->maximumWidth / (RsGlobal->maximumWidth - (RsGlobal->maximumHeight / 9 * 16)) * 2.0;
-        auto gunRadius = CHook::CallFunction<float>(g_libGTASA + (VER_x32 ? 0x004C69E8 + 1 : 0x5C4528), pPed->m_pPed);
+        static auto gunRadius = reinterpret_cast<CPlayerPedGta*>(pPed)->GetWeaponRadiusOnScreen();
         static float fCHairScreenMultY = (RsGlobal->maximumHeight / 9 * 16) / 10 * 6 * 0.4 + fFixedOffset;
 
         RwRenderStateSet(rwRENDERSTATETEXTUREFILTER, RWRSTATE(rwFILTERLINEAR));
@@ -49,6 +54,5 @@ void CCrossHair::Render()
         pCircleTex->Draw(CRect{fPosX1 + f1, fPosY1, fPosX2, fPosY2}, CRGBA(255, 255, 255, 255));
         pCircleTex->Draw(CRect{fPosX1, fPosY1 + f1, fPosX2, fPosY2}, CRGBA(255, 255, 255, 255));
         pCircleTex->Draw(CRect{fPosX1 + f1, fPosY1 + f1, fPosX2, fPosY2}, CRGBA(255, 255, 255, 255));
-        return;
     }
 }

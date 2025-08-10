@@ -30,11 +30,8 @@ public:
     bool Load_Reversed();
     bool Save_Reversed();
 
-//    void ProcessControl() override;
-//    bool Load() override;
-//    bool Save() override;
+    float GetWeaponRadiusOnScreen();
 
-  //  CPad* GetPadFromPlayer() const;
     bool CanPlayerStartMission();
     bool IsHidden();
     void ReApplyMoveAnims();

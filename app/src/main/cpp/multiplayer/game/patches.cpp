@@ -99,7 +99,6 @@ void ApplyPatches_level0()
 	CHook::RET("_ZN11CFileLoader10LoadPickupEPKc"); // CFileLoader::LoadPickup
 
     // entryexit
-    CHook::RET("_ZN17CEntryExitManager4InitEv");
     CHook::RET("_ZN17CEntryExitManager22PostEntryExitsCreationEv");
 }
 

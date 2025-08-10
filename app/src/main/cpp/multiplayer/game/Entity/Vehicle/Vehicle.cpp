@@ -8,6 +8,7 @@
 #include "game/Models/ModelInfo.h"
 #include "game/Coronas.h"
 #include "Camera.h"
+#include "net/netgame.h"
 
 void CVehicleGta::RenderDriverAndPassengers() {
     if(IsRCVehicleModelID())
@@ -154,11 +155,11 @@ void CVehicle__DoVehicleLights_hook(CVehicleGta* thiz, CMatrix *matVehicle, uint
     thiz->m_nVehicleFlags.bEngineOn = old;
 }
 
-bool CVehicle__DoTailLightEffect(CVehicleGta* thisVehicle, int32_t lightId, CMatrix* matVehicle, int isRight, int forcedOff, uint32_t nLightFlags, int lightsOn) {
+bool CVehicleGta::DoTailLightEffect(int32_t lightId, CMatrix* matVehicle, int isRight, int forcedOff, uint32_t nLightFlags, int lightsOn) {
 
     constexpr int REVERSE_LIGHT_OFFSET = 5;
 
-    auto pModelInfoStart = CModelInfo::GetVehicleModelInfo(thisVehicle->m_nModelIndex);
+    auto pModelInfoStart = CModelInfo::GetVehicleModelInfo(m_nModelIndex);
 
     CVector* m_avDummyPos = pModelInfoStart->m_pVehicleStruct->m_avDummyPos;
 
@@ -167,11 +168,11 @@ bool CVehicle__DoTailLightEffect(CVehicleGta* thisVehicle, int32_t lightId, CMat
     if (!isRight)
         v.x = -v.x;
 
-    uint8_t alpha = (thisVehicle->m_fBreakPedal > 0) ? 200 : 96;
-    if (thisVehicle->GetLightsStatus() || (thisVehicle->m_fBreakPedal > 0 && thisVehicle->pDriver)) {
+    uint8_t alpha = (m_fBreakPedal > 0) ? 200 : 96;
+    if (GetLightsStatus() || (m_fBreakPedal > 0 && pDriver)) {
         CCoronas::RegisterCorona(
-                (uintptr) &thisVehicle->m_placement.m_vPosn.y + 2 * lightId + isRight,
-                thisVehicle,
+                (uintptr) &m_placement.m_vPosn.y + 2 * lightId + isRight,
+                this,
                 100, 0, 0, alpha,
                 &v,
                 0.65f,
@@ -191,10 +192,10 @@ bool CVehicle__DoTailLightEffect(CVehicleGta* thisVehicle, int32_t lightId, CMat
         );
     }
 
-    if(thisVehicle->m_nCurrentGear == 0 && thisVehicle->m_pHandlingData->m_transmissionData.m_fCurrentSpeed < -0.01) {
+    if (m_nCurrentGear == 0 && m_pHandlingData->m_transmissionData.m_fCurrentSpeed < -0.01) {
         CCoronas::RegisterCorona(
-                (uintptr) &thisVehicle->m_placement.m_vPosn.y + 2 * lightId + isRight + REVERSE_LIGHT_OFFSET,
-                thisVehicle,
+                (uintptr) &m_placement.m_vPosn.y + 2 * lightId + isRight + REVERSE_LIGHT_OFFSET,
+                this,
                 255, 255, 255, 200,
                 &v,
                 0.70f,
@@ -216,12 +217,13 @@ bool CVehicle__DoTailLightEffect(CVehicleGta* thisVehicle, int32_t lightId, CMat
     return true;
 }
 
-void DoHeadLightBeam(CVehicleGta* vehicle, int lightId, CMatrix* matrix, bool isRight)
+void CVehicleGta::DoHeadLightBeam(int lightId, CMatrix* matrix, bool isRight)
 {
-    auto* modelInfo = CModelInfo::GetVehicleModelInfo(vehicle->m_nModelIndex);
+    auto* modelInfo = CModelInfo::GetVehicleModelInfo(m_nModelIndex);
     CVector lightOffset = modelInfo->GetModelDummyPosition(static_cast<eVehicleDummy>(2 * lightId));
 
-    if (lightId == 1 && lightOffset.IsZero())
+    auto* pVehicle = CVehiclePool::FindVehicle(this);
+    if (!pVehicle || lightId == 1 && lightOffset.IsZero())
         return;
 
     if (!isRight) {
@@ -262,8 +264,10 @@ void DoHeadLightBeam(CVehicleGta* vehicle, int lightId, CMatrix* matrix, bool is
 
     RxObjSpace3DVertex vertices[8];
 
-    RwRGBA whiteColor = {255, 255, 255, alpha};
-    RwRGBA transparentColor = {255, 255, 255, 0};
+    uint8_t red, green, blue;
+    pVehicle->ProcessHeadlightsColor(red, green, blue);
+    RwRGBA whiteColor = {blue, green, red, alpha};
+    RwRGBA transparentColor = {blue, green, red, 0};
 
     CVector baseLeft = worldPos - beamRight * 0.05f;
     CVector baseRight = worldPos + beamRight * 0.05f;
@@ -325,17 +329,25 @@ void DoHeadLightBeam(CVehicleGta* vehicle, int lightId, CMatrix* matrix, bool is
     RwRenderStateSet(rwRENDERSTATECULLMODE, RWRSTATE(rwCULLMODECULLBACK));
 }
 
+bool DoTailLightEffect_hooked(CVehicleGta* vehicle, int32_t lightId, CMatrix* matVehicle, int isRight, int forcedOff, uint32_t nLightFlags, int lightsOn) {
+    return vehicle->DoTailLightEffect(lightId, matVehicle, isRight, forcedOff, nLightFlags, lightsOn);
+}
+
+void DoHeadLightBeam_hooked(CVehicleGta* vehicle, int lightId, CMatrix* matrix, bool isRight) {
+    vehicle->DoHeadLightBeam(lightId, matrix, isRight);
+}
+
 void CVehicleGta::InjectHooks() {
     // var
-    CHook::Write(g_libGTASA + (VER_x32 ? 0x675F10 : 0x849EA8), &CVehicleGta::m_aSpecialColModel);
+    CHook::Write(g_libGTASA + (VER_x32 ? 0x675F10 : 0x849EA8), &m_aSpecialColModel);
 
     CHook::Redirect("_ZN8CVehicle25RenderDriverAndPassengersEv", &RenderDriverAndPassengers_hook);
     CHook::Redirect("_ZN8CVehicle9SetDriverEP4CPed", &SetDriver_hook);
 
-    CHook::Redirect("_ZN8CVehicle17DoTailLightEffectEiR7CMatrixhhjh", &CVehicle__DoTailLightEffect);
+    CHook::Redirect("_ZN8CVehicle17DoTailLightEffectEiR7CMatrixhhjh", &DoTailLightEffect_hooked);
     CHook::InlineHook("_ZN8CVehicle15DoVehicleLightsER7CMatrixj", &CVehicle__DoVehicleLights_hook, &CVehicle__DoVehicleLights);
     CHook::Redirect("_ZN8CVehicle22GetVehicleLightsStatusEv", &CVehicle__GetVehicleLightsStatus_hook);
-    CHook::Redirect("_ZN8CVehicle15DoHeadLightBeamEiR7CMatrixh", &DoHeadLightBeam);
+    CHook::Redirect("_ZN8CVehicle15DoHeadLightBeamEiR7CMatrixh", &DoHeadLightBeam_hooked);
 }
 
 bool CVehicleGta::IsRCVehicleModelID() {

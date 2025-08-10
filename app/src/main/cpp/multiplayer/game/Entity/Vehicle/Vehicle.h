@@ -351,6 +351,9 @@ public:
 
     bool UsesSiren();
     bool IsLawEnforcementVehicle() const;
+
+    bool DoTailLightEffect(int32_t lightId, CMatrix* matVehicle, int isRight, int forcedOff, uint32_t nLightFlags, int lightsOn);
+    void DoHeadLightBeam(int lightId, CMatrix* matrix, bool isRight);
 };
 //#pragma pack(pop)
 

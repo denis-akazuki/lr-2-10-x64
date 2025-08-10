@@ -549,10 +549,15 @@ int CTextureDatabaseRuntime__GetEntry_hook(TextureDatabaseRuntime *a1, const cha
 #include "Audio/hardware/AEAudioHardware.h"
 #include "Mirrors.h"
 #include "Mobile/MobileSettings/MobileSettings.h"
+#include "EntryExitManager.h"
+#include "Occlusion.h"
 
 void InjectHooks()
 {
 	Log("InjectHooks");
+
+    COcclusion::InjectHooks();
+    CEntryExitManager::InjectHooks();
     CTaskSimpleUseGun::InjectHooks();
     CIplStore::InjectHooks();
     CQuadTreeNode::InjectHooks();
