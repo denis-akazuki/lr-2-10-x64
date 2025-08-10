@@ -65,22 +65,21 @@ CObjectSamp* CSkyBox::CreateObjectScaled(int iModel, float fScale)
     CVector vecScale(fScale);
 
     auto *object = new CObjectSamp(iModel, 0.0f, 0.0f, 0.0f, vecRot, 0.0f);
+    CEntity* entity = object->m_pEntity;
 
-    object->m_pEntity->m_bUsesCollision = false;
-
-    object->m_pEntity->Remove();
+    entity->m_bUsesCollision = false;
+    entity->Remove();
 
     RwMatrix matrix;
-    object->m_pEntity->GetMatrix(&matrix);
-
+    entity->GetMatrix(&matrix);
     RwMatrixScale(&matrix, &vecScale);
 
-    object->m_pEntity->SetMatrix((CMatrix&)matrix);
-    object->m_pEntity->UpdateRW();
-    object->m_pEntity->UpdateRwFrame();
+    entity->SetMatrix(reinterpret_cast<CMatrix&>(matrix));
+    entity->UpdateRW();
+    entity->UpdateRwFrame();
 
-    object->m_pEntity->Add();
-    object->m_pEntity->m_bUsesCollision = false;
+    entity->Add();
+    entity->m_bUsesCollision = false;
 
     return object;
 }
@@ -130,37 +129,32 @@ void CSkyBox::ReTexture()
 
 RwObject* CSkyBox::RwFrameForAllObjectsCallback(RwObject* object, void* data)
 {
-    if (*(uint8_t*)object != 1)
+    if (!object || object->type != rpATOMIC || !m_pTex)
         return object;
 
-    RpAtomic* pAtomic = (RpAtomic*)object;
-    if(!pAtomic)
+    auto* atomic = reinterpret_cast<RpAtomic*>(object);
+    if (!atomic->geometry)
         return object;
 
-    RpGeometry* pGeom = pAtomic->geometry;
-    if (!pGeom)
-        return object;
+    auto& geometry = *atomic->geometry;
+    auto materials = std::span(geometry.matList.materials,
+                               std::min<size_t>(geometry.matList.numMaterials, 16));
 
-    int numMats = pGeom->matList.numMaterials;
-    if (numMats > 16)
-        numMats = 16;
+    const auto& skyColor = CTimeCycle::m_CurrentColours;
+    const RwRGBA rgbaColor = {
+            static_cast<RwUInt8>(skyColor.m_nSkyBottomRed),
+            static_cast<RwUInt8>(skyColor.m_nSkyBottomGreen),
+            static_cast<RwUInt8>(skyColor.m_nSkyBottomBlue),
+            150
+    };
 
-    for (int i = 0; i < numMats; i++)
+    for (auto* material : materials)
     {
-        RpMaterial* pMaterial = pGeom->matList.materials[i];
-        if (!pMaterial)
+        if (!material)
             continue;
 
-        if (m_pTex) {
-            pMaterial->texture = m_pTex;
-            pMaterial->color = RwRGBA{
-                    static_cast<RwUInt8>(CTimeCycle::m_CurrentColours.m_nSkyBottomRed),
-                    static_cast<RwUInt8>(CTimeCycle::m_CurrentColours.m_nSkyBottomGreen),
-                    static_cast<RwUInt8>(CTimeCycle::m_CurrentColours.m_nSkyBottomBlue),
-                    150
-            };
-        }
-
+        material->texture = m_pTex;
+        material->color = rgbaColor;
     }
 
     return object;
