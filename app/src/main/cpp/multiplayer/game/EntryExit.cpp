@@ -9,3 +9,7 @@ void CEntryExit::GetPositionRelativeToOutsideWorld(CVector& outPos) {
         outPos += GetPosition() - enex->m_vecExitPos;
     }
 }
+
+CVector CEntryExit::GetPosition() const {
+    return CVector{ m_recEntrance.GetCenter(), m_fEntranceZ };
+}
