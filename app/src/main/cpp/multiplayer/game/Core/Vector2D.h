@@ -27,6 +27,8 @@ public:
         return std::atan2(-x, y);
     }
 
+    void Normalise(float* outMag = nullptr);
+
     // Returns length of vector
     [[nodiscard]] inline float Magnitude() const {
         return std::sqrt(x * x + y * y);

@@ -138,6 +138,8 @@ VALIDATE_SIZE(tBlipHandle, 0x4);
 
 using tBlipHandle = uint32; // TODO: Use struct above
 
+class CEntryExit;
+
 struct tRadarTrace {
     eBlipColour  m_nColour;
     uint32       m_nEntityHandle;
@@ -145,7 +147,7 @@ struct tRadarTrace {
     uint16       m_nCounter;
     float        m_fSphereRadius;
     uint16       m_nBlipSize;
-    uintptr_t*   m_pEntryExit;
+    CEntryExit*  m_pEntryExit;
     eRadarSprite m_nBlipSprite;
 
     bool         m_bBright : 1;              // It makes use of bright colors. Always set.
@@ -182,11 +184,10 @@ public:
     static void DrawRadarGangOverlay(bool inMenu);
     static uint32 GetRadarTraceColour(uint32 color, bool bright, bool friendly);
     static void DrawLegend(int32 x, int32 y, eRadarSprite blipType);
-    static float LimitRadarPoint(CVector2D& point);
-    static void LimitToMap(float* x, float* y);
+    static float LimitRadarPoint(CVector2D* point);
     static uint8 CalculateBlipAlpha(float distance);
-    static void TransformRadarPointToScreenSpace(CVector2D& out, const CVector2D& in);
-    static void TransformRealWorldPointToRadarSpace(CVector2D& out, const CVector2D& in);
+    static void TransformRadarPointToScreenSpace(CVector2D* out, const CVector2D* in);
+    static void TransformRealWorldPointToRadarSpace(CVector2D* out, const CVector2D* in);
 
     static int32 GetActualBlipArrayIndex(tBlipHandle blip);
     static void DrawCoordBlip(int32 blipIndex, bool isSprite, uint8 nWidgetAlpha, float circleSize);

@@ -9,6 +9,7 @@
 #include "Widgets/TouchInterface.h"
 #include "game.h"
 #include "Mobile/MobileMenu/MobileMenu.h"
+#include "EntryExit.h"
 
 tBlipHandle CRadar::SetCoordBlip(eBlipType type, CVector posn, eBlipColour color, eBlipDisplay blipDisplay, const char* scriptName) {
     if (pNetGame && !strncmp(scriptName, "CODEWAY", 7)) {
@@ -105,33 +106,52 @@ void CRadar::ClearActualBlip(tRadarTrace& trace) {
     trace.m_nBlipType = BLIP_NONE;
 }
 
-/*!
- * @brief Transforms a real coordinate to radar coordinate.
- */
-void CRadar::TransformRealWorldPointToRadarSpace(CVector2D& out, const CVector2D& in) {
-    CHook::CallFunction<void>(g_libGTASA + (VER_x32 ? 0x0043F6E4 + 1 : 0x524AD0), out, in);
+void CRadar::TransformRealWorldPointToRadarSpace(CVector2D* out, const CVector2D* in)
+{
+    float x = (in->x - CRadar::vec2DRadarOrigin.x) / CRadar::m_radarRange;
+    float y = (in->y - CRadar::vec2DRadarOrigin.y) / CRadar::m_radarRange;
+
+    float sinVal = getCachedSin();
+    float cosVal = getCachedCos();
+
+    out->x =  cosVal * x + sinVal * y;
+    out->y = -sinVal * x + cosVal * y;
 }
 
-/*!
- * @brief Transforms a radar point to screen.
- * @brief Unhooked by default for now. Causes `DrawRadarSection` to crash.
- */
-void CRadar::TransformRadarPointToScreenSpace(CVector2D& out, const CVector2D& in) {
-    CHook::CallFunction<void>(g_libGTASA + (VER_x32 ? 0x0043F62C + 1 : 0x524A30), out, in);
+void CRadar::TransformRadarPointToScreenSpace(CVector2D* out, const CVector2D* in)
+{
+    auto gMobileMenu = CMobileMenu::GetMobileMenu();
+    if (CMobileMenu::GetMobileMenu()->DisplayingMap) {
+        out->x = gMobileMenu->MAP_OFFSET_X + in->x * gMobileMenu->NEW_MAP_SCALE;
+        out->y = gMobileMenu->MAP_OFFSET_Y - in->y * gMobileMenu->NEW_MAP_SCALE;
+        return;
+    }
+
+    const auto* widget = CTouchInterface::m_pWidgets[WidgetIDs::WIDGET_RADAR];
+    if (!widget)
+        return;
+
+    float width = fabsf(widget->m_RectScreen.right - widget->m_RectScreen.left);
+    float centerX = (widget->m_RectScreen.left + widget->m_RectScreen.right) * 0.5f;
+    out->x = centerX + in->x * width * 0.5f;
+
+    float height = fabsf(widget->m_RectScreen.bottom - widget->m_RectScreen.top);
+    float centerY = (widget->m_RectScreen.top + widget->m_RectScreen.bottom) * 0.5f;
+    out->y = centerY - in->y * height * 0.5f;
 }
 
-/*!
- * @brief Limits a 2D vector to the radar. (which is a unit circle)
- * @brief This function does not effect the vector if the map is being drawn.
- * @param point The vector to be limited.
- * @returns Magnitude of the vector before limiting.
- */
-float CRadar::LimitRadarPoint(CVector2D &point) {
-    return CHook::CallFunction<float>(g_libGTASA + (VER_x32 ? 0x0043F760 + 1 : 0x524B2C), point);
-}
+float CRadar::LimitRadarPoint(CVector2D* point) {
+    const auto mobileMenu = CMobileMenu::GetMobileMenu();
+    const auto mag = point->Magnitude();
 
-void CRadar::LimitToMap(float* x, float* y) {
-    CHook::CallFunction<void>(g_libGTASA + (VER_x32 ? 0x004424E4 + 1 : 0x5277EC), x, y);
+    if (mobileMenu->DisplayingMap)
+        return mag;
+
+    if (mag > 1.0f) {
+        point->Normalise();
+    }
+
+    return mag;
 }
 
 bool CRadar::DisplayThisBlip(eRadarSprite spriteId, int8 priority) {
@@ -185,7 +205,7 @@ void CRadar::DrawRadarSprite(eRadarSprite spriteId, float x, float y, uint8 alph
 CVector tRadarTrace::GetWorldPos() const {
     CVector pos = { m_vPosition };
     if (m_pEntryExit) {
-        CHook::CallFunction<void>("_ZN10CEntryExit33GetPositionRelativeToOutsideWorldER7CVector", m_pEntryExit, &pos);
+        m_pEntryExit->GetPositionRelativeToOutsideWorld(pos);
     }
     return pos;
 }
@@ -193,7 +213,7 @@ CVector tRadarTrace::GetWorldPos() const {
 std::pair<CVector2D, CVector2D> tRadarTrace::GetRadarAndScreenPos(float* radarPointDist) const {
     const auto world = GetWorldPos();
     auto radar = CRadar::TransformRealWorldPointToRadarSpace(world);
-    const auto dist = CRadar::LimitRadarPoint(radar);
+    const auto dist = CRadar::LimitRadarPoint(&radar);
     if (radarPointDist) {
         *radarPointDist = dist;
     }

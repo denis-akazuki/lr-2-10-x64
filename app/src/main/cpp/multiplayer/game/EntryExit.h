@@ -76,5 +76,12 @@ public:
 
 public:
     static void InjectHooks();
+
+    void GetPositionRelativeToOutsideWorld(CVector& outPos);
+
+    auto GetLinkedOrThis() { return m_pLink ? m_pLink : this; }
+    auto GetLinkedOrThis() const { return m_pLink ? m_pLink : this; }
+
+    [[nodiscard]] CVector GetPosition() const;
 };
 VALIDATE_SIZE(CEntryExit, (VER_x32 ? 0x3C : 0x40));
