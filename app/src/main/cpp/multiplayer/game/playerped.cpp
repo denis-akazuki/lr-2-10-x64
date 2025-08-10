@@ -17,6 +17,7 @@
 #include "CarEnterExit.h"
 #include "Timer.h"
 #include "WeaponInfo.h"
+#include "CrossHair.h"
 
 CPedSamp* g_pCurrentFiredPed;
 
@@ -722,75 +723,67 @@ void CPedSamp::FlushAttach()
 
 void CPedSamp::ProcessAttach()
 {
+    const bool bIsAdded = m_pPed->IsAdded();
     bool needRender = true;
 
-    if(m_pPed->IsInVehicle() && m_pPed->pVehicle->IsRCVehicleModelID())
-        needRender = false;
+    if (bIsAdded) {
+        m_pPed->UpdateRpHAnim();
+        ProcessHeadMatrix();
+    }
 
-	m_pPed->UpdateRpHAnim();
+    bool firstPersonEnabled = false;
+    if (GamePool_FindPlayerPed() == m_pPed) {
+        if (CCrossHair::m_UsedCrossHair)
+            needRender = false;
+    }
+    if (CFirstPersonCamera::IsEnabled()) {
+        firstPersonEnabled = true;
+    }
 
-	if (m_pPed->IsAdded())
-	{
-		ProcessHeadMatrix();
-	}
-	for (auto iter : m_aAttachedObject)
-	{
+    RpHAnimHierarchy* hierarchy = bIsAdded ? GetAnimHierarchyFromSkinClump(m_pPed->m_pRwClump) : nullptr;
+
+    for (const auto& iter : m_aAttachedObject) {
         auto attach = iter.second;
 
-		CObject* pObject = attach.pObject;
-		if (m_pPed->IsAdded())
-		{
-			auto hierarchy = GetAnimHierarchyFromSkinClump(m_pPed->m_pRwClump);
+        const auto pObject = attach.pObject;
+        if (bIsAdded && hierarchy && needRender &&
+            (firstPersonEnabled && attach.dwBone != BONE_HEAD || !firstPersonEnabled))
+        {
+            int iID = RpHAnimIDGetIndex(hierarchy, attach.dwBone);
+            if (iID == -1) continue;
 
-			int iID;
-			if (hierarchy)
-			{
-
-				iID = RpHAnimIDGetIndex(hierarchy, attach.dwBone);
-			}
-			else
-			{
-				continue;
-			}
-			if (iID == -1)
-			{
-				continue;
-			}
             pObject->m_pEntity->Remove();
 
-            if(!needRender)
-                continue;
+            RwMatrix& boneMatrix = hierarchy->pMatrixArray[iID];
+            CMatrix matrix;
+            memcpy(&matrix, &boneMatrix, sizeof(RwMatrix));
 
-			RwMatrix outMat;
-
-			memcpy(&outMat, &hierarchy->pMatrixArray[iID], sizeof(RwMatrix));
-
-            CMatrix* matrix = reinterpret_cast<CMatrix*>(&outMat);
-
-			outMat.pos = matrix->TransformPoint(attach.vecOffset);
-            matrix->RotateFromDegrees(attach.vecRotation);
-            matrix->Scale(attach.vecScale);
+            matrix.m_pos = matrix.TransformPoint(attach.vecOffset);
+            matrix.RotateFromDegrees(attach.vecRotation);
+            matrix.Scale(attach.vecScale);
 
             constexpr float boundaryLimit = 10000.0f;
-            if (std::abs(outMat.pos.x) >= boundaryLimit ||
-                std::abs(outMat.pos.y) >= boundaryLimit ||
-                std::abs(outMat.pos.z) >= boundaryLimit)
+            if (std::abs(matrix.m_pos.x) >= boundaryLimit ||
+                std::abs(matrix.m_pos.y) >= boundaryLimit ||
+                std::abs(matrix.m_pos.z) >= boundaryLimit)
             {
                 continue;
             }
 
-			pObject->m_pEntity->SetMatrix((CMatrix&)outMat); // copy to CMatrix
+            auto UpdateObject = [&matrix](CObject* obj) {
+                obj->m_pEntity->SetMatrix((CMatrix&)matrix);
+                obj->m_pEntity->UpdateRW();
+                obj->m_pEntity->UpdateRwFrame();
+                obj->m_pEntity->Add();
+            };
 
-			pObject->m_pEntity->UpdateRW();
-			pObject->m_pEntity->UpdateRwFrame();
-
-            pObject->m_pEntity->Add();
-		}
-		else
-		{
-			pObject->m_pEntity->Teleport(CVector(), false);
-		}
-	}
+            UpdateObject(pObject);
+        }
+        else
+        {
+            pObject->m_pEntity->Teleport(CVector(), false);
+        }
+    }
 }
 
 void CPedSamp::ProcessHeadMatrix()

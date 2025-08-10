@@ -16,6 +16,8 @@ void CCrossHair::Init()
     Log("CCrossHair::Init");
     pCircleTex = new CSprite2d();
     pCircleTex->m_pTexture = CUtil::LoadTextureFromDB("txd", "siteM16");
+    pSniperTex = new CSprite2d();
+    pSniperTex->m_pTexture = CUtil::LoadTextureFromDB("txd", "sniperCross");
 }
 
 bool CCrossHair::IsCircleCrosshairMode(eCamMode mode)
@@ -23,6 +25,11 @@ bool CCrossHair::IsCircleCrosshairMode(eCamMode mode)
     return mode == MODE_AIMWEAPON ||
            mode == MODE_DW_CAM_MAN ||
            (mode & 0xFFFD) == MODE_AIMWEAPON_ATTACHED;
+}
+
+bool CCrossHair::IsSniperCrosshairMode(eCamMode mode)
+{
+    return mode == MODE_SNIPER || mode == MODE_ROCKETLAUNCHER_HS;
 }
 
 void CCrossHair::Render()
@@ -54,5 +61,15 @@ void CCrossHair::Render()
         pCircleTex->Draw(CRect{fPosX1 + f1, fPosY1, fPosX2, fPosY2}, CRGBA(255, 255, 255, 255));
         pCircleTex->Draw(CRect{fPosX1, fPosY1 + f1, fPosX2, fPosY2}, CRGBA(255, 255, 255, 255));
         pCircleTex->Draw(CRect{fPosX1 + f1, fPosY1 + f1, fPosX2, fPosY2}, CRGBA(255, 255, 255, 255));
+        m_UsedCrossHair = false;
+        return;
     }
+    else if (IsSniperCrosshairMode(camMode))
+    {
+        CRGBA white {255, 255, 255, 255};
+        pSniperTex->Draw(0.0f, 0.0f, RsGlobal->maximumWidth, RsGlobal->maximumHeight, &white);
+        m_UsedCrossHair = true;
+        return;
+    }
+    m_UsedCrossHair = false;
 }

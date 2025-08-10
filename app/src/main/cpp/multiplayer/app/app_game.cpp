@@ -28,7 +28,6 @@
 #include "Mobile/MobileSettings/MobileSettings.h"
 #include "Weather.h"
 #include "Renderer.h"
-#include "../net/netgame.h"
 
 void RenderScene()
 {
@@ -195,11 +194,6 @@ void Render2dStuff()
         }
 
         ((void (*)()) (g_libGTASA + (VER_x32 ? 0x00437B0C + 1 : 0x51CFF0)))(); // CHud::DrawRadar
-
-        // textdraw
-        if (pNetGame) {
-            CTextDrawPool::Draw();
-        }
 
         if(!CKeyBoard::m_bEnable)
             ( ( void(*)(bool) )(g_libGTASA + (VER_x32 ? 0x002B0BD8 + 1 : 0x36FB00)) )(false); // CTouchInterface::DrawAll

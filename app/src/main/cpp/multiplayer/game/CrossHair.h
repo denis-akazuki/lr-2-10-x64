@@ -11,9 +11,13 @@
 class CCrossHair {
 public:
     static inline CSprite2d* pCircleTex;
+    static inline CSprite2d* pSniperTex;
+
+    static inline bool m_UsedCrossHair;
 
 public:
     static void Init();
     static void Render();
     static bool IsCircleCrosshairMode(eCamMode mode);
+    static bool IsSniperCrosshairMode(eCamMode mode);
 };

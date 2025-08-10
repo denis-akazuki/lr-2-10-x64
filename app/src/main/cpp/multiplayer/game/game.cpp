@@ -711,6 +711,7 @@ void CGame::Process() {
 		once = true;
 		return;
 	}
+    CTextDrawPool::Draw();
 	SnapShotsWrapper::Process();
 }
 
