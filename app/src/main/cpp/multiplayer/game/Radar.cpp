@@ -61,11 +61,48 @@ int32 CRadar::FindTraceNotTrackingBlipIndex() {
     return -1;
 }
 
-/*
- * @brief Clear a blip
- */
+int32 CRadar::GetActualBlipArrayIndex(tBlipHandle blip) {
+    if (blip == -1)
+        return -1;
+
+    const auto  traceIndex = static_cast<uint16>(blip);
+    const auto& trace      = ms_RadarTrace[traceIndex];
+    const auto  counter    = static_cast<uint16>(blip >> 16);
+    if (counter != trace.m_nCounter || !trace.m_bTrackingBlip)
+        return -1;
+
+    return traceIndex;
+}
+
 void CRadar::ClearBlip(tBlipHandle blip) {
-    CHook::CallFunction<void>(g_libGTASA + (VER_x32 ? 0x004429E8 + 1 : 0x527C60), blip);
+    if (const auto index = GetActualBlipArrayIndex(blip); index != -1) {
+        ClearActualBlip(index);
+    }
+}
+
+void CRadar::ClearActualBlip(int32 blipIndex) {
+    if (blipIndex < 0 || blipIndex >= MAX_RADAR_TRACES)
+        return;
+
+    ClearActualBlip(ms_RadarTrace[blipIndex]);
+}
+
+void CRadar::ClearActualBlip(tRadarTrace& trace) {
+    trace.m_nBlipSize = 1;
+    trace.m_fSphereRadius = 1.0f;
+    trace.m_pEntryExit = nullptr;
+    trace.m_nBlipSprite = RADAR_SPRITE_NONE;
+
+    trace.m_bBright       = true;
+    trace.m_bTrackingBlip = false;
+    trace.m_bShortRange   = false;
+    trace.m_bFriendly     = false;
+    trace.m_bBlipRemain   = false;
+    trace.m_bBlipFade     = false;
+
+    trace.m_nCoordBlipAppearance = BLIP_FLAG_FRIEND;
+    trace.m_nBlipDisplayFlag = BLIP_DISPLAY_NEITHER;
+    trace.m_nBlipType = BLIP_NONE;
 }
 
 /*!
@@ -186,6 +223,16 @@ CVector2D CRadar::TransformRadarPointToScreenSpace(const CVector2D& in) {
     }
 }
 
+bool bFullMap = false;
+void CRadar::DrawRadarGangOverlay(bool inMenu) {
+    bFullMap = inMenu;
+    CGangZonePool::Draw();
+}
+
+uint32 CRadar::GetRadarTraceColour(uint32 color, bool bright, bool friendly) {
+    return TranslateColorCodeToRGBA(color);
+}
+
 void CRadar::InjectHooks() {
     CHook::Write(g_libGTASA + (VER_x32 ? 0x6773C4 : 0x84C7D0), &ms_RadarTrace);
     CHook::Write(g_libGTASA + (VER_x32 ? 0x6776F0 : 0x84CE18), &RadarBlipSprites);
@@ -194,4 +241,8 @@ void CRadar::InjectHooks() {
 
     CHook::Redirect("_ZN6CRadar12SetCoordBlipE9eBlipType7CVectorj12eBlipDisplayPc", &SetCoordBlip);
     CHook::Redirect("_ZN6CRadar15DrawRadarSpriteEtffh", &DrawRadarSprite);
+
+    CHook::Redirect("_ZN6CRadar20DrawRadarGangOverlayEb", &DrawRadarGangOverlay);
+    CHook::Redirect("_ZN6CRadar19GetRadarTraceColourEjhh", &GetRadarTraceColour);
+    CHook::Redirect("_ZN6CRadar9ClearBlipEi", &ClearBlip);
 }

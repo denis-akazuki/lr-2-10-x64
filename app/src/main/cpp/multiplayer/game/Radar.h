@@ -166,6 +166,7 @@ struct tRadarTrace {
 
     std::pair<CVector2D, CVector2D> GetRadarAndScreenPos(float* radarPointDist) const;
 };
+VALIDATE_SIZE(tRadarTrace, (VER_x32 ? 0x28 : 0x30));
 
 class CRadar {
 public:
@@ -178,6 +179,8 @@ public:
     static tBlipHandle GetNewUniqueBlipIndex(int32 index);
     static int32 FindTraceNotTrackingBlipIndex();
 
+    static void DrawRadarGangOverlay(bool inMenu);
+    static uint32 GetRadarTraceColour(uint32 color, bool bright, bool friendly);
     static void DrawLegend(int32 x, int32 y, eRadarSprite blipType);
     static float LimitRadarPoint(CVector2D& point);
     static void LimitToMap(float* x, float* y);
@@ -185,13 +188,12 @@ public:
     static void TransformRadarPointToScreenSpace(CVector2D& out, const CVector2D& in);
     static void TransformRealWorldPointToRadarSpace(CVector2D& out, const CVector2D& in);
 
-    static void DrawCoordBlip(int32 blipIndex, bool isSprite);
+    static int32 GetActualBlipArrayIndex(tBlipHandle blip);
+    static void DrawCoordBlip(int32 blipIndex, bool isSprite, uint8 nWidgetAlpha, float circleSize);
     static void DrawEntityBlip(int32 blipIndex, uint8 arg1);
     static void ClearActualBlip(int32 blipIndex);
-//    static void ClearActualBlip(tRadarTrace& trace);
-//    static void ClearBlipForEntity(eBlipType blipType, int32 entityHandle);
-//    static void ClearBlipForEntity(CPed* ped);
-    static void ClearBlip(tBlipHandle blip);
+    static void ClearActualBlip(tRadarTrace& trace);
+    static void ClearBlip(uint32 blip);
     static void SetupAirstripBlips();
     static void DrawBlips();
 

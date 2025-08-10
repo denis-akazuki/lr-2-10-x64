@@ -164,11 +164,6 @@ void TouchEvent_hook(int type, int num, int posX, int posY)
 	TouchEvent(type, num, posX, posY);
 }
 
-uint32_t CRadar__GetRadarTraceColor(uint32_t color, uint8_t bright, uint8_t friendly)
-{
-	return TranslateColorCodeToRGBA(color);
-}
-
 #if VER_x32
 uint32_t CHudColours__GetIntColour(uint32 colour_id)
 {
@@ -180,14 +175,6 @@ uint32_t CHudColours__GetIntColour(uintptr* thiz, uint32 colour_id)
 	return TranslateColorCodeToRGBA(colour_id);
 }
 #endif
-
-uint8_t bGZ = 0;
-void (*CRadar__DrawRadarGangOverlay)(uint8_t v1);
-void CRadar__DrawRadarGangOverlay_hook(uint8_t v1)
-{
-	bGZ = v1;
-	CGangZonePool::Draw();
-}
 
 // fire weapon hooks
 uint32_t (*CWeapon__FireInstantHit)(CWeapon * thiz, CPed * pFiringEntity, CVector * vecOrigin, CVector * muzzlePosn, CEntity * targetEntity, CVector * target, CVector * originForDriveBy, int arg6, int muzzle);
@@ -1691,8 +1678,6 @@ void InstallHooks()
 	CHook::InlineHook("_Z14AND_TouchEventiiii", &TouchEvent_hook, &TouchEvent);
     //
 	CHook::Redirect("_ZN11CHudColours12GetIntColourEh", &CHudColours__GetIntColour); // dangerous
-	CHook::Redirect("_ZN6CRadar19GetRadarTraceColourEjhh", &CRadar__GetRadarTraceColor); // dangerous
-	CHook::InlineHook("_ZN6CRadar20DrawRadarGangOverlayEb", &CRadar__DrawRadarGangOverlay_hook, &CRadar__DrawRadarGangOverlay);
 
 	//CHook::InlineHook("_Z15RwFrameAddChildP7RwFrameS0_", &RwFrameAddChild_hook, &RwFrameAddChild);
     //CHook::InlineHook("_Z27_rpMaterialListDeinitializeP14RpMaterialList", &_rpMaterialListDeinitialize_hook, &_rpMaterialListDeinitialize);

@@ -425,10 +425,10 @@ void CGame::DisableInteriorEnterExits()
 //#endif
 }
 
-extern uint8_t bGZ;
+extern bool bFullMap;
 void CGame::DrawGangZone(const CRect* rect, uint32_t dwColor)
 {
-    CHook::CallFunction<void>(g_libGTASA + (VER_x32 ? 0x00443C60 + 1 : 0x528EC4), rect, &dwColor, bGZ);
+    CHook::CallFunction<void>(g_libGTASA + (VER_x32 ? 0x00443C60 + 1 : 0x528EC4), rect, &dwColor, bFullMap);
 }
 
 void CGame::InitialiseOnceBeforeRW() {
