@@ -9,9 +9,6 @@
 #include <thread>
 #include <chrono>
 
-extern CWidgetManager *g_pWidgetManager;
-extern CNetGame *pNetGame;
-
 #include "../chatwindow.h"
 
 #include "..//CLocalisation.h"
@@ -44,21 +41,18 @@ unsigned char GetPacketID(Packet *p) {
         return (unsigned char) p->data[0];
 }
 
-class string_encryptor;
-
 CNetGame::CNetGame(const char *szHostOrIp, int iPort, const char *szPlayerName,
                    const char *szPass) {
     strcpy(m_szHostName, "San Andreas Multiplayer");
     strncpy(m_szHostOrIp, szHostOrIp, sizeof(m_szHostOrIp));
     m_iPort = iPort;
 
+    CVehiclePool::Init();
+    CTextDrawPool::Init();
     CAudioStreamPool::Init();
     CPlayerPool::Init();
     CPlayerPool::SetLocalPlayerName(szPlayerName);
 
-    CVehiclePool::Init();
-
-    //m_pTextDrawPool = new CTextDrawPool();
     g_pWidgetManager = new CWidgetManager();
 
     m_pRakClient = RakNetworkFactory::GetRakClientInterface();

@@ -2070,3 +2070,28 @@ RwTexture* CUtil::LoadTextureFromDB(const char* dbname, const char* texture)
 
     return tex;
 }
+
+bool bTextDrawTextureSlotState[200];
+uintptr_t TextDrawTexture[200];
+
+int GetFreeTextDrawTextureSlot()
+{
+    for (int i = 0; i < 200; i++)
+    {
+        if (!bTextDrawTextureSlotState[i]) {
+            bTextDrawTextureSlotState[i] = true;
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+void DestroyTextDrawTexture(int index)
+{
+    if (index >= 0 && index < 200)
+    {
+        bTextDrawTextureSlotState[index] = false;
+        TextDrawTexture[index] = 0x0;
+    }
+}

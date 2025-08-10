@@ -255,6 +255,11 @@ bool CGUI::OnTouchEvent(int &type, int &num, int &x, int &y)
 //	io.MousePos.y = (float)y;
 	io.AddMousePosEvent((float)x, (float)y);
 
+    if (pNetGame) {
+        if (!CTextDrawPool::OnTouchEvent(type, num, x, y))
+            return true;
+    }
+
 	switch(type)
 	{
 		case TOUCH_PUSH:
@@ -500,4 +505,26 @@ bool ImGui::ImageButtonLr(ImTextureID user_texture_id, const ImVec2& size, const
     ImGui::GetWindowDrawList()->AddImage(user_texture_id, pos, bb_max, uv0, uv1, ImGui::GetColorU32(tint_col));
 
     return pressed;
+}
+
+DataStructures::SingleProducerConsumer<BUFFERED_COMMAND_TEXTDRAW> CGUI::m_BufferedCommandTextdraws;
+void CGUI::PushToBufferedQueueTextDrawPressed(uint16_t textdrawId)
+{
+    BUFFERED_COMMAND_TEXTDRAW* pCmd = m_BufferedCommandTextdraws.WriteLock();
+
+    pCmd->textdrawId = textdrawId;
+
+    m_BufferedCommandTextdraws.WriteUnlock();
+}
+
+void CGUI::ProcessPushedTextdraws()
+{
+    BUFFERED_COMMAND_TEXTDRAW* pCmd = nullptr;
+    while (pCmd = m_BufferedCommandTextdraws.ReadLock())
+    {
+        RakNet::BitStream bs;
+        bs.Write(pCmd->textdrawId);
+        pNetGame->GetRakClient()->RPC(&RPC_ClickTextDraw, &bs, HIGH_PRIORITY, RELIABLE_SEQUENCED, 0, false, UNASSIGNED_NETWORK_ID, 0);
+        m_BufferedCommandTextdraws.ReadUnlock();
+    }
 }

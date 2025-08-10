@@ -33,7 +33,6 @@ void RwMatrixScale(RwMatrix* mat, CVector* vecScale);
 
 int GetFreeTextDrawTextureSlot();
 void DestroyTextDrawTexture(int index);
-uintptr_t LoadTexture(const char* texname);
 
 uintptr_t GetModelInfoByID(int iModelID);
 

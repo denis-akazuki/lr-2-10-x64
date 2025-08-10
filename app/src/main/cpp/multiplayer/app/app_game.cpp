@@ -28,6 +28,7 @@
 #include "Mobile/MobileSettings/MobileSettings.h"
 #include "Weather.h"
 #include "Renderer.h"
+#include "../net/netgame.h"
 
 void RenderScene()
 {
@@ -194,13 +195,17 @@ void Render2dStuff()
         }
 
         ((void (*)()) (g_libGTASA + (VER_x32 ? 0x00437B0C + 1 : 0x51CFF0)))(); // CHud::DrawRadar
-        //	GPS::Draw();
 
-        //
+        // textdraw
+        if (pNetGame) {
+            CTextDrawPool::Draw();
+        }
+
         if(!CKeyBoard::m_bEnable)
             ( ( void(*)(bool) )(g_libGTASA + (VER_x32 ? 0x002B0BD8 + 1 : 0x36FB00)) )(false); // CTouchInterface::DrawAll
     }
 
+    CHook::CallFunction<void>(g_libGTASA + (VER_x32 ? 0x1C0750 + 1 : 0x252CE4), 1); // textdraw text
     ((void (*)(bool)) (g_libGTASA + (VER_x32 ? 0x0054BDD4 + 1 : 0x66B678)))(1u); // CMessages::Display - gametext
     ((void (*)(bool)) (g_libGTASA + (VER_x32 ? 0x005A9120 + 1 : 0x6CCEA0)))(1u); // CFont::RenderFontBuffer
 }

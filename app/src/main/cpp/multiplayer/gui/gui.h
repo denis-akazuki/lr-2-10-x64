@@ -11,6 +11,11 @@ enum eTouchType
 	TOUCH_MOVE = 3
 };
 
+struct BUFFERED_COMMAND_TEXTDRAW
+{
+    uint16_t textdrawId;
+};
+
 class CGUI
 {
 public:
@@ -52,6 +57,8 @@ private:
 	ImVec2		m_vecScale;
 	float 		m_fFontSize;
 
+    static DataStructures::SingleProducerConsumer<BUFFERED_COMMAND_TEXTDRAW> m_BufferedCommandTextdraws;
+
 public:
 	static inline ImVec2 GegPosFromGta(const ImVec2 &pos) {
 		ImGuiIO &io = ImGui::GetIO();
@@ -85,6 +92,9 @@ public:
 
 	static void RenderMechanicHook();
 	static void RenderPassengerButton();
+
+    static void PushToBufferedQueueTextDrawPressed(uint16_t textdrawId);
+    static void ProcessPushedTextdraws();
 };
 
 namespace ImGui {

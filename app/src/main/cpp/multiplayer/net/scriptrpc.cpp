@@ -9,7 +9,6 @@
 #include "java_systems/RadialMenu.h"
 #include "game/Camera.h"
 
-extern CNetGame *pNetGame;
 extern CGUI *pGUI;
 
 void ScrDisplayGameText(RPCParameters *rpcParams)
@@ -1253,12 +1252,81 @@ void ScrSetPlayerSkillLevel(RPCParameters *rpcParams)
 void ScrResetPlayerWeapons(RPCParameters* rpcParams)
 {
     LOGRPC("ScrResetPlayerWeapons");
-//	uint8_t* Data = reinterpret_cast<uint8_t*>(rpcParams->input);
-//	int iBitLength = rpcParams->numberOfBitsOfData;
-//	PlayerID sender = rpcParams->sender;
+    uint8_t* Data = reinterpret_cast<uint8_t*>(rpcParams->input);
+    int iBitLength = rpcParams->numberOfBitsOfData;
+    PlayerID sender = rpcParams->sender;
 
-	CPedSamp* pPlayerPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
-	pPlayerPed->ClearAllWeapons();
+    CPedSamp* pPlayerPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
+    pPlayerPed->ClearAllWeapons();
+}
+
+void ScrShowTextDraw(RPCParameters* rpcParams)
+{
+    LOGRPC("ScrShowTextDraw");
+    unsigned char* Data = reinterpret_cast<unsigned char*>(rpcParams->input);
+    int iBitLength = rpcParams->numberOfBitsOfData;
+    RakNet::BitStream bsData(Data, (iBitLength / 8) + 1, false);
+
+    uint16_t wTextID;
+    uint16_t wTextSize;
+    TEXT_DRAW_TRANSMIT TextDrawTransmit;
+    char cText[MAX_TEXT_DRAW_LINE];
+
+    bsData.Read(wTextID);
+    bsData.Read((char*)& TextDrawTransmit, sizeof(TEXT_DRAW_TRANSMIT));
+    bsData.Read(wTextSize);
+    bsData.Read(cText, wTextSize);
+    cText[wTextSize] = 0;
+    CTextDrawPool::New(wTextID, &TextDrawTransmit, cText);
+}
+
+void ScrHideTextDraw(RPCParameters* rpcParams)
+{
+    LOGRPC("ScrHideTextDraw");
+    unsigned char* Data = reinterpret_cast<unsigned char*>(rpcParams->input);
+    int iBitLength = rpcParams->numberOfBitsOfData;
+
+    RakNet::BitStream bsData(Data, (iBitLength / 8) + 1, false);
+    uint16_t wTextID;
+    bsData.Read(wTextID);
+    CTextDrawPool::Delete(wTextID);
+}
+
+void ScrEditTextDraw(RPCParameters* rpcParams)
+{
+    LOGRPC("ScrEditTextDraw");
+    unsigned char* Data = reinterpret_cast<unsigned char*>(rpcParams->input);
+    int iBitLength = rpcParams->numberOfBitsOfData;
+    RakNet::BitStream bsData(Data, (iBitLength / 8) + 1, false);
+    uint16_t wTextID;
+    uint16_t wLen;
+    bsData.Read(wTextID);
+    bsData.Read(wLen);
+    uint8_t pStr[256];
+    if (wLen >= 255) return;
+
+    bsData.Read((char*)pStr, wLen);
+    pStr[wLen] = 0;
+    CTextDraw* pTextDraw = CTextDrawPool::GetAt(wTextID);
+    if (pTextDraw)
+    {
+        pTextDraw->SetText((const char*)pStr);
+    }
+}
+
+void ScrSelectTextDraw(RPCParameters* rpcParams)
+{
+    Log("RPC: ScrSelectTextDraw");
+    unsigned char* Data = reinterpret_cast<unsigned char*>(rpcParams->input);
+    int iBitLength = rpcParams->numberOfBitsOfData;
+
+    bool bEnable = false;
+    uint32_t dwColor = 0;
+    RakNet::BitStream bsData(Data, (iBitLength / 8) + 1, false);
+    bsData.Read(bEnable);
+    bsData.Read(dwColor);
+
+    CTextDrawPool::SetSelectState(bEnable, dwColor);
 }
 
 #define ATTACH_BONE_SPINE	1
@@ -1694,6 +1762,11 @@ void RegisterScriptRPCs(RakClientInterface* pRakClient)
 	pRakClient->RegisterAsRemoteProcedureCall(&RPC_ScrResetPlayerWeapons, ScrResetPlayerWeapons);
 	pRakClient->RegisterAsRemoteProcedureCall(&RPC_ScrSetPlayerSkillLevel, ScrSetPlayerSkillLevel);
 
+    pRakClient->RegisterAsRemoteProcedureCall(&RPC_ScrShowTextDraw, ScrShowTextDraw);
+    pRakClient->RegisterAsRemoteProcedureCall(&RPC_ScrHideTextDraw, ScrHideTextDraw);
+    pRakClient->RegisterAsRemoteProcedureCall(&RPC_ScrEditTextDraw, ScrEditTextDraw);
+    pRakClient->RegisterAsRemoteProcedureCall(&RPC_ClickTextDraw, ScrSelectTextDraw);
+
 	pRakClient->RegisterAsRemoteProcedureCall(&RPC_ScrSetPlayerAttachedObject, ScrSetPlayerAttachedObject);
 
 	pRakClient->RegisterAsRemoteProcedureCall(&RPC_ScrSetPlayerObjectMaterial, ScrSetPlayerObjectMaterial);
@@ -1788,6 +1861,11 @@ void UnRegisterScriptRPCs(RakClientInterface* pRakClient)
 	pRakClient->UnregisterAsRemoteProcedureCall(&RPC_ScrRemoveComponent);
 	pRakClient->UnregisterAsRemoteProcedureCall(&RPC_ScrSetObjectRotation);
 	pRakClient->UnregisterAsRemoteProcedureCall(&RPC_ScrMoveObject);
+
+    pRakClient->UnregisterAsRemoteProcedureCall(&RPC_ScrEditTextDraw);
+    pRakClient->UnregisterAsRemoteProcedureCall(&RPC_ScrShowTextDraw);
+    pRakClient->UnregisterAsRemoteProcedureCall(&RPC_ScrHideTextDraw);
+    pRakClient->UnregisterAsRemoteProcedureCall(&RPC_ClickTextDraw);
 
     pRakClient->UnregisterAsRemoteProcedureCall(&RPC_ScrDisableRemoteVehicleCollision);
 }

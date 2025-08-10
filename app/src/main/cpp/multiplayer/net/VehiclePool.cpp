@@ -166,20 +166,16 @@ VEHICLEID CVehiclePool::FindIDFromGtaPtr(CEntity *pGtaVehicle)
     return GetEntity(pGtaVehicle);
 }
 
-//CVehicle* CVehiclePool::FindVehicle(CVehicleGta *pGtaVehicle)
-//{
-//	for (size_t i = 0; i < MAX_VEHICLES; i++) {
-//		if (GetSlotState(i)) {
-//			CVehicle *pVehicle = GetAt(i);
-//			if (pVehicle && pVehicle->m_pVehicle->IsAdded()) {
-//				if (pVehicle->m_pVehicle == pGtaVehicle) {
-//					return pVehicle;
-//				}
-//			}
-//		}
-//	}
-//	return nullptr;
-//}
+CVehicle *CVehiclePool::FindVehicle(CVehicleGta *pGtaVehicle)
+{
+    if (!pGtaVehicle) return nullptr;
+
+    uint32_t vehicleId = GetEntity(pGtaVehicle);
+    if (vehicleId != INVALID_VEHICLE_ID) {
+        return GetAt(vehicleId);
+    }
+    return nullptr;
+}
 
 VEHICLEID CVehiclePool::FindIDFromRwObject(RwObject* pRWObject)
 {

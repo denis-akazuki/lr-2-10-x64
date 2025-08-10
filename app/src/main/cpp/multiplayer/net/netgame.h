@@ -16,6 +16,7 @@
 #include "textlabelpool.h"
 #include "AudioStreamPool.h"
 #include "ActorPool.h"
+#include "textdrawpool.h"
 
 enum class eNetworkState {
 	NONE = 0,
