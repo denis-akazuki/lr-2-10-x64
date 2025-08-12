@@ -59,7 +59,7 @@ void CTab::setStat(int id, char name[], int score, int ping) {
 
     uint32_t color;
     if(id == CPlayerPool::GetLocalPlayerID())
-        color = CPlayerPool::GetLocalPlayer()->GetPlayerColor();
+        color = CLocalPlayer::GetPlayerColor();
     else
         color = CPlayerPool::GetAt(id)->GetPlayerColor();
 

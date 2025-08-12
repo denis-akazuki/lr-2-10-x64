@@ -24,7 +24,7 @@ void CSnow::Process()
     if (!m_iCurrentSnow)
         return;
 
-    auto pPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
+    auto pPed = CLocalPlayer::GetPlayerPed();
 
     if (CGame::currArea && m_dwParticeHandle1 && m_dwParticeHandle2)
     {

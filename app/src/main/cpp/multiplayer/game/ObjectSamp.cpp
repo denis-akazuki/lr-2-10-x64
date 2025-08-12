@@ -279,7 +279,7 @@ void CObjectSamp::MoveTo(float fX, float fY, float fZ, float fSpeed, float fRotX
 	m_fDistanceToTargetPoint = m_pEntity->GetDistanceFromPoint(m_matTarget.pos.x, m_matTarget.pos.y, m_matTarget.pos.z);
 
 	if (pNetGame) {
-		CPlayerPool::GetLocalPlayer()->UpdateSurfing();
+		CLocalPlayer::UpdateSurfing();
 	}
 }
 

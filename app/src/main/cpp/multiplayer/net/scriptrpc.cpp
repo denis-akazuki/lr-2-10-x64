@@ -124,10 +124,10 @@ void ScrSetFightingStyle(RPCParameters *rpcParams)
 
 	CPedSamp *pPlayerPed = nullptr;
 
-	if(playerId == CPlayerPool::GetLocalPlayerID())
-			pPlayerPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
-	else if(CPlayerPool::GetSpawnedPlayer(playerId))
-		    pPlayerPed = CPlayerPool::GetSpawnedPlayer(playerId)->GetPlayerPed();
+    if(playerId == CPlayerPool::GetLocalPlayerID())
+        pPlayerPed = CLocalPlayer::GetPlayerPed();
+    else if(CPlayerPool::GetSpawnedPlayer(playerId))
+        pPlayerPed = CPlayerPool::GetSpawnedPlayer(playerId)->GetPlayerPed();
 
 	if(pPlayerPed)
 		pPlayerPed->SetFightingStyle(byteFightingStyle);
@@ -146,7 +146,7 @@ void ScrSetPlayerSkin(RPCParameters *rpcParams)
 	bsData.Read(uiSkin);
 
 	if(iPlayerID == CPlayerPool::GetLocalPlayerID())
-		CPlayerPool::GetLocalPlayer()->GetPlayerPed()->SetModelIndex(uiSkin);
+		CLocalPlayer::GetPlayerPed()->SetModelIndex(uiSkin);
 	else
 	{
 		if(CPlayerPool::GetSpawnedPlayer(iPlayerID) && CPlayerPool::GetAt(iPlayerID)->GetPlayerPed())
@@ -190,7 +190,7 @@ void ScrApplyPlayerAnimation(RPCParameters *rpcParams)
 	szAnimName[byteAnimNameLen] = '\0';
 
 	if(CPlayerPool::GetLocalPlayerID() == playerId) {
-			pPlayerPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
+			pPlayerPed = CLocalPlayer::GetPlayerPed();
 	}
 	else if(CPlayerPool::GetSpawnedPlayer(playerId))
 		pPlayerPed = CPlayerPool::GetSpawnedPlayer(playerId)->GetPlayerPed();
@@ -214,7 +214,7 @@ void ScrClearPlayerAnimations(RPCParameters *rpcParams)
 
 	if(playerId == CPlayerPool::GetLocalPlayerID())
     {
-        pPlayerPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
+        pPlayerPed = CLocalPlayer::GetPlayerPed();
     }
     else
     {
@@ -241,7 +241,7 @@ void ScrSetPlayerSpecialAction(RPCParameters *rpcParams)
 	BYTE byteSpecialAction;
 	bsData.Read(byteSpecialAction);
 
-	CPedSamp *pPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
+	CPedSamp *pPed = CLocalPlayer::GetPlayerPed();
 
 	pPed->m_iCurrentSpecialAction = byteSpecialAction;
 	if (byteSpecialAction == SPECIAL_ACTION_NONE) {
@@ -282,12 +282,10 @@ void ScrSetPlayerHealth(RPCParameters *rpcParams)
 
 	int iBitLength = rpcParams->numberOfBitsOfData;
 
-	CLocalPlayer *pLocalPlayer = CPlayerPool::GetLocalPlayer();
 	float fHealth;
-
 	RakNet::BitStream bsData((unsigned char*)Data,(iBitLength/8)+1,false);
 	bsData.Read(fHealth);
-	pLocalPlayer->GetPlayerPed()->SetHealth(fHealth);
+    CLocalPlayer::GetPlayerPed()->SetHealth(fHealth);
 }
 
 void ScrSetPlayerArmour(RPCParameters *rpcParams)
@@ -296,13 +294,11 @@ void ScrSetPlayerArmour(RPCParameters *rpcParams)
 	auto Data = reinterpret_cast<unsigned char *>(rpcParams->input);
 	int iBitLength = rpcParams->numberOfBitsOfData;
 
-	CLocalPlayer *pLocalPlayer = CPlayerPool::GetLocalPlayer();
 	float fHealth;
-
 	RakNet::BitStream bsData((unsigned char*)Data,(iBitLength/8)+1,false);
 	bsData.Read(fHealth);
 
-	pLocalPlayer->GetPlayerPed()->SetArmour(fHealth);
+    CLocalPlayer::GetPlayerPed()->SetArmour(fHealth);
 }
 
 void ScrSetPlayerColor(RPCParameters *rpcParams)
@@ -320,7 +316,7 @@ void ScrSetPlayerColor(RPCParameters *rpcParams)
 
 	if(playerId == CPlayerPool::GetLocalPlayerID())
 	{
-        CPlayerPool::GetLocalPlayer()->SetPlayerColor(dwColor);
+        CLocalPlayer::SetPlayerColor(dwColor);
 	} 
 	else 
 	{
@@ -370,8 +366,6 @@ void ScrSetPlayerPosFindZ(RPCParameters *rpcParams)
 
 	RakNet::BitStream bsData((unsigned char*)Data,(iBitLength/8)+1,false);
 
-	CLocalPlayer *pLocalPlayer = CPlayerPool::GetLocalPlayer();
-
 	CVector vecPos;
 
 	bsData.Read(vecPos.x);
@@ -381,7 +375,7 @@ void ScrSetPlayerPosFindZ(RPCParameters *rpcParams)
 	vecPos.z = CGame::FindGroundZForCoord(vecPos.x, vecPos.y, vecPos.z);
 	vecPos.z += 1.5f;
 
-	pLocalPlayer->GetPlayerPed()->m_pPed->Teleport(vecPos, false);
+	CLocalPlayer::GetPlayerPed()->m_pPed->Teleport(vecPos, false);
 }
 
 void ScrSetPlayerInterior(RPCParameters *rpcParams)
@@ -456,7 +450,7 @@ void ScrTogglePlayerSpectating(RPCParameters *rpcParams)
 	RakNet::BitStream bsData((unsigned char*)Data,(iBitLength/8)+1,false);
 	uint32_t bToggle;
 	bsData.Read(bToggle);
-	CPlayerPool::GetLocalPlayer()->ToggleSpectating(bToggle);
+	CLocalPlayer::ToggleSpectating(bToggle);
 	Log("toggle: %d", bToggle);
 }
 
@@ -507,9 +501,8 @@ void ScrPlayerSpectatePlayer(RPCParameters *rpcParams)
 			byteMode = 4;
 	}
 
-	CLocalPlayer *pLocalPlayer = CPlayerPool::GetLocalPlayer();
-	pLocalPlayer->m_byteSpectateMode = byteMode;
-	pLocalPlayer->SpectatePlayer(playerId);
+	CLocalPlayer::m_byteSpectateMode = byteMode;
+    CLocalPlayer::SpectatePlayer(playerId);
 }
 
 void ScrPlayerSpectateVehicle(RPCParameters *rpcParams)
@@ -539,9 +532,8 @@ void ScrPlayerSpectateVehicle(RPCParameters *rpcParams)
 			byteMode = 3;
 	}
 
-	CLocalPlayer *pLocalPlayer = CPlayerPool::GetLocalPlayer();
-	pLocalPlayer->m_byteSpectateMode = byteMode;
-	pLocalPlayer->SpectateVehicle(VehicleID);
+    CLocalPlayer::m_byteSpectateMode = byteMode;
+    CLocalPlayer::SpectateVehicle(VehicleID);
 }
 
 void ScrPutPlayerInVehicle(RPCParameters *rpcParams)
@@ -694,7 +686,7 @@ void ScrRemovePlayerFromVehicle(RPCParameters *rpcParams)
 
 	RakNet::BitStream bsData((unsigned char*)Data,(iBitLength/8)+1,false);
 
-    CPlayerPool::GetLocalPlayer()->GetPlayerPed()->ExitCurrentVehicle();
+    CLocalPlayer::GetPlayerPed()->ExitCurrentVehicle();
 }
 
 void ScrSetVehicleHealth(RPCParameters *rpcParams)
@@ -808,7 +800,7 @@ void ScrInterpolateCamera(RPCParameters *rpcParams)
 
 	if(time > 0)
 	{
-        CPlayerPool::GetLocalPlayer()->m_bSpectateProcessed = true;
+        CLocalPlayer::m_bSpectateProcessed = true;
 		if(bSetPos)
 		{
 			CCamera::InterpolateCameraPos(&vecFrom, &vecDest, time, mode);
@@ -1060,8 +1052,7 @@ void ScrAttachObjectToPlayer(RPCParameters* rpcParams)
 
 	if (wPlayerID == CPlayerPool::GetLocalPlayerID())
 	{
-		CLocalPlayer* pPlayer = CPlayerPool::GetLocalPlayer();
-		ScriptCommand(&attach_object_to_actor, pObject->m_dwGTAId, pPlayer->GetPlayerPed()->m_dwGTAId,
+		ScriptCommand(&attach_object_to_actor, pObject->m_dwGTAId, CLocalPlayer::GetPlayerPed()->m_dwGTAId,
 			OffsetX, OffsetY, OffsetZ, rX, rY, rZ);
 	}
 	else {
@@ -1126,8 +1117,8 @@ void ScrGivePlayerWeapon(RPCParameters* rpcParams)
 
 	//CChatWindow::AddMessage("giveweapon | weaponid: %d ammo: %d", iWeaponID, iAmmo);
 
-	CLocalPlayer* pPlayer = CPlayerPool::GetLocalPlayer();
-	pPlayer->GetPlayerPed()->m_pPed->GiveWeapon(iWeaponID, iAmmo);
+	CLocalPlayer::GetPlayerPed()->m_pPed->GiveWeapon(iWeaponID, iAmmo);
+    CLocalPlayer::ammoUpdated = true;
 }
 
 void ScrSetWeaponAmmo(RPCParameters* rpcParams)
@@ -1162,7 +1153,7 @@ void ScrTogglePlayerControllable(RPCParameters *rpcParams)
 	bsData.Read(byteControllable);
 	//Log("controllable = %d", byteControllable);
 
-	CPlayerPool::GetLocalPlayer()->GetPlayerPed()->TogglePlayerControllable((bool)byteControllable);
+	CLocalPlayer::GetPlayerPed()->TogglePlayerControllable((bool)byteControllable);
 }
 
 #define WEAPONTYPE_PISTOL_SKILL 69
@@ -1256,7 +1247,7 @@ void ScrResetPlayerWeapons(RPCParameters* rpcParams)
     int iBitLength = rpcParams->numberOfBitsOfData;
     PlayerID sender = rpcParams->sender;
 
-    CPedSamp* pPlayerPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
+    CPedSamp* pPlayerPed = CLocalPlayer::GetPlayerPed();
     pPlayerPed->ClearAllWeapons();
 }
 
@@ -1455,7 +1446,7 @@ void ScrSetPlayerAttachedObject(RPCParameters* rpcParams)
 	CPedSamp* pPed = nullptr;
 	if (id == CPlayerPool::GetLocalPlayerID())
 	{
-		pPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
+		pPed = CLocalPlayer::GetPlayerPed();
 	}
 	else
 	{
@@ -1683,7 +1674,7 @@ void ScrSetPlayerTeam(RPCParameters *rpcParams)
 	bsData.Read(teamId);
 
 	if(playerId == CPlayerPool::GetLocalPlayerID())
-		CPlayerPool::GetLocalPlayer()->GetPlayerPed()->SetMoveAnim(teamId);
+		CLocalPlayer::GetPlayerPed()->SetMoveAnim(teamId);
 	else
 	{
 		if(CPlayerPool::GetSpawnedPlayer(playerId))

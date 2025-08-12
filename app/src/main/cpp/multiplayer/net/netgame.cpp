@@ -50,7 +50,6 @@ CNetGame::CNetGame(const char *szHostOrIp, int iPort, const char *szPlayerName,
     CVehiclePool::Init();
     CTextDrawPool::Init();
     CAudioStreamPool::Init();
-    CPlayerPool::Init();
     CPlayerPool::SetLocalPlayerName(szPlayerName);
 
     g_pWidgetManager = new CWidgetManager();
@@ -128,7 +127,7 @@ void CNetGame::Process() {
 
     // need all frame
     if (CGame::m_bCheckpointsEnabled) {
-        CPedSamp *pPlayerDed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
+        CPedSamp *pPlayerDed = CLocalPlayer::GetPlayerPed();
         if (pPlayerDed) {
             ScriptCommand(&is_actor_near_point_3d, pPlayerDed->m_dwGTAId,
                           CGame::m_vecCheckpointPos.x,
@@ -752,7 +751,7 @@ void CNetGame::Packet_CustomRPC(Packet *p) {
             bs.Read(pos.z);
             bs.Read(rotation);
 
-            CPlayerPool::GetLocalPlayer()->Spawn(pos, rotation);
+            CLocalPlayer::Spawn(pos, rotation);
             break;
         }
         case RPC_SHOW_FACTORY_GAME: {
@@ -813,7 +812,7 @@ void CNetGame::Packet_CustomRPC(Packet *p) {
             uint16_t targetID;
             bs.Read(targetID);
 
-            CPedSamp *localPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
+            CPedSamp *localPed = CLocalPlayer::GetPlayerPed();
             CPedSamp *toPed = CPlayerPool::GetAt(targetID)->GetPlayerPed();
             ScriptCommand(&TASK_CHAR_ARREST_CHAR, localPed->m_dwGTAId, toPed->m_dwGTAId);
             break;
@@ -1315,11 +1314,8 @@ void CNetGame::Reset() {
 
     CPlayerPool::Free();
 
-    CLocalPlayer *pLocalPlayer = CPlayerPool::GetLocalPlayer();
-    if (pLocalPlayer) {
-        pLocalPlayer->ResetAllSyncAttributes();
-        pLocalPlayer->ToggleSpectating(false);
-    }
+    CLocalPlayer::ResetAllSyncAttributes();
+    CLocalPlayer::ToggleSpectating(false);
 
     CVehiclePool::Free();
     CObjectPool::Free();
@@ -1331,7 +1327,7 @@ void CNetGame::Reset() {
     g_pJavaWrapper->ClearScreen();
     Voice::Network::OnRaknetDisconnect();
 
-    CPedSamp *pPlayerPed = CGame::FindPlayerPed();
+    CPedSamp *pPlayerPed = CLocalPlayer::GetPlayerPed();
     if (pPlayerPed) {
         pPlayerPed->m_pPed->SetInterior(0, true);
         pPlayerPed->SetArmour(0.0f);
@@ -1867,8 +1863,8 @@ CNetGame::sendTakeDamage(PLAYERID attacker, eWeaponType weaponId, float ammount,
 
     pNetGame->GetRakClient()->Send(&bs, HIGH_PRIORITY, RELIABLE, 0);
 
-    CPlayerPool::GetLocalPlayer()->lastDamageId = attacker;
-    CPlayerPool::GetLocalPlayer()->lastDamageWeap = weaponId;
+    CLocalPlayer::lastDamageId = attacker;
+    CLocalPlayer::lastDamageWeap = weaponId;
 }
 
 void CNetGame::sendGiveDamage(PLAYERID taker, int weaponId, float ammount, int bodyPart) {

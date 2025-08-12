@@ -17,8 +17,8 @@ void CInventory::ToggleShow(bool toggle)
 
     auto method = env->GetMethodID(clazz, "toggleShow", "(ZLjava/lang/String;IFFII)V");
 
-    CLocalPlayer* pPlayer = CPlayerPool::GetLocalPlayer();
-    if (!pPlayer || !pPlayer->GetPlayerPed()) return;
+    CPedSamp* pPlayer = CLocalPlayer::GetPlayerPed();
+    if (!pPlayer) return;
 
     jstring jnick = env->NewStringUTF(CPlayerPool::GetLocalPlayerName());
 
@@ -26,10 +26,10 @@ void CInventory::ToggleShow(bool toggle)
                         toggle,
                         jnick,
                         CPlayerPool::GetLocalPlayerID(),
-                        pPlayer->GetPlayerPed()->GetHealth(),
-                        pPlayer->GetPlayerPed()->GetArmour(),
+                        pPlayer->GetHealth(),
+                        pPlayer->GetArmour(),
                         CHUD::iSatiety,
-                        pPlayer->GetPlayerPed()->m_pPed->m_nModelIndex);
+                        pPlayer->m_pPed->m_nModelIndex);
 
     env->DeleteLocalRef(jnick);
 

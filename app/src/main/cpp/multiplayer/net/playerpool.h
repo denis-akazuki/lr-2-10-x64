@@ -7,7 +7,6 @@
 class CPlayerPool : public CNetPool<CRemotePlayer*>
 {
 public:
-	static void Init();
 	static void Free();
 
 	static bool Process();
@@ -38,7 +37,6 @@ public:
 		m_LocalPlayerID = MyPlayerID;
 	}
 	static PLAYERID GetLocalPlayerID() { return m_LocalPlayerID; }
-	static CLocalPlayer* GetLocalPlayer() { return m_pLocalPlayer; }
 	// remote
 	static bool New(PLAYERID playerId, char* szPlayerName, bool bIsNPC);
 	static bool Delete(PLAYERID playerId, uint8_t byteReason);
@@ -70,7 +68,6 @@ public:
 private:
 	// LOCAL
 	static inline PLAYERID		m_LocalPlayerID;
-	static inline CLocalPlayer	*m_pLocalPlayer;
 	static inline char			m_szLocalPlayerName[MAX_PLAYER_NAME+1];
 	static inline int			m_iLocalPlayerScore;
 	static inline uint32_t		m_dwLocalPlayerPing;

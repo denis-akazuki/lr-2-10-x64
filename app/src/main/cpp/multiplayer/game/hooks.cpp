@@ -180,7 +180,7 @@ uint32_t CHudColours__GetIntColour(uintptr* thiz, uint32 colour_id)
 uint32_t (*CWeapon__FireInstantHit)(CWeapon * thiz, CPed * pFiringEntity, CVector * vecOrigin, CVector * muzzlePosn, CEntity * targetEntity, CVector * target, CVector * originForDriveBy, int arg6, int muzzle);
 uint32_t CWeapon__FireInstantHit_hook(CWeapon * thiz, CPed * pFiringEntity, CVector * vecOrigin, CVector * muzzlePosn, CEntity * targetEntity, CVector * target, CVector * originForDriveBy, int arg6, int muzzle) __attribute__((optimize("O0")))
 {
-    auto &pLocalPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed()->m_pPed;
+    auto &pLocalPed = CLocalPlayer::GetPlayerPed()->m_pPed;
     if(pLocalPed) {
         if (pFiringEntity != pLocalPed)
             return muzzle;
@@ -873,7 +873,7 @@ void CPedDamageResponseCalculator__ComputeDamageResponse_hook(stPedDamageRespons
 	auto pSender = (CPed *)thiz->pEntity;
 	auto pReceiver = (CPed *)pEntity;
 
-	auto pLocalPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
+	auto pLocalPed = CLocalPlayer::GetPlayerPed();
 
 	if(!pLocalPed->m_bIsSpawned || pLocalPed->IsDead())
 		return;
@@ -1204,55 +1204,50 @@ void CTaskSimpleUseGun__RemoveStanceAnims_hook(uintptr* thiz, void* ped, float a
 void (*CCam__Process)(CCam*);
 void CCam__Process_hook(CCam* thiz)
 {
-    if(!CFirstPersonCamera::IsEnabled()) {
+    if (!CFirstPersonCamera::IsEnabled()) {
         CCam__Process(thiz);
         return;
     }
     CVector vecSpeed;
-    CVehicleSamp* pVeh = nullptr;
+    CVehicleSamp* veh = nullptr;
 
     CCamera& TheCamera = *reinterpret_cast<CCamera*>(g_libGTASA + (VER_x32 ? 0x00951FA8 : 0xBBA8D0));
     float& CAR_FOV_START_SPEED = *(float*)(g_libGTASA + (VER_x32 ? 0x006A9FD0 : 0x8855D4));
     float old = CAR_FOV_START_SPEED;
 
-    if (pNetGame && (thiz->m_nMode == MODE_CAM_ON_A_STRING || thiz->m_nMode == MODE_1STPERSON) && CFirstPersonCamera::IsEnabled())
+    if (pNetGame && (thiz->m_nMode == MODE_CAM_ON_A_STRING || thiz->m_nMode == MODE_1STPERSON))
     {
-        if (CPlayerPool::GetLocalPlayer())
+        auto ped = CLocalPlayer::GetPlayerPed()->m_pPed;
+        if (ped->IsInVehicle() && ped->pVehicle)
         {
-            CPedSamp* pPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
-            pVeh = CVehiclePool::GetAt(CPlayerPool::GetLocalPlayer()->m_CurrentVehicle);
-            if (pVeh)
-            {
-                vecSpeed = pVeh->m_pVehicle->m_vecMoveSpeed;
+            veh = CVehiclePool::FindVehicle(ped->pVehicle);
+            vecSpeed = veh->m_pVehicle->m_vecMoveSpeed;
+            veh->m_pVehicle->m_vecMoveSpeed *= 6.0f;
 
-                pVeh->m_pVehicle->m_vecMoveSpeed *= 6.0f;
-
-                CAR_FOV_START_SPEED = 200.0f;
-            }
+            CAR_FOV_START_SPEED = 200.0f;
         }
     }
 
     CCam__Process(thiz);
-    if (pVeh)
+    if (veh)
     {
-        pVeh->m_pVehicle->m_vecMoveSpeed = vecSpeed;
+        veh->m_pVehicle->m_vecMoveSpeed = vecSpeed;
         CAR_FOV_START_SPEED = old;
     }
     if(thiz->m_nMode == MODE_FOLLOWPED || thiz->m_nMode == MODE_AIMWEAPON)
     {
         if (pNetGame)
         {
-            if (CPlayerPool::GetLocalPlayer())
+            auto gtaPed = CLocalPlayer::GetPlayerPed()->m_pPed;
+            if (auto pPed = CLocalPlayer::GetPlayerPed())
             {
-                CPedSamp* pPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
-                if (pPed)
-                {
-                    TheCamera.m_uiTransitionDuration = 0xFFFFFFFF;
-                    TheCamera.m_uiTransitionDurationTargetCoors = 0xFFFFFFFF;
-                    TheCamera.m_bJust_Switched = false;
+                TheCamera.m_uiTransitionDuration = 0xFFFFFFFF;
+                TheCamera.m_uiTransitionDurationTargetCoors = 0xFFFFFFFF;
+                TheCamera.m_bJust_Switched = false;
 
-                    CFirstPersonCamera::ProcessCameraOnFoot(thiz, pPed);
-                }
+                gtaPed->m_fAimingRotation = gtaPed->m_fCurrentRotation = atan2(TheCamera.m_aCams[0].Front.y, TheCamera.m_aCams[0].Front.x) - M_PI_2;
+
+                CFirstPersonCamera::ProcessCameraOnFoot(thiz, pPed);
             }
         }
     }
@@ -1260,19 +1255,15 @@ void CCam__Process_hook(CCam* thiz)
     {
         if (pNetGame)
         {
-            if (CPlayerPool::GetLocalPlayer())
+            CPedSamp* pPed = CLocalPlayer::GetPlayerPed();
+            if (pPed)
             {
-                CPedSamp* pPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
-                if (pPed)
-                {
-                    TheCamera.m_uiTransitionDuration = 0xFFFFFFFF;
-                    TheCamera.m_uiTransitionDurationTargetCoors = 0xFFFFFFFF;
-                    TheCamera.m_bJust_Switched = false;
+                TheCamera.m_uiTransitionDuration = 0xFFFFFFFF;
+                TheCamera.m_uiTransitionDurationTargetCoors = 0xFFFFFFFF;
+                TheCamera.m_bJust_Switched = false;
 
-                    CFirstPersonCamera::ProcessCameraInVeh(thiz, pPed, pVeh);
-                }
+                CFirstPersonCamera::ProcessCameraInVeh(thiz, pPed, veh);
             }
-
         }
     }
 }
@@ -1532,7 +1523,7 @@ bool CWorld__ProcessLineOfSight_hook(CVector *vecOrigin, CVector *vecEnd, CColPo
 	{
 		g_bForceWorldProcessLineOfSight = false;
 
-		if(g_pCurrentFiredPed != CPlayerPool::GetLocalPlayer()->GetPlayerPed())
+		if(g_pCurrentFiredPed != CLocalPlayer::GetPlayerPed())
 		{
 
 			if(g_pCurrentFiredPed->m_bHaveBulletData) {

@@ -119,7 +119,7 @@ void CAudioStream::ProcessAttached()
 	{
 		CPedSamp *pPed = nullptr;
 		if(m_iAttachedTo == CPlayerPool::GetLocalPlayerID()) {
-			pPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
+			pPed = CLocalPlayer::GetPlayerPed();
 		}
 		else {
 			if(CPlayerPool::GetSpawnedPlayer(m_iAttachedTo)) {

@@ -125,9 +125,7 @@ void CGUI::RenderPassengerButton() {
 		ImGui::SetCursorPos(butPos);
 
 		if (ImGui::ImageButton((ImTextureID) m_pPassengerButtonTex->raster, butSize)) {
-            auto pPlayer = CPlayerPool::GetLocalPlayer();
-
-            pPlayer->GoEnterVehicle(true);
+            CLocalPlayer::GoEnterVehicle(true);
 		}
 
 	}

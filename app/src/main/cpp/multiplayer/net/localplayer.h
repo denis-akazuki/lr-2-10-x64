@@ -158,83 +158,65 @@ VALIDATE_SIZE(SPECTATOR_SYNC_DATA, 18);
 class CLocalPlayer
 {
 public:
-	CLocalPlayer();
-	~CLocalPlayer();
+    static void Init();
 
-	void ResetAllSyncAttributes();
+    static void ResetAllSyncAttributes();
+    static bool Process();
+    static void SendDeath();
+    static void GoEnterVehicle(bool passenger);
+    static uint32_t GetPlayerColor();
+    static void SetPlayerColor(uint32_t dwColor);
+    static void UpdateSurfing();
+    static void SendEnterVehicleNotification(VEHICLEID VehicleID, bool bPassenger);
+    static void UpdateRemoteInterior(uint8_t byteInterior);
+    static bool Spawn(const CVector pos, float rot);
+    static int GetOptimumOnFootSendRate();
+    static int GetOptimumInCarSendRate();
+    static void ProcessSpectating();
+    static void ToggleSpectating(bool bToggle);
+    static void SpectatePlayer(PLAYERID playerId);
+    static void SpectateVehicle(VEHICLEID VehicleID);
+    static bool IsSpectating() { return m_bIsSpectating; }
+    static CPedSamp* GetPlayerPed() { return m_pPlayerPed; };
 
-	bool Process();
+    static void SendOnFootFullSyncData();
+    static void SendInCarFullSyncData();
+    static void SendTrailerSync(uint16 trailerId, CVehicle *trailer);
+    static void SendPassengerFullSyncData();
+    static void SendAimSyncData();
+    static void SendStatsUpdate();
+    static void CheckWeapons();
+    static uint8_t GetSpecialAction();
+    static uint32_t CalculateAimSendRate(uint16_t wKeys);
+    static void MaybeSendExitVehicle();
+    static void MaybeSendEnterVehicle();
 
-	void SendDeath();
-
-	void GoEnterVehicle(bool passenger);
-	uint32_t GetPlayerColorAsARGB();
-	uint32_t GetPlayerColor();
-	void SetPlayerColor(uint32_t dwColor);
-	void UpdateSurfing();
-	void SendEnterVehicleNotification(VEHICLEID VehicleID, bool bPassenger);
-	void UpdateRemoteInterior(uint8_t byteInterior);
-	bool Spawn(const CVector pos, float rot);
-	int GetOptimumOnFootSendRate() const;
-	int GetOptimumInCarSendRate() const;
-	void ProcessSpectating();
-	void ToggleSpectating(bool bToggle);
-	void SpectatePlayer(PLAYERID playerId);
-	void SpectateVehicle(VEHICLEID VehicleID);
-	bool IsSpectating() { return m_bIsSpectating; }
-
-	CPedSamp * GetPlayerPed() { return m_pPlayerPed; };
-
-	bool IsInRCMode() { return m_bInRCMode; };
-
-	void SendOnFootFullSyncData();
-	void SendInCarFullSyncData();
-	void SendPassengerFullSyncData();
-	void SendAimSyncData() const;
-	void SendStatsUpdate() const;
-	void CheckWeapons();
-    uint8_t GetSpecialAction();
-    uint32_t CalculateAimSendRate(uint16_t wKeys) const;
-    void MaybeSendExitVehicle();
-
-	CPedSamp			*m_pPlayerPed;
-
-	static inline int 	m_nPlayersInRange{};
 public:
-	bool				m_bIsSpectating;
-	uint8_t				m_byteSpectateMode;
-	uint8_t				m_byteSpectateType;
-	uint32_t			m_SpectateID; // Vehicle or player id
-	bool				m_bSpectateProcessed;
+    static constexpr int                timeNoSendedDataWithoutAfk = 500;
 
-	VEHICLEID			m_CurrentVehicle;
-	PLAYERID 			lastDamageId;
-	eWeaponType 		lastDamageWeap;
+    static inline CPedSamp*             m_pPlayerPed;
+    static inline int 	                m_nPlayersInRange{};
+
+    static inline bool		            m_bIsSpectating;
+    static inline uint8_t	            m_byteSpectateMode;
+    static inline uint8_t	            m_byteSpectateType;
+    static inline uint32_t	            m_SpectateID; // Vehicle or player id
+    static inline bool		            m_bSpectateProcessed;
+
+    static inline PLAYERID 	            lastDamageId;
+    static inline eWeaponType 	        lastDamageWeap;
+    static inline bool			        ammoUpdated{};
 
 private:
-	bool				m_bDeathSended;
-	uint8_t				m_byteCurInterior;
-	bool				m_bInRCMode;
+    static inline bool				    m_bDeathSended;
+    static inline uint8_t				m_byteCurInterior;
+    static inline bool				    m_bInRCMode;
 
-	uint32_t			m_dwPassengerEnterExit;
+    static inline uint32_t			    m_dwPassengerEnterExit;
 
-	ONFOOT_SYNC_DATA 	m_LastSendOnFootSync {};
-	INCAR_SYNC_DATA 	m_InCarData;
-	PASSENGER_SYNC_DATA m_PassengerData;
+    static inline uint32_t			    m_dwLastSendSpecTick;
+    static inline uint32_t			    m_dwLastAimSendTick;
+    static inline uint32_t			    m_dwLastStatsUpdateTick;
 
-	uint32_t 			m_dwLastSendTick;
-	uint32_t			m_dwLastSendSpecTick;
-	uint32_t			m_dwLastAimSendTick;
-	uint32_t			m_dwLastSendAimTick;
-	uint32_t			m_dwLastHeadUpdate;
-	uint32_t 			m_dwTimeLastSendOnFootSync;
-	uint32_t			m_dwLastUpdateInCarData;
-	uint32_t 			m_dwLastUpdatePassengerData;
-	uint32_t			m_dwLastStatsUpdateTick;
-
-	uint8_t				m_byteLastWeapon[MAX_WEAPONS_SLOT];
-	uint32_t			m_dwLastAmmo[MAX_WEAPONS_SLOT];
-	uint32_t 			m_dwLastUpdateHudButtons;
-
-    void MaybeSendEnterVehicle();
+    static inline uint32_t 			    m_dwLastUpdateHudButtons;
 };

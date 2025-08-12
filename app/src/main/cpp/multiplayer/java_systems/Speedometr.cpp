@@ -17,12 +17,8 @@ void CSpeedometr::UpdateSpeed()
 
     JNIEnv* env = g_pJavaWrapper->GetEnv();
 
-    CLocalPlayer *pPlayer = CPlayerPool::GetLocalPlayer();
-    if(!pPlayer)return;
-
-    CPedSamp *pPed = pPlayer->GetPlayerPed();
+    CPedSamp *pPed = CLocalPlayer::GetPlayerPed();
     if(!pPed) return;
-
     if(!pPed->m_pPed->IsInVehicle()) return;
 
     CVehicleSamp* pVehicle = pPed->GetCurrentVehicle();
@@ -40,10 +36,7 @@ void CSpeedometr::UpdateInfo()
 
     JNIEnv* env = g_pJavaWrapper->GetEnv();
 
-    CLocalPlayer *pPlayer = CPlayerPool::GetLocalPlayer();
-    if(!pPlayer)return;
-
-    CPedSamp *pPed = pPlayer->GetPlayerPed();
+    CPedSamp *pPed = CLocalPlayer::GetPlayerPed();
     if(!pPed) return;
 
     if(!pPed->m_pPed->IsInVehicle()) return;
@@ -82,7 +75,7 @@ Java_com_russia_game_gui_Speedometer_sendClick(JNIEnv *env, jobject thiz, jint c
         }
         case CSpeedometr::BUTTON_TURN_LEFT:
         {
-            CPedSamp *pPlayerPed = CPlayerPool::GetLocalPlayer()->m_pPlayerPed;
+            CPedSamp *pPlayerPed = CLocalPlayer::m_pPlayerPed;
             CVehicleSamp* pVehicle = pPlayerPed->GetCurrentVehicle();
 
             if(pVehicle->m_iTurnState == eTurnState::TURN_LEFT)
@@ -94,7 +87,7 @@ Java_com_russia_game_gui_Speedometer_sendClick(JNIEnv *env, jobject thiz, jint c
         }
         case CSpeedometr::BUTTON_TURN_RIGHT:
         {
-            CPedSamp *pPlayerPed = CPlayerPool::GetLocalPlayer()->m_pPlayerPed;
+            CPedSamp *pPlayerPed = CLocalPlayer::m_pPlayerPed;
             CVehicleSamp* pVehicle = pPlayerPed->GetCurrentVehicle();
 
             if(pVehicle->m_iTurnState == eTurnState::TURN_RIGHT)
@@ -106,7 +99,7 @@ Java_com_russia_game_gui_Speedometer_sendClick(JNIEnv *env, jobject thiz, jint c
         }
         case CSpeedometr::BUTTON_TURN_ALL:
         {
-            CPedSamp *pPlayerPed = CPlayerPool::GetLocalPlayer()->m_pPlayerPed;
+            CPedSamp *pPlayerPed = CLocalPlayer::m_pPlayerPed;
             CVehicleSamp* pVehicle = pPlayerPed->GetCurrentVehicle();
 
             if(pVehicle->m_iTurnState == eTurnState::TURN_ALL)

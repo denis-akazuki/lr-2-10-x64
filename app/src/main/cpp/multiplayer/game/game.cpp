@@ -148,8 +148,8 @@ void CGame::InitInGame()
 
 	std::tm* timeInfo = std::localtime(&currentTime);
 	CGame::SetWorldTime(timeInfo->tm_hour, 0);
+    CLocalPlayer::Init();
 }
-
 
 void CGame::ToggleHUDElement(int iID, bool bToggle)
 {

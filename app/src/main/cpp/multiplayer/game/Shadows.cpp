@@ -198,7 +198,7 @@ void CShadows::StoreCarLightShadow(CVehicle* vehicle, int32 id, RwTexture* textu
         blue  = (uint8)((float)blue * t);
     }
 
-//    const auto isPlyrVeh = CPlayerPool::GetLocalPlayer()->m_pPlayerPed->m_pPed->pVehicle == vehicle;
+//    const auto isPlyrVeh = CLocalPlayer::m_pPlayerPed->m_pPed->pVehicle == vehicle;
 //    if (isPlyrVeh || vehicle->GetMoveSpeed().Magnitude() * CTimer::GetTimeStep() >= 0.4f) {
 //        StoreShadowToBeRendered(
 //                SHADOW_ADDITIVE,

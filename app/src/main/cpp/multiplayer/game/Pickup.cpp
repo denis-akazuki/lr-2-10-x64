@@ -34,7 +34,7 @@ bool CPickup::IsVisible() {
 }
 
 bool CPickup::Update() {
-    auto &ped = CPlayerPool::GetLocalPlayer()->GetPlayerPed()->m_pPed;
+    auto &ped = CLocalPlayer::GetPlayerPed()->m_pPed;
 
     auto oldState = m_bIsPicked;
 

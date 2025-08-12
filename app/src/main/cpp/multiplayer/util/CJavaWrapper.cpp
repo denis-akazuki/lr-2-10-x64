@@ -114,10 +114,10 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_nvidia_devtech_NvEventQueueActivity_togglePlayer(JNIEnv *pEnv, jobject thiz, jint toggle) {
     if (toggle)
-        CPlayerPool::GetLocalPlayer()->GetPlayerPed()->TogglePlayerControllable(false,
+        CLocalPlayer::GetPlayerPed()->TogglePlayerControllable(false,
                                                                                               true);
     else
-        CPlayerPool::GetLocalPlayer()->GetPlayerPed()->TogglePlayerControllable(true, true);
+        CLocalPlayer::GetPlayerPed()->TogglePlayerControllable(true, true);
 }
 
 JNIEXPORT void JNICALL

@@ -51,7 +51,7 @@ void CWidgetButton__Update_hook(CWidgetButton* thiz) {
     CTouchInterface::m_pWidgets[WidgetIDs::WIDGET_VEHICLE_SHOOT_RIGHT]->m_bEnabled = false;
 
     if (pNetGame) {
-        const auto pPlayerPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
+        const auto pPlayerPed = CLocalPlayer::GetPlayerPed();
         if (pPlayerPed) {
             bool bSwimming = pPlayerPed->m_pPed->physicalFlags.bSubmergedInWater;
             bool isInVehicle = pPlayerPed->m_pPed->IsInVehicle();
@@ -104,7 +104,7 @@ void (*CWidgetButton__Enabled)(CWidgetButton* thiz, bool bEnabled);
 void CWidgetButton__Enabled_hook(CWidgetButton* thiz, bool bEnabled) {
 
     if (pNetGame) {
-        const auto& pPlayerPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
+        const auto& pPlayerPed = CLocalPlayer::GetPlayerPed();
         if (pPlayerPed) {
             bool bSwimming = pPlayerPed->m_pPed->physicalFlags.bSubmergedInWater;
             bool isInVehicle = pPlayerPed->m_pPed->IsInVehicle();

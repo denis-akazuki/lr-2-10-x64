@@ -13,7 +13,7 @@ void TextWithColors(ImVec2 pos, ImColor col, const char* szStr, const char* szSt
 
 void CText3DLabelsPool::DrawAttachedToPlayer(CText3DLabel* pLabel)
 {
-	CPedSamp* pPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
+	CPedSamp* pPed = CLocalPlayer::GetPlayerPed();
 
 	if(!CSettings::m_Settings.iIsEnable3dTextInVehicle && pPed->m_pPed->IsInVehicle())
 	    return;
@@ -88,7 +88,7 @@ void CText3DLabelsPool::DrawTextLabel(CText3DLabel* pLabel, const CVector* pos)
 {
 	int hitEntity = 0;
 
-	CPedSamp* pPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
+	CPedSamp* pPed = CLocalPlayer::GetPlayerPed();
 	if (!pPed)
 	{
 		return;

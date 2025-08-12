@@ -3,11 +3,6 @@
 #include "netgame.h"
 #include "../game/Entity/Ped/Ped.h"
 
-void CPlayerPool::Init()
-{
-	m_pLocalPlayer = new CLocalPlayer();
-}
-
 void CPlayerPool::Free()
 {
     auto ids = GetAllIds();
@@ -20,9 +15,6 @@ void CPlayerPool::Free()
 #include "..//game/game.h"
 #include "..//net/netgame.h"
 #include "playerpool.h"
-\
-extern CNetGame* pNetGame;
-
 
 void CPlayerPool::ApplyCollisionChecking()
 {
@@ -81,7 +73,7 @@ bool CPlayerPool::Process()
         pPlayer->Process();
 	}
 
-	m_pLocalPlayer->Process();
+	CLocalPlayer::Process();
 	return true;
 }
 
@@ -104,8 +96,8 @@ bool CPlayerPool::Delete(PLAYERID playerId, uint8_t byteReason)
 	if(!GetAt(playerId))
 		return false;
 
-	if(GetLocalPlayer()->IsSpectating() && GetLocalPlayer()->m_SpectateID == playerId)
-		GetLocalPlayer()->ToggleSpectating(false);
+	if(CLocalPlayer::IsSpectating() && CLocalPlayer::m_SpectateID == playerId)
+        CLocalPlayer::ToggleSpectating(false);
 
 	delete list[playerId];
 

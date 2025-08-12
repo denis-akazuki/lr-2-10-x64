@@ -12,7 +12,7 @@
 
 void GPS::Draw() {
 //    float gpsDistance = 0;
-//    auto playa = CPlayerPool::GetLocalPlayer()->m_pPlayerPed;
+//    auto playa = CLocalPlayer::m_pPlayerPed;
 //    if(!playa)return;
 //    auto pPed = playa->m_pPed;
 //    if(!pPed)return;

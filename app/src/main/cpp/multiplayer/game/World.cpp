@@ -67,11 +67,9 @@ void CWorld::ProcessPedsAfterPreRender() {
         }
     }
 
-    auto pLocalPlayer = CPlayerPool::GetLocalPlayer();
-    if(pLocalPlayer) {
-        pLocalPlayer->GetPlayerPed()->m_pPed->GetIntelligence()->ProcessAfterPreRender();
-
-        pLocalPlayer->GetPlayerPed()->ProcessAttach();
+    if(auto pLocalPlayer = CLocalPlayer::GetPlayerPed()) {
+        pLocalPlayer->m_pPed->GetIntelligence()->ProcessAfterPreRender();
+        pLocalPlayer->ProcessAttach();
     }
 
     for(auto &pair : CActorPool::list) {

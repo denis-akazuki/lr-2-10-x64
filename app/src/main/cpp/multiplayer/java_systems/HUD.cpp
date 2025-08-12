@@ -468,16 +468,11 @@ Java_com_russia_game_gui_hud_Chat_SendChatMessage(JNIEnv *env, jobject thiz, jby
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_russia_game_gui_hud_HudManager_clickCameraMode(JNIEnv *env, jobject thiz) {
-//
-
-    CLocalPlayer *pPlayer = CPlayerPool::GetLocalPlayer();
-    if(!pPlayer)return;
-
-    if(pPlayer->IsSpectating())
-        return;
-
-    CPedSamp *pPed = pPlayer->GetPlayerPed();
+    CPedSamp *pPed = CLocalPlayer::GetPlayerPed();
     if(!pPed) return;
+
+    if(CLocalPlayer::IsSpectating())
+        return;
 
     if(pPed->m_pPed->IsInVehicle()) {
         CHUD::bIsTouchCameraButt = true;

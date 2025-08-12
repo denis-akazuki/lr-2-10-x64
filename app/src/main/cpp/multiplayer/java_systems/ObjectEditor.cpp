@@ -19,7 +19,7 @@
 
 void CObjectEditor::Start(int slot)
 {
-    if(!CPlayerPool::GetLocalPlayer()->GetPlayerPed()->IsValidAttach(slot)){
+    if(!CLocalPlayer::GetPlayerPed()->IsValidAttach(slot)){
         CChatWindow::AddMessage("Invalid attach slot %d", slot);
         return;
     }
@@ -79,7 +79,7 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_russia_game_gui_AttachEdit_Exit(JNIEnv *env, jobject thiz) {
     CGame::PostToMainThread([=] {
-        CPedSamp *pPlayer = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
+        CPedSamp *pPlayer = CLocalPlayer::GetPlayerPed();
 
 
         if (CObjectEditor::editType == CObjectEditor::TYPE_PLAYER_ATTACH) {
@@ -157,7 +157,7 @@ Java_com_russia_game_gui_AttachEdit_AttachClick(JNIEnv *env, jobject thiz, jint 
     CGame::PostToMainThread([=] {
 
 
-        auto pPlayer = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
+        auto pPlayer = CLocalPlayer::GetPlayerPed();
         int slot = CObjectEditor::iEditedId;
         auto attach = pPlayer->GetAttachedObject(slot);
 
@@ -290,7 +290,7 @@ Java_com_russia_game_gui_AttachEdit_AttachClick(JNIEnv *env, jobject thiz, jint 
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_russia_game_gui_AttachEdit_Save(JNIEnv *env, jobject thiz) {
-    CPedSamp* pPlayer = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
+    CPedSamp* pPlayer = CLocalPlayer::GetPlayerPed();
     int slot = CObjectEditor::iEditedId;
 
     if(CObjectEditor::pObject) {

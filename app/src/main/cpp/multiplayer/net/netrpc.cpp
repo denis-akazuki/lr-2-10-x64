@@ -10,7 +10,6 @@
 #include "../game/Entity/Ped/Ped.h"
 #include "java_systems/GameFilesCheck.h"
 
-extern CGame *pGame;
 extern CNetGame *pNetGame;
 
 int iNetModeNormalOnfootSendRate	= NETMODE_ONFOOT_SENDRATE;
@@ -100,9 +99,6 @@ void InitGame(RPCParameters *rpcParams)
 	uint8_t byteVehicleModels[212];
 	bsInitGame.Read((char*)&byteVehicleModels[0], 212);							// don't use?
 	bsInitGame.Read(pNetGame->m_iVehicleFriendlyFire);							// native EnableVehicleFriendlyFire(); +
-
-	CLocalPlayer *pLocalPlayer = nullptr;
-	pLocalPlayer = CPlayerPool::GetLocalPlayer();
 
 	CGame::SetGravity(pNetGame->m_fGravity);
 
@@ -210,12 +206,8 @@ void Chat(RPCParameters *rpcParams)
 
 	if (playerId == CPlayerPool::GetLocalPlayerID())
 	{
-		CLocalPlayer *pLocalPlayer = CPlayerPool::GetLocalPlayer();
-		if (pLocalPlayer) 
-		{
-			CChatWindow::AddChatMessage(CPlayerPool::GetLocalPlayerName(),
-			pLocalPlayer->GetPlayerColor(), (char*)szText);
-		}
+        CChatWindow::AddChatMessage(CPlayerPool::GetLocalPlayerName(),
+                                    CLocalPlayer::GetPlayerColor(), (char*)szText);
 	} 
 	else 
 	{

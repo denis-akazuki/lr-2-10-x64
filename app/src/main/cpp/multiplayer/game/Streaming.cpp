@@ -399,10 +399,8 @@ void CStreaming::Update() {
 //            m_bBoatsNeeded = ThePaths.IsWaterNodeNearby(camPos, 80.0f);
 //        }
 //    }
-    if(!CPlayerPool::GetLocalPlayer())
-        return;
 
-    auto pLocalPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed()->m_pPed;
+    auto pLocalPed = CLocalPlayer::GetPlayerPed()->m_pPed;
     const CVector& playerPos = pLocalPed->GetPosition();
 //    if (!ms_disableStreaming
 //        && !CCutsceneMgr::IsCutsceneProcessing()

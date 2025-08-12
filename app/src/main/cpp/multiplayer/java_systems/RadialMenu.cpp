@@ -22,7 +22,7 @@ void CRadialMenu::Update() {
     auto env = g_pJavaWrapper->GetEnv();
 
     if(CRadialMenu::thiz != nullptr) {
-        auto pPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
+        auto pPed = CLocalPlayer::GetPlayerPed();
         auto pVehicle = pPed->GetCurrentVehicle();
         if(!pVehicle)return;
 
@@ -54,7 +54,7 @@ Java_com_russia_game_gui_RadialMenu_nativeOnClose(JNIEnv *env, jobject thiz) {
 extern "C"
 JNIEXPORT jboolean JNICALL
 Java_com_russia_game_gui_hud_HudManager_nativeClickMenu(JNIEnv *env, jobject thiz) {
-    auto pPed = CPlayerPool::GetLocalPlayer()->GetPlayerPed();
+    auto pPed = CLocalPlayer::GetPlayerPed();
    // auto pVehicle = pPed->GetCurrentVehicle();
     if(!pPed->m_pPed->IsInVehicle())return false;
 

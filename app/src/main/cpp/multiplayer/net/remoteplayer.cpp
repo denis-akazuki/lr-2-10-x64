@@ -85,7 +85,7 @@ void CRemotePlayer::Process() {
 			m_ofSync.byteCurrentWeapon = m_byteWeaponShotID;
 			m_pPlayerPed->SetArmedWeapon((int) m_byteWeaponShotID);
 			//ScriptCommand(&task_shoot_at_coord, m_pPlayerPed->m_dwGTAId, localMat.pos.x, localMat.pos.y, localMat.pos.z, 10);
-			m_pPlayerPed->SetCurrentAim(CPlayerPool::GetLocalPlayer()->GetPlayerPed()->GetCurrentAim());
+			m_pPlayerPed->SetCurrentAim(CLocalPlayer::GetPlayerPed()->GetCurrentAim());
 			m_pPlayerPed->SetKeys((uint16_t) 4, m_ofSync.lrAnalog, m_ofSync.udAnalog);
 
 			//unknown weapon

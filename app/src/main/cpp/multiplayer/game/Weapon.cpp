@@ -9,6 +9,7 @@
 #include "Camera.h"
 #include "Stats.h"
 #include "game.h"
+#include "net/netgame.h"
 
 void CWeapon__Update(CWeapon* thiz, CPed* owner) {
     thiz->Update(owner);
@@ -586,6 +587,8 @@ bool CWeapon::Fire(CEntity* firedBy, CVector* startPosn, CVector* barrelPosn, CE
     if (m_nType == WEAPON_UNARMED || m_nType == WEAPON_BASEBALLBAT) {
         return true;
     }
+
+    CLocalPlayer::ammoUpdated = true;
     return hasFired;
 }
 
