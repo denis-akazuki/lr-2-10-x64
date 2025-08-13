@@ -382,14 +382,23 @@ struct RwD3D9Vertex
     RwReal      z;              /**< Screen Z */
     RwReal      rhw;            /**< Reciprocal of homogeneous W */
 
-    RwUInt32    emissiveColor;  /**< Vertex color */
+    union {
+        RwUInt32 emissiveColor;  /**< Vertex color rgba */
+        struct {
+            RwUInt8 r;
+            RwUInt8 g;
+            RwUInt8 b;
+            RwUInt8 a;
+        };
+        RwRGBA color;
+    };
 
     RwReal      u;              /**< Texture coordinate U */
     RwReal      v;              /**< Texture coordinate V */
 };
 
 typedef RwD3D9Vertex    RwIm2DVertex;
-typedef RwUInt32        RxVertexIndex;
+typedef RwUInt16        RxVertexIndex;
 typedef RxVertexIndex   RwImVertexIndex;
 
 #include "immedi.h"

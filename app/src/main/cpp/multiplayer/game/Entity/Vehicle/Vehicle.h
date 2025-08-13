@@ -10,6 +10,7 @@
 #include "game/Enums/eModelID.h"
 #include "game/RideAnimData.h"
 #include "Audio/entities/AEVehicleAudioEntity.h"
+#include "Enums/eVehicleDummy.h"
 
 enum eVehicleCreatedBy : uint8 {
     RANDOM_VEHICLE = 1,
@@ -353,7 +354,7 @@ public:
     bool IsLawEnforcementVehicle() const;
 
     bool DoTailLightEffect(int32_t lightId, CMatrix* matVehicle, int isRight, int forcedOff, uint32_t nLightFlags, int lightsOn);
-    void DoHeadLightBeam(int lightId, CMatrix* matrix, bool isRight);
+    void DoHeadLightBeam(eVehicleDummy dummyId, CMatrix* matrix, bool isRight);
 };
 //#pragma pack(pop)
 

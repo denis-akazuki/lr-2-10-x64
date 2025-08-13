@@ -29,10 +29,10 @@ namespace RenderBuffer {
     * @param out pFirstVertex    Pointer to the first unused vertex in the buffer
     */
     void StartStoring(
-       int32 nIndicesNeeded,
-       int32 nVerticesNeeded,
-       RwImVertexIndex*& pFirstIndex,
-       RwIm3DVertex*& pFirstVertex
+            int32 nIndicesNeeded,
+            int32 nVerticesNeeded,
+            RwImVertexIndex*& pFirstIndex,
+            RwIm3DVertex*& pFirstVertex
     );
 
     /*!
@@ -81,12 +81,20 @@ namespace RenderBuffer {
 
 constexpr int32 TOTAL_TEMP_BUFFER_INDICES = 4096;
 constexpr int32 TOTAL_TEMP_BUFFER_VERTICES = 2048;
+
+constexpr int32 TOTAL_TEMP_BUFFER_3DVERTICES = 2048;
+constexpr int32 TOTAL_TEMP_BUFFER_2DVERTICES = 2048;
+
 constexpr int32 TOTAL_RADIOSITY_VERTEX_BUFFER = 1532;
 
-static inline int32 uiTempBufferVerticesStored;
-static inline int32 uiTempBufferIndicesStored;
-static inline RxObjSpace3DVertex aTempBufferVertices[TOTAL_TEMP_BUFFER_VERTICES];
-static inline RxVertexIndex aTempBufferIndices[TOTAL_TEMP_BUFFER_INDICES];
+struct TempVertexBuffer {
+    RwIm3DVertex m_3d[TOTAL_TEMP_BUFFER_3DVERTICES]; // For Im3D rendering
+    RwIm2DVertex m_2d[TOTAL_TEMP_BUFFER_2DVERTICES]; // For Im2D rendering
+};
+VALIDATE_SIZE(TempVertexBuffer, 0x20000);
 
-const auto IdxBufferSize = (int32)std::size(aTempBufferIndices);
-const auto VtxBufferSize = (int32)std::size(aTempBufferVertices);
+inline int32 uiTempBufferIndicesStored;
+inline int32 uiTempBufferVerticesStored;
+inline RxVertexIndex aTempBufferIndices[TOTAL_TEMP_BUFFER_INDICES];
+inline TempVertexBuffer TempBufferVertices;
+inline RwD3D9Vertex aRadiosityVertexBuffer[TOTAL_RADIOSITY_VERTEX_BUFFER];

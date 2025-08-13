@@ -70,10 +70,10 @@ enum class eLightsState {
 
 enum class eStobsStatus {
 	OFF = 0,
-	ON_TYPE_1, 	// левая права пауза
-	ON_TYPE_2,	// левая 3 раза, правая 3 раза с полицейским цветом
-	ON_TYPE_3, 	// обе моргают 4 раза
-	ON_TYPE_4,  // лева 2 правая 2
+	ON_TYPE_1, 	// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+	ON_TYPE_2,	// пїЅпїЅпїЅпїЅпїЅ 3 пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ 3 пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+	ON_TYPE_3, 	// пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ 4 пїЅпїЅпїЅпїЅ
+	ON_TYPE_4,  // пїЅпїЅпїЅпїЅ 2 пїЅпїЅпїЅпїЅпїЅпїЅ 2
 };
 
 enum eTurnState
@@ -162,7 +162,7 @@ public:
 	CVehicle* 	m_pVehicle;
     CDamageManager* m_pDamageManager;
 
-	// поворотники
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	CObjectSamp*		m_pLeftFrontTurnLighter = nullptr;
 	CObjectSamp*		m_pRightFrontTurnLighter = nullptr;
 	CObjectSamp*		m_pLeftRearTurnLighter = nullptr;
@@ -218,6 +218,7 @@ public:
     void SetPanelStatus(ePanels bPanel, ePanelDamageState bPanelStatus) const;
 
     void ChangeVinylTo(int vinylIdx);
+    void SetRGBATexture(CRGBA crgba, CRGBA crgba2);
 
     void SetDoorStatus(uint32_t dwDoorStatus, bool spawnFlyingComponen);
 

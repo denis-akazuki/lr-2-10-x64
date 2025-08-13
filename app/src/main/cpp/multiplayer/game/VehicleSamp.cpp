@@ -14,6 +14,7 @@
 #include "VehicleSamp.h"
 #include "Shadows.h"
 #include "Entity/Vehicle/Automobile.h"
+#include "util/TextRasterizer/TextRasterizer.h"
 
 CVehicleSamp::CVehicleSamp(int iType, float fPosX, float fPosY, float fPosZ, float fRotation, bool bSiren)
 {
@@ -1560,4 +1561,66 @@ void CVehicleSamp::ChangeVinylTo(int vinylIdx) {
 	char name[55];
 	sprintf(name, "remapbody%d", vinylIdx + 1);
 	m_pVinylTex = CUtil::LoadTextureFromDB("gta3", name);
+}
+
+void CVehicleSamp::SetRGBATexture(CRGBA crgba, CRGBA crgba2) {
+    static constexpr int TEXTURE_WIDTH = 256;
+    static constexpr int TEXTURE_HEIGHT = 128;
+    static constexpr int PIXEL_SIZE = 4;
+
+    if (m_pVinylTex) {
+        RwTextureDestroy(m_pVinylTex);
+        m_pVinylTex = nullptr;
+    }
+
+    auto textRasterizer = std::make_shared<CTextRasterizer>(TEXTURE_WIDTH, TEXTURE_HEIGHT);
+    uint8_t* pBitmap = textRasterizer->GetBitmap();
+
+    for (int x = 0; x < TEXTURE_WIDTH; x++) {
+        float t = x / static_cast<float>(TEXTURE_WIDTH - 1);
+        CColor colGradient(
+                static_cast<uint8_t>(crgba.r + (crgba2.r - crgba.r) * t),
+                static_cast<uint8_t>(crgba.g + (crgba2.g - crgba.g) * t),
+                static_cast<uint8_t>(crgba.b + (crgba2.b - crgba.b) * t),
+                255
+        );
+
+        uint32_t pixelValue = colGradient.Get(CColor::COLOR_ENDIAN_ABGR);
+        for (int y = 0; y < TEXTURE_HEIGHT; y++) {
+            *reinterpret_cast<uint32_t*>(pBitmap + (y * TEXTURE_WIDTH + x) * PIXEL_SIZE) = pixelValue;
+        }
+    }
+
+    RwImage* pRwImage = RwImageCreate(TEXTURE_WIDTH, TEXTURE_HEIGHT, PIXEL_SIZE * 8);
+    if (!pRwImage) {
+        return;
+    }
+
+    RwImageAllocatePixels(pRwImage);
+    for (int y = 0; y < TEXTURE_HEIGHT; y++) {
+        memcpy(
+                pRwImage->cpPixels + pRwImage->stride * y,
+                pBitmap + TEXTURE_WIDTH * PIXEL_SIZE * y,
+                TEXTURE_WIDTH * PIXEL_SIZE
+        );
+    }
+
+    int width, height, depth, flags;
+    RwImageFindRasterFormat(pRwImage, rwRASTERTYPETEXTURE, &width, &height, &depth, &flags);
+
+    RwRaster* pRaster = RwRasterCreate(width, height, depth, flags);
+    if (!pRaster) {
+        RwImageDestroy(pRwImage);
+        return;
+    }
+
+    RwRasterSetFromImage(pRaster, pRwImage);
+    RwImageDestroy(pRwImage);
+
+    m_pVinylTex = RwTextureCreate(pRaster);
+    if (m_pVinylTex) {
+        m_pVinylTex->refCount++;
+    } else {
+        RwRasterDestroy(pRaster);
+    }
 }
