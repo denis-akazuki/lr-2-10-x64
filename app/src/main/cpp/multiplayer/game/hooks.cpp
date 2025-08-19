@@ -538,6 +538,7 @@ int CTextureDatabaseRuntime__GetEntry_hook(TextureDatabaseRuntime *a1, const cha
 #include "Mobile/MobileSettings/MobileSettings.h"
 #include "EntryExitManager.h"
 #include "Occlusion.h"
+#include "Mobile/MobileMenu/MobileMenu.h"
 
 void InjectHooks()
 {
@@ -554,6 +555,7 @@ void InjectHooks()
     CAEAudioEntity::InjectHooks();
     CAEVehicleAudioEntity::InjectHooks();
     CMirrors::InjectHooks();
+    CMobileMenu::InjectHooks();
     CMobileSettings::InjectHooks();
 
     CWeapon::InjectHooks();

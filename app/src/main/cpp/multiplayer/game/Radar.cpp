@@ -120,8 +120,7 @@ void CRadar::TransformRealWorldPointToRadarSpace(CVector2D* out, const CVector2D
 
 void CRadar::TransformRadarPointToScreenSpace(CVector2D* out, const CVector2D* in)
 {
-    auto gMobileMenu = CMobileMenu::GetMobileMenu();
-    if (CMobileMenu::GetMobileMenu()->DisplayingMap) {
+    if (gMobileMenu->DisplayingMap) {
         out->x = gMobileMenu->MAP_OFFSET_X + in->x * gMobileMenu->NEW_MAP_SCALE;
         out->y = gMobileMenu->MAP_OFFSET_Y - in->y * gMobileMenu->NEW_MAP_SCALE;
         return;
@@ -141,10 +140,9 @@ void CRadar::TransformRadarPointToScreenSpace(CVector2D* out, const CVector2D* i
 }
 
 float CRadar::LimitRadarPoint(CVector2D* point) {
-    const auto mobileMenu = CMobileMenu::GetMobileMenu();
     const auto mag = point->Magnitude();
 
-    if (mobileMenu->DisplayingMap)
+    if (gMobileMenu->DisplayingMap)
         return mag;
 
     if (mag > 1.0f) {
@@ -160,27 +158,25 @@ bool CRadar::DisplayThisBlip(eRadarSprite spriteId, int8 priority) {
 }
 
 void CRadar::LimitToMap(float& x, float& y) {
-    const auto mobileMenu = CMobileMenu::GetMobileMenu();
-    const auto zoom = (mobileMenu->screenStack.numEntries || mobileMenu->pendingScreen)
-                      ? mobileMenu->NEW_MAP_SCALE
+    const auto zoom = (gMobileMenu->screenStack.numEntries || gMobileMenu->pendingScreen)
+                      ? gMobileMenu->NEW_MAP_SCALE
                       : 140.0f;
 
     {
-        const auto min = SCREEN_STRETCH_X(mobileMenu->MAP_OFFSET_X - zoom);
-        const auto max = SCREEN_STRETCH_X(mobileMenu->MAP_OFFSET_X + zoom);
+        const auto min = SCREEN_STRETCH_X(gMobileMenu->MAP_OFFSET_X - zoom);
+        const auto max = SCREEN_STRETCH_X(gMobileMenu->MAP_OFFSET_X + zoom);
         x = std::clamp(x, min, max);
     }
 
     {
-        const auto min = SCREEN_STRETCH_Y(mobileMenu->MAP_OFFSET_Y - zoom);
-        const auto max = SCREEN_STRETCH_Y(mobileMenu->MAP_OFFSET_Y + zoom);
+        const auto min = SCREEN_STRETCH_Y(gMobileMenu->MAP_OFFSET_Y - zoom);
+        const auto max = SCREEN_STRETCH_Y(gMobileMenu->MAP_OFFSET_Y + zoom);
         y = std::clamp(y, min, max);
     }
 }
 
 void Limit(float& x, float& y) {
-    const auto mobileMenu = CMobileMenu::GetMobileMenu();
-    if (mobileMenu->DisplayingMap) {
+    if (gMobileMenu->DisplayingMap) {
         x = SCREEN_STRETCH_Y(x);
         y = SCREEN_STRETCH_Y(y);
 
@@ -212,7 +208,6 @@ CVector tRadarTrace::GetWorldPos() const {
 
 std::pair<CVector2D, CVector2D> tRadarTrace::GetRadarAndScreenPos(float* radarPointDist) const {
     CVector worldPos = GetWorldPos();
-    auto gMobileMenu = CMobileMenu::GetMobileMenu();
 
     CVector2D radarPos;
     radarPos.x = (worldPos.x - CRadar::vec2DRadarOrigin.x) * (1.0f / CRadar::m_radarRange);
@@ -255,11 +250,10 @@ CVector2D CRadar::TransformRealWorldPointToRadarSpace(const CVector2D& in) {
 }
 
 CVector2D CRadar::TransformRadarPointToScreenSpace(const CVector2D& in) {
-    auto mobileMenu = CMobileMenu::GetMobileMenu();
-    if (mobileMenu->DisplayingMap) {
+    if (gMobileMenu->DisplayingMap) {
         return {
-                mobileMenu->MAP_OFFSET_X + mobileMenu->NEW_MAP_SCALE * in.x,
-                mobileMenu->MAP_OFFSET_Y - mobileMenu->NEW_MAP_SCALE * in.y
+                gMobileMenu->MAP_OFFSET_X + gMobileMenu->NEW_MAP_SCALE * in.x,
+                gMobileMenu->MAP_OFFSET_Y - gMobileMenu->NEW_MAP_SCALE * in.y
         };
     } else {
         return {
@@ -362,8 +356,7 @@ void CRadar::ShowRadarTraceWithHeight(float x, float y, uint32 size, uint32 R, u
 }
 
 uint8 CRadar::CalculateBlipAlpha(float distance) {
-    const auto mobileMenu = CMobileMenu::GetMobileMenu();
-    if (mobileMenu->DisplayingMap) {
+    if (gMobileMenu->DisplayingMap) {
         return 255;
     }
 
@@ -382,8 +375,6 @@ void CRadar::DrawCoordBlip(int32 blipIndex, bool isSprite, uint8 nWidgetAlpha, f
     if (trace.m_nBlipDisplayFlag != BLIP_DISPLAY_BOTH && trace.m_nBlipDisplayFlag != BLIP_DISPLAY_BLIPONLY)
         return;
 
-    const auto mobileMenu = CMobileMenu::GetMobileMenu();
-
     float realDist{};
     const auto [radarPos, screenPos] = trace.GetRadarAndScreenPos(&realDist);
     const auto radarZoomValue = *(uint8*)(g_libGTASA + (VER_x32 ? 0x819D85 : 0x9FF3A5));
@@ -391,7 +382,7 @@ void CRadar::DrawCoordBlip(int32 blipIndex, bool isSprite, uint8 nWidgetAlpha, f
 
     if (isSprite) {
         // either the blip is close to the player or we're drawing the whole map.
-        const auto canBeDrawn = !trace.m_bShortRange || zoomedDist <= 1.0f || mobileMenu->DisplayingMap;
+        const auto canBeDrawn = !trace.m_bShortRange || zoomedDist <= 1.0f || gMobileMenu->DisplayingMap;
 
         if (trace.HasSprite() && canBeDrawn) {
             DrawRadarSprite(trace.m_nBlipSprite, screenPos.x, screenPos.y, 255);
