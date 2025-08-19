@@ -100,6 +100,11 @@ void ApplyPatches_level0()
 
     // entryexit
     CHook::RET("_ZN17CEntryExitManager22PostEntryExitsCreationEv");
+
+	// loading crash, i really f*ck this sh*t
+    CHook::RET("_ZN19CGenericGameStorage18CheckSlotDataValidEib"); // CGenericGameStorage::CheckSlotDataValid
+    CHook::RET("_ZN19CGenericGameStorage19CheckDataNotCorruptEiPc"); // CGenericGameStorage::CheckDataNotCorrupt
+    CHook::RET("_ZN9CColAccel8endCacheEv"); // CColAccel::endCache()
 }
 
 void ApplyShadowPatch()
@@ -116,10 +121,10 @@ void ApplyPatches()
 
 	CHook::RET("_ZN17CVehicleModelInfo17SetCarCustomPlateEv"); // default plate
 
-	CHook::RET("_Z16SaveGameForPause10eSaveTypesPc"); // не сохранять при сворачивании. черный экран
+	CHook::RET("_Z16SaveGameForPause10eSaveTypesPc"); // Г­ГҐ Г±Г®ГµГ°Г Г­ГїГІГј ГЇГ°ГЁ Г±ГўГ®Г°Г Г·ГЁГўГ Г­ГЁГЁ. Г·ГҐГ°Г­Г»Г© ГЅГЄГ°Г Г­
 
 #if VER_x32
-	// черные значки
+	// Г·ГҐГ°Г­Г»ГҐ Г§Г­Г Г·ГЄГЁ
 	CHook::WriteMemory(g_libGTASA + 0x00442120, (uintptr_t)"\x2C\xE0", 2); // B 0x44217c
 	CHook::WriteMemory(g_libGTASA + 0x0044217C, (uintptr_t)"\x30\x46", 2); // mov r0, r6
 	// CRadar::DrawEntityBlip (translate color)
@@ -131,7 +136,7 @@ void ApplyPatches()
 	CHook::WriteMemory(g_libGTASA + 0x0043FB86, (uintptr_t)"\x48\x46", 2); // mov r0, r9
 	CHook::WriteMemory(g_libGTASA + 0x002AB5C6, (uintptr_t)"\x00\x21", 2);
 #else
-    // черные значки
+    // Г·ГҐГ°Г­Г»ГҐ Г§Г­Г Г·ГЄГЁ
 	CHook::WriteMemory(g_libGTASA + 0x52737C, (uintptr_t)"\x1E\x00\x00\x14", 4); // B 0x5273F4
 	CHook::WriteMemory(g_libGTASA + 0x5273F4, (uintptr_t)"\xE1\x03\x14\x2A", 4); // mov w1, w20
 
@@ -152,7 +157,7 @@ void ApplyPatches()
 
 	CDebugInfo::ApplyDebugPatches();
 
-	CHook::RET("_ZN12CAudioEngine16StartLoadingTuneEv"); // звук загрузочного экрана
+	CHook::RET("_ZN12CAudioEngine16StartLoadingTuneEv"); // Г§ГўГіГЄ Г§Г ГЈГ°ГіГ§Г®Г·Г­Г®ГЈГ® ГЅГЄГ°Г Г­Г 
 
 	// DefaultPCSaveFileName
 	char* DefaultPCSaveFileName = (char*)(g_libGTASA + (VER_x32 ? 0x006B012C : 0x88CB08));
@@ -160,12 +165,12 @@ void ApplyPatches()
 
 #if VER_x32
 	CHook::NOP(g_libGTASA + 0x003F61B6, 2);	// CCoronas::RenderSunReflection crash
-	CHook::NOP(g_libGTASA + 0x00584884, 2);	// не давать ган при выходе из тачки 	( клюшка, дробовик and etc )
-	CHook::NOP(g_libGTASA + 0x00584850, 2);	// не давать ган при выходе из тачки	( клюшка, дробовик and etc )
+	CHook::NOP(g_libGTASA + 0x00584884, 2);	// Г­ГҐ Г¤Г ГўГ ГІГј ГЈГ Г­ ГЇГ°ГЁ ГўГ»ГµГ®Г¤ГҐ ГЁГ§ ГІГ Г·ГЄГЁ 	( ГЄГ«ГѕГёГЄГ , Г¤Г°Г®ГЎГ®ГўГЁГЄ and etc )
+	CHook::NOP(g_libGTASA + 0x00584850, 2);	// Г­ГҐ Г¤Г ГўГ ГІГј ГЈГ Г­ ГЇГ°ГЁ ГўГ»ГµГ®Г¤ГҐ ГЁГ§ ГІГ Г·ГЄГЁ	( ГЄГ«ГѕГёГЄГ , Г¤Г°Г®ГЎГ®ГўГЁГЄ and etc )
 #else
     CHook::NOP(g_libGTASA + 0x004D8700, 1);  // CCoronas::RenderSunReflection crash
-    CHook::NOP(g_libGTASA + 0x006A852C, 1);  // не давать ган при выходе из тачки   ( клюшка, дробовик and etc )
-    CHook::NOP(g_libGTASA + 0x006A84E0, 1);  // не давать ган при выходе из тачки  ( клюшка, дробовик and etc )
+    CHook::NOP(g_libGTASA + 0x006A852C, 1);  // Г­ГҐ Г¤Г ГўГ ГІГј ГЈГ Г­ ГЇГ°ГЁ ГўГ»ГµГ®Г¤ГҐ ГЁГ§ ГІГ Г·ГЄГЁ   ( ГЄГ«ГѕГёГЄГ , Г¤Г°Г®ГЎГ®ГўГЁГЄ and etc )
+    CHook::NOP(g_libGTASA + 0x006A84E0, 1);  // Г­ГҐ Г¤Г ГўГ ГІГј ГЈГ Г­ ГЇГ°ГЁ ГўГ»ГµГ®Г¤ГҐ ГЁГ§ ГІГ Г·ГЄГЁ  ( ГЄГ«ГѕГёГЄГ , Г¤Г°Г®ГЎГ®ГўГЁГЄ and etc )
 
 #endif
 
@@ -187,7 +192,7 @@ void ApplyPatches()
 	CHook::RET("_ZN7CCamera8CamShakeEffff"); // CCamera::CamShake
 	CHook::RET("_ZN7CEntity23PreRenderForGlassWindowEv"); // CEntity::PreRenderForGlassWindow
 	CHook::RET("_ZN8CMirrors16RenderReflBufferEb"); // CMirrors::RenderReflBuffer
-	CHook::RET("_ZN4CHud23DrawBustedWastedMessageEv"); // CHud::DrawBustedWastedMessage // ПОТРАЧЕНО
+	CHook::RET("_ZN4CHud23DrawBustedWastedMessageEv"); // CHud::DrawBustedWastedMessage // ГЏГЋГ’ГђГЂГ—Г…ГЌГЋ
 	CHook::RET("_ZN4CHud14SetHelpMessageEPKcPtbbbj"); // CHud::SetHelpMessage
 	CHook::RET("_ZN4CHud24SetHelpMessageStatUpdateEhtff"); // CHud::SetHelpMessageStatUpdate
 	CHook::RET("_ZN6CCheat16ProcessCheatMenuEv"); // CCheat::ProcessCheatMenu
@@ -234,7 +239,7 @@ void ApplyInGamePatches()
 {
 	Log("Installing patches (ingame)..");
 
-	/* Разблокировка карты */
+	/* ГђГ Г§ГЎГ«Г®ГЄГЁГ°Г®ГўГЄГ  ГЄГ Г°ГІГ» */
 	// CTheZones::ZonesVisited[100]
 	memset((void*)(g_libGTASA + (VER_x32 ? 0x0098D252 : 0xC1BF92)), 1, 100);
 	// CTheZones::ZonesRevealed
@@ -262,8 +267,8 @@ void ApplyInGamePatches()
 	// Disable in-game radio
 	CHook::RET("_ZN20CAERadioTrackManager7ServiceEi");
 
-	// карта в меню
-	CHook::NOP(g_libGTASA + (VER_x32 ? 0x2ABA08 : 0x36A6E8), 2); // текст легенды карты
-	CHook::NOP(g_libGTASA + (VER_x32 ? 0x2ABA14 : 0x36A6F8), 2); // значки легенды
-    CHook::NOP(g_libGTASA + (VER_x32 ? 0x2AB4A6 : 0x36A190), 2); // название местности
+	// ГЄГ Г°ГІГ  Гў Г¬ГҐГ­Гѕ
+	CHook::NOP(g_libGTASA + (VER_x32 ? 0x2ABA08 : 0x36A6E8), 2); // ГІГҐГЄГ±ГІ Г«ГҐГЈГҐГ­Г¤Г» ГЄГ Г°ГІГ»
+	CHook::NOP(g_libGTASA + (VER_x32 ? 0x2ABA14 : 0x36A6F8), 2); // Г§Г­Г Г·ГЄГЁ Г«ГҐГЈГҐГ­Г¤Г»
+    CHook::NOP(g_libGTASA + (VER_x32 ? 0x2AB4A6 : 0x36A190), 2); // Г­Г Г§ГўГ Г­ГЁГҐ Г¬ГҐГ±ГІГ­Г®Г±ГІГЁ
 }
