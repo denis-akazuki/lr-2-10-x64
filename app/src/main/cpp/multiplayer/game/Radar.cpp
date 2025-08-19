@@ -211,15 +211,41 @@ CVector tRadarTrace::GetWorldPos() const {
 }
 
 std::pair<CVector2D, CVector2D> tRadarTrace::GetRadarAndScreenPos(float* radarPointDist) const {
-    const auto world = GetWorldPos();
-    auto radar = CRadar::TransformRealWorldPointToRadarSpace(world);
-    const auto dist = CRadar::LimitRadarPoint(&radar);
+    CVector worldPos = GetWorldPos();
+    auto gMobileMenu = CMobileMenu::GetMobileMenu();
+
+    CVector2D radarPos;
+    radarPos.x = (worldPos.x - CRadar::vec2DRadarOrigin.x) * (1.0f / CRadar::m_radarRange);
+    radarPos.y = (worldPos.y - CRadar::vec2DRadarOrigin.y) * (1.0f / CRadar::m_radarRange);
+
+    float rotatedX = CRadar::getCachedCos() * radarPos.x + CRadar::getCachedSin() * radarPos.y;
+    float rotatedY = CRadar::getCachedCos() * radarPos.y - CRadar::getCachedSin() * radarPos.x;
+    radarPos = CVector2D(rotatedX, rotatedY);
+
+    float dist = sqrtf(radarPos.x * radarPos.x + radarPos.y * radarPos.y);
+    if (dist > 1.0f && !gMobileMenu->DisplayingMap) {
+        radarPos.x *= (1.0f / dist);
+        radarPos.y *= (1.0f / dist);
+    }
+
     if (radarPointDist) {
         *radarPointDist = dist;
     }
 
-    const auto screen = CRadar::TransformRadarPointToScreenSpace(radar);
-    return std::make_pair(radar, screen);
+    CVector2D screenPos;
+    if (gMobileMenu->DisplayingMap) {
+        screenPos.x = gMobileMenu->MAP_OFFSET_X + radarPos.x * gMobileMenu->NEW_MAP_SCALE;
+        screenPos.y = gMobileMenu->MAP_OFFSET_Y - radarPos.y * gMobileMenu->NEW_MAP_SCALE;
+    } else if (CTouchInterface::m_pWidgets[WidgetIDs::WIDGET_RADAR]) {
+        const auto& widgetRect = CTouchInterface::m_pWidgets[WidgetIDs::WIDGET_RADAR]->m_RectScreen;
+        float width = fabsf(widgetRect.right - widgetRect.left);
+        float height = fabsf(widgetRect.top - widgetRect.bottom);
+
+        screenPos.x = (widgetRect.left + widgetRect.right) * 0.5f + radarPos.x * width * 0.5f;
+        screenPos.y = (widgetRect.top + widgetRect.bottom) * 0.5f - radarPos.y * height * 0.5f;
+    }
+
+    return std::make_pair(radarPos, screenPos);
 }
 
 CVector2D CRadar::TransformRealWorldPointToRadarSpace(const CVector2D& in) {
