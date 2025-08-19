@@ -253,6 +253,158 @@ uint32 CRadar::GetRadarTraceColour(uint32 color, bool bright, bool friendly) {
     return TranslateColorCodeToRGBA(color);
 }
 
+void CRadar::ShowRadarTraceWithHeight(float x, float y, uint32 size, uint32 R, uint32 G, uint32 B, uint32 A, eRadarTraceHeight height) {
+    Limit(x, y);
+    RwRenderStateSet(rwRENDERSTATETEXTURERASTER, RWRSTATE(NULL));
+
+    const auto r = static_cast<uint8>(R), g = static_cast<uint8>(G), b = static_cast<uint8>(B), a = static_cast<uint8>(A);
+
+    const auto widget = CTouchInterface::m_pWidgets[WidgetIDs::WIDGET_RADAR];
+    if (!widget) return;
+
+    const float scale = fabsf(widget->m_RectScreen.right - widget->m_RectScreen.left) * 0.01f;
+
+    const auto size0 = scale * float(size + 0), size1 = scale * float(size + 1);
+    const auto size2 = scale * float(size + 2), size3 = scale * float(size + 3);
+
+    /*
+
+     If anyone has a cool idea to use the texture, then I will immediately attach how to do it correctly:
+     CSprite2d* texture;
+     texture->Draw(
+                        {
+                                x - size1, y - (size1 * 2),
+                                x + size1, y
+                        },
+                        { r, g, b, a }
+                );
+
+     */
+
+    switch (height) {
+        case RADAR_TRACE_HIGH:
+            CSprite2d::Draw2DPolygon( // draw black border
+                    x, y + size3,
+                    x, y + size3,
+                    x + size3, y - size2,
+                    x - size3, y - size2,
+                    {0, 0, 0, a}
+            );
+            CSprite2d::Draw2DPolygon( // draw triangle
+                    x, y + size1,
+                    x, y + size1,
+                    x + size1, y - size1,
+                    x - size1, y - size1,
+                    {r, g, b, a}
+            );
+            break;
+        case RADAR_TRACE_NORMAL:
+            CSprite2d::DrawRect( // draw black border
+                    {
+                            x - size1, y - size1,
+                            x + size1, y + size1
+                    },
+                    {0, 0, 0, a}
+            );
+
+            CSprite2d::DrawRect( // draw box
+                    {
+                            x - size0, y - size0,
+                            x + size0, y + size0
+                    },
+                    {r, g, b, a}
+            );
+            break;
+        case RADAR_TRACE_LOW:
+            CSprite2d::Draw2DPolygon( // draw black border
+                    x + size3, y + size2,
+                    x - size3, y + size2,
+                    x, y - size3,
+                    x, y - size3,
+                    {0, 0, 0, a}
+            );
+
+            CSprite2d::Draw2DPolygon( // draw triangle
+                    x + size1, y + size1,
+                    x - size1, y + size1,
+                    x, y - size1,
+                    x, y - size1,
+                    {r, g, b, a}
+            );
+            break;
+    }
+}
+
+uint8 CRadar::CalculateBlipAlpha(float distance) {
+    const auto mobileMenu = CMobileMenu::GetMobileMenu();
+    if (mobileMenu->DisplayingMap) {
+        return 255;
+    }
+
+    const auto alpha = 255 - (uint32)(distance / 6.0f * 255.0f);
+    return (uint8)std::max((float)alpha, 70.0f);
+}
+
+void CRadar::DrawCoordBlip(int32 blipIndex, bool isSprite, uint8 nWidgetAlpha, float circleSize) {
+    const auto& trace = ms_RadarTrace[blipIndex];
+    if (trace.m_nBlipType == BLIP_CONTACT_POINT)
+        return;
+
+    if (isSprite == !trace.HasSprite())
+        return;
+
+    if (trace.m_nBlipDisplayFlag != BLIP_DISPLAY_BOTH && trace.m_nBlipDisplayFlag != BLIP_DISPLAY_BLIPONLY)
+        return;
+
+    const auto mobileMenu = CMobileMenu::GetMobileMenu();
+
+    float realDist{};
+    const auto [radarPos, screenPos] = trace.GetRadarAndScreenPos(&realDist);
+    const auto radarZoomValue = *(uint8*)(g_libGTASA + (VER_x32 ? 0x819D85 : 0x9FF3A5));
+    const auto zoomedDist = radarZoomValue != 0u ? 255.0f : realDist;
+
+    if (isSprite) {
+        // either the blip is close to the player or we're drawing the whole map.
+        const auto canBeDrawn = !trace.m_bShortRange || zoomedDist <= 1.0f || mobileMenu->DisplayingMap;
+
+        if (trace.HasSprite() && canBeDrawn) {
+            DrawRadarSprite(trace.m_nBlipSprite, screenPos.x, screenPos.y, 255);
+        }
+        return;
+    }
+
+    if (trace.HasSprite())
+        return;
+
+    const auto GetHeight = [&] {
+        const auto zDiff = trace.GetWorldPos().z - FindPlayerCentreOfWorld_NoInteriorShift(ePedType::PEDTYPE_PLAYER1).z;
+
+        if (zDiff > 2.0f) {
+            // trace is higher
+            return RADAR_TRACE_LOW;
+        } else if (zDiff >= -4.0f) {
+            // they are at the around the same elevation.
+            return RADAR_TRACE_NORMAL;
+        } else {
+            // player is higher
+            return RADAR_TRACE_HIGH;
+        }
+    };
+
+    CRGBA color;
+    color.Set(trace.m_nColour);
+    CRadar::ShowRadarTraceWithHeight(
+            screenPos.x,
+            screenPos.y,
+            trace.m_nBlipSize,
+            color.b,
+            color.g,
+            color.r,
+            trace.m_bBlipFade ? color.a : CalculateBlipAlpha(realDist),
+            GetHeight()
+    );
+}
+
 void CRadar::InjectHooks() {
     CHook::Write(g_libGTASA + (VER_x32 ? 0x6773C4 : 0x84C7D0), &ms_RadarTrace);
     CHook::Write(g_libGTASA + (VER_x32 ? 0x6776F0 : 0x84CE18), &RadarBlipSprites);
@@ -260,6 +412,7 @@ void CRadar::InjectHooks() {
     CHook::Write(g_libGTASA + (VER_x32 ? 0x677E3C : 0x84DCA8), &vec2DRadarOrigin);
 
     CHook::Redirect("_ZN6CRadar12SetCoordBlipE9eBlipType7CVectorj12eBlipDisplayPc", &SetCoordBlip);
+    CHook::Redirect("_ZN6CRadar13DrawCoordBlipEihif", &DrawCoordBlip);
     CHook::Redirect("_ZN6CRadar15DrawRadarSpriteEtffh", &DrawRadarSprite);
 
     CHook::Redirect("_ZN6CRadar20DrawRadarGangOverlayEb", &DrawRadarGangOverlay);

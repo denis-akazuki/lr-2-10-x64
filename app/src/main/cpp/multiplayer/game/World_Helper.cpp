@@ -40,3 +40,7 @@ CVehicle* FindPlayerVehicle(int32 playerId, bool bIncludeRemote) {
 
     return player->pVehicle;
 }
+
+CVector FindPlayerCentreOfWorld_NoInteriorShift(int32 playerId) {
+    return CHook::CallFunction<CVector>("_Z29FindPlayerCentreOfWorldForMapi", playerId);
+}
